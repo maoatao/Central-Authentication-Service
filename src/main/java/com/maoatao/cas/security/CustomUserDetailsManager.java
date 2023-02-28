@@ -10,6 +10,7 @@ import com.maoatao.cas.core.service.UserRoleService;
 import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.security.bean.CustomAuthority;
 import com.maoatao.cas.security.bean.CustomUserDetails;
+import com.maoatao.synapse.core.lang.SynaException;
 import com.maoatao.synapse.core.util.SynaAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
@@ -50,12 +51,13 @@ public class CustomUserDetailsManager implements UserDetailsManager {
     private RegisteredClientRepository registeredClientRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity userEntity = userService.getUserByName(username);
-        if (userEntity != null) {
-            return new User(userEntity.getName(), userEntity.getPassword(), true, true, true, true, getAuthorities(userEntity.getId()));
-        }
-        throw new UsernameNotFoundException("用户名或密码错误");
+    public UserDetails loadUserByUsername(String username) {
+        String[] params = username.split(",");
+        SynaAssert.isTrue(params.length == 2, "参数异常:username需要包含客户端ID(userName,clientId)");
+        UserEntity userEntity = userService.getByNameAndClient(params[0], params[1]);
+        SynaAssert.notNull(userEntity, "用户名或密码错误");
+        SynaAssert.isTrue(userEntity.isEnabled(), "该用户已被禁用");
+        return new User(userEntity.getName(), userEntity.getPassword(), true, true, true, true, getAuthorities(userEntity.getId()));
     }
 
     /**

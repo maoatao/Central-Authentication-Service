@@ -24,10 +24,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     }
 
     @Override
-    public UserEntity getUserByName(String userName) {
+    public UserEntity getByNameAndClient(String userName, String clientId) {
         return getOne(Wrappers.<UserEntity>lambdaQuery()
                 .eq(UserEntity::getName, userName)
-                .eq(UserEntity::isEnabled, true)
+                .eq(UserEntity::getClientId, clientId)
         );
     }
 }

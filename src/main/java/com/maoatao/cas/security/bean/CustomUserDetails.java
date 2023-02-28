@@ -12,7 +12,7 @@ import java.util.Collection;
 /**
  * 自定义用户详情
  *
- * @author LiYuanHao
+ * @author MaoAtao
  * @date 2023-02-28 15:26:47
  */
 @Getter

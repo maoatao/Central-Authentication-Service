@@ -26,7 +26,8 @@ public interface UserService extends IService<UserEntity> {
      * 通过用户名称和客户端ID获取用户信息
      *
      * @param userName 用户名
+     * @param clientId 客户端 ID
      * @return 用户信息
      */
-    UserEntity getUserByName(String userName);
+    UserEntity getByNameAndClient(String userName, String clientId);
 }
