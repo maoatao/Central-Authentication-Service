@@ -22,12 +22,4 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     public Page<UserEntity> getPage(PageParam pageParam, UserEntity entity) {
         return page(new Page<>(pageParam.getPageNo(), pageParam.getPageSize()), Wrappers.query(entity));
     }
-
-    @Override
-    public UserEntity getByNameAndClient(String userName, String clientId) {
-        return getOne(Wrappers.<UserEntity>lambdaQuery()
-                .eq(UserEntity::getName, userName)
-                .eq(UserEntity::getClientId, clientId)
-        );
-    }
 }

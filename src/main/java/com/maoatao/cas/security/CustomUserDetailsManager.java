@@ -1,6 +1,6 @@
 package com.maoatao.cas.security;
 
-import com.maoatao.cas.core.entity.PermissionEntity;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.maoatao.cas.core.entity.RoleEntity;
 import com.maoatao.cas.core.entity.UserEntity;
 import com.maoatao.cas.core.entity.UserRoleEntity;
@@ -10,18 +10,16 @@ import com.maoatao.cas.core.service.UserRoleService;
 import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.security.bean.CustomAuthority;
 import com.maoatao.cas.security.bean.CustomUserDetails;
-import com.maoatao.synapse.core.lang.SynaException;
 import com.maoatao.synapse.core.util.SynaAssert;
+import com.maoatao.synapse.core.util.SynaSafes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -52,9 +50,7 @@ public class CustomUserDetailsManager implements UserDetailsManager {
 
     @Override
     public UserDetails loadUserByUsername(String username) {
-        String[] params = username.split(",");
-        SynaAssert.isTrue(params.length == 2, "参数异常:username需要包含客户端ID(userName,clientId)");
-        UserEntity userEntity = userService.getByNameAndClient(params[0], params[1]);
+        UserEntity userEntity = getUser(username);
         SynaAssert.notNull(userEntity, "用户名或密码错误");
         SynaAssert.isTrue(userEntity.isEnabled(), "该用户已被禁用");
         return new User(userEntity.getName(), userEntity.getPassword(), true, true, true, true, getAuthorities(userEntity.getId()));
@@ -67,14 +63,9 @@ public class CustomUserDetailsManager implements UserDetailsManager {
      * @return 权限列表
      */
     private List<CustomAuthority> getAuthorities(Long id) {
-        List<CustomAuthority> authorities = new ArrayList<>();
-        List<PermissionEntity> permissions = permissionService.getPermissionByUser(id);
-        if (permissions != null) {
-            permissions.forEach(entity -> authorities.add(
-                    CustomAuthority.builder().authority(entity.getName()).client(entity.getClientId()).build()
-            ));
-        }
-        return authorities;
+        return SynaSafes.of(permissionService.getPermissionByUser(id)).stream()
+                .map(o -> CustomAuthority.builder().authority(o.getName()).client(o.getClientId()).build())
+                .toList();
     }
 
     @Override
@@ -82,6 +73,7 @@ public class CustomUserDetailsManager implements UserDetailsManager {
     public void createUser(UserDetails user) {
         if (user instanceof CustomUserDetails userDetails) {
             SynaAssert.notNull(registeredClientRepository.findByClientId(userDetails.getClientId()), "注册客户端不存在!");
+            // TODO: 2023/2/28 校验用户已存在
             UserEntity userEntity = new UserEntity();
             userEntity.setClientId(userDetails.getClientId());
             userEntity.setName(userDetails.getUsername());
@@ -129,5 +121,14 @@ public class CustomUserDetailsManager implements UserDetailsManager {
     @Override
     public boolean userExists(String username) {
         return false;
+    }
+
+    private UserEntity getUser(String username) {
+        String[] params = username.split(",");
+        SynaAssert.isTrue(params.length == 2, "参数异常:username需要包含客户端ID(userName,clientId)");
+        UserEntity userEntity = new UserEntity();
+        userEntity.setName(params[0]);
+        userEntity.setClientId(params[1]);
+        return userService.getOne(Wrappers.query(userEntity));
     }
 }
