@@ -108,7 +108,7 @@ public class RedisAuthorizationService implements CustomAuthorizationService {
 
     @Override
     public OAuth2Authorization findById(String key) {
-        return (OAuth2Authorization)RedisUtils.getObject(getAuthorizationKey(key));
+        return (OAuth2Authorization) RedisUtils.getObject(getAuthorizationKey(key));
     }
 
     @Override
@@ -272,7 +272,7 @@ public class RedisAuthorizationService implements CustomAuthorizationService {
      * @return 授权信息
      */
     private OAuth2Authorization getAuthorization(String id) {
-        return (OAuth2Authorization)RedisUtils.getObject(getAuthorizationKey(id));
+        return (OAuth2Authorization) RedisUtils.getObject(getAuthorizationKey(id));
     }
 
     /**

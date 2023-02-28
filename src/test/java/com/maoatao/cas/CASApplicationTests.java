@@ -1,15 +1,15 @@
 package com.maoatao.cas;
 
-import com.maoatao.cas.security.bean.CustomUserDetails;
+import com.maoatao.cas.security.bean.CustomUser;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
 import com.maoatao.cas.security.generator.UUIDStringKeyGenerator;
+import com.maoatao.cas.security.service.CustomUserDetailsService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -29,7 +29,6 @@ import org.springframework.security.oauth2.server.authorization.settings.OAuth2T
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.security.oauth2.server.authorization.token.DefaultOAuth2TokenContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenContext;
-import org.springframework.security.provisioning.UserDetailsManager;
 
 import java.security.Principal;
 import java.util.HashMap;
@@ -45,7 +44,7 @@ class CASApplicationTests {
      * 初始化客户端信息
      */
     @Autowired
-    private UserDetailsManager userDetailsManager;
+    private CustomUserDetailsService userDetailsService;
 
     /**
      * 创建clientId信息
@@ -64,13 +63,13 @@ class CASApplicationTests {
      */
     @Test
     void testSaveUser() {
-        UserDetails userDetails = new CustomUserDetails("messaging-client", User.builder()
+        userDetailsService.createUser(CustomUser.builder()
+                .clientId("messaging-client")
                 .passwordEncoder(s -> "{bcrypt}" + new BCryptPasswordEncoder().encode(s))
                 .username("user")
                 .password("password")
                 .roles("USER")
                 .build());
-        userDetailsManager.createUser(userDetails);
     }
 
     /**

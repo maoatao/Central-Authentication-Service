@@ -14,7 +14,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * 自定义客户端注册转换器
- * <p>Customized by {@link org.springframework.security.oauth2.server.authorization.oidc.authentication.RegisteredClientOidcClientRegistrationConverter}
+ * <p>
+ * Customized by {@link org.springframework.security.oauth2.server.authorization.oidc.authentication.RegisteredClientOidcClientRegistrationConverter}
  *
  * @author MaoAtao
  * @date 2023-01-22 13:20:01

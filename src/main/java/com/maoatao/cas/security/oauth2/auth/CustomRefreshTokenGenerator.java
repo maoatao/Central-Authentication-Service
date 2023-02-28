@@ -14,7 +14,8 @@ import java.util.Objects;
 
 /**
  * 自定义OAuth2刷新令牌生成器
- * <p>Customized by {@link org.springframework.security.oauth2.server.authorization.token.OAuth2RefreshTokenGenerator}
+ * <p>
+ * Customized by {@link org.springframework.security.oauth2.server.authorization.token.OAuth2RefreshTokenGenerator}
  *
  * @author MaoAtao
  * @date 2022-10-06 21:33:13

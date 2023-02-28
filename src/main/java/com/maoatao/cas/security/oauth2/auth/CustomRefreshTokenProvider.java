@@ -36,7 +36,8 @@ import java.util.Set;
 
 /**
  * 自定义刷新令牌提供者
- * <p>Customized by {@link org.springframework.security.oauth2.server.authorization.authentication.OAuth2RefreshTokenAuthenticationProvider}
+ * <p>
+ * Customized by {@link org.springframework.security.oauth2.server.authorization.authentication.OAuth2RefreshTokenAuthenticationProvider}
  *
  * @author MaoAtao
  * @date 2022-10-17 00:21:16
@@ -65,14 +66,14 @@ public class CustomRefreshTokenProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         OAuth2RefreshTokenAuthenticationToken refreshTokenAuthentication =
-            (OAuth2RefreshTokenAuthenticationToken) authentication;
+                (OAuth2RefreshTokenAuthenticationToken) authentication;
 
         OAuth2ClientAuthenticationToken clientPrincipal =
-            getAuthenticatedClientElseThrowInvalidClient(refreshTokenAuthentication);
+                getAuthenticatedClientElseThrowInvalidClient(refreshTokenAuthentication);
         RegisteredClient registeredClient = clientPrincipal.getRegisteredClient();
 
         OAuth2Authorization authorization = this.authorizationService.findByToken(
-            refreshTokenAuthentication.getRefreshToken(), OAuth2TokenType.REFRESH_TOKEN);
+                refreshTokenAuthentication.getRefreshToken(), OAuth2TokenType.REFRESH_TOKEN);
         if (authorization == null) {
             throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_GRANT);
         }
@@ -107,13 +108,13 @@ public class CustomRefreshTokenProvider implements AuthenticationProvider {
 
         // @formatter:off
         DefaultOAuth2TokenContext.Builder tokenContextBuilder = DefaultOAuth2TokenContext.builder()
-            .registeredClient(registeredClient)
-            .principal(authorization.getAttribute(Principal.class.getName()))
-            .authorizationServerContext(AuthorizationServerContextHolder.getContext())
-            .authorization(authorization)
-            .authorizedScopes(scopes)
-            .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-            .authorizationGrant(refreshTokenAuthentication);
+                .registeredClient(registeredClient)
+                .principal(authorization.getAttribute(Principal.class.getName()))
+                .authorizationServerContext(AuthorizationServerContextHolder.getContext())
+                .authorization(authorization)
+                .authorizedScopes(scopes)
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                .authorizationGrant(refreshTokenAuthentication);
         // @formatter:on
 
         OAuth2Authorization.Builder authorizationBuilder = OAuth2Authorization.from(authorization);
@@ -123,12 +124,12 @@ public class CustomRefreshTokenProvider implements AuthenticationProvider {
         OAuth2Token generatedAccessToken = this.tokenGenerator.generate(tokenContext);
         if (generatedAccessToken == null) {
             OAuth2Error error = new OAuth2Error(OAuth2ErrorCodes.SERVER_ERROR,
-                "The token generator failed to generate the access token.", ERROR_URI);
+                    "The token generator failed to generate the access token.", ERROR_URI);
             throw new OAuth2AuthenticationException(error);
         }
         OAuth2AccessToken accessToken = new OAuth2AccessToken(OAuth2AccessToken.TokenType.BEARER,
-            generatedAccessToken.getTokenValue(), generatedAccessToken.getIssuedAt(),
-            generatedAccessToken.getExpiresAt(), tokenContext.getAuthorizedScopes());
+                generatedAccessToken.getTokenValue(), generatedAccessToken.getIssuedAt(),
+                generatedAccessToken.getExpiresAt(), tokenContext.getAuthorizedScopes());
         if (generatedAccessToken instanceof ClaimAccessor) {
             authorizationBuilder.token(accessToken, (metadata) -> {
                 metadata.put(OAuth2Authorization.Token.CLAIMS_METADATA_NAME, ((ClaimAccessor) generatedAccessToken).getClaims());
@@ -145,7 +146,7 @@ public class CustomRefreshTokenProvider implements AuthenticationProvider {
             OAuth2Token generatedRefreshToken = this.tokenGenerator.generate(tokenContext);
             if (!(generatedRefreshToken instanceof OAuth2RefreshToken)) {
                 OAuth2Error error = new OAuth2Error(OAuth2ErrorCodes.SERVER_ERROR,
-                    "The token generator failed to generate the refresh token.", ERROR_URI);
+                        "The token generator failed to generate the refresh token.", ERROR_URI);
                 throw new OAuth2AuthenticationException(error);
             }
             currentRefreshToken = (OAuth2RefreshToken) generatedRefreshToken;
@@ -157,20 +158,20 @@ public class CustomRefreshTokenProvider implements AuthenticationProvider {
         if (authorizedScopes.contains(OidcScopes.OPENID)) {
             // @formatter:off
             tokenContext = tokenContextBuilder
-                .tokenType(ID_TOKEN_TOKEN_TYPE)
-                .authorization(authorizationBuilder.build())    // ID token customizer may need access to the access token and/or refresh token
-                .build();
+                    .tokenType(ID_TOKEN_TOKEN_TYPE)
+                    .authorization(authorizationBuilder.build())    // ID token customizer may need access to the access token and/or refresh token
+                    .build();
             // @formatter:on
             OAuth2Token generatedIdToken = this.tokenGenerator.generate(tokenContext);
             if (!(generatedIdToken instanceof Jwt)) {
                 OAuth2Error error = new OAuth2Error(OAuth2ErrorCodes.SERVER_ERROR,
-                    "The token generator failed to generate the ID token.", ERROR_URI);
+                        "The token generator failed to generate the ID token.", ERROR_URI);
                 throw new OAuth2AuthenticationException(error);
             }
             idToken = new OidcIdToken(generatedIdToken.getTokenValue(), generatedIdToken.getIssuedAt(),
-                generatedIdToken.getExpiresAt(), ((Jwt) generatedIdToken).getClaims());
+                    generatedIdToken.getExpiresAt(), ((Jwt) generatedIdToken).getClaims());
             authorizationBuilder.token(idToken, (metadata) ->
-                metadata.put(OAuth2Authorization.Token.CLAIMS_METADATA_NAME, idToken.getClaims()));
+                    metadata.put(OAuth2Authorization.Token.CLAIMS_METADATA_NAME, idToken.getClaims()));
         } else {
             idToken = null;
         }
@@ -188,7 +189,7 @@ public class CustomRefreshTokenProvider implements AuthenticationProvider {
         }
 
         return new OAuth2AccessTokenAuthenticationToken(
-            registeredClient, clientPrincipal, accessToken, currentRefreshToken, additionalParameters);
+                registeredClient, clientPrincipal, accessToken, currentRefreshToken, additionalParameters);
     }
 
     @Override

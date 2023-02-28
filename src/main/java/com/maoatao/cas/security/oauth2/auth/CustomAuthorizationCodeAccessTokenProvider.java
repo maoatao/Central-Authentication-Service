@@ -44,7 +44,8 @@ import java.util.Map;
 
 /**
  * 自定义通过授权码生成AccessToken
- * {@link org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeAuthenticationProvider}
+ * <p>
+ * Customized by {@link org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeAuthenticationProvider}
  *
  * @author MaoAtao
  * @date 2022-10-29 22:10:10
@@ -52,9 +53,9 @@ import java.util.Map;
 public class CustomAuthorizationCodeAccessTokenProvider implements AuthenticationProvider {
     private static final String ERROR_URI = "https://datatracker.ietf.org/doc/html/rfc6749#section-5.2";
     private static final OAuth2TokenType AUTHORIZATION_CODE_TOKEN_TYPE =
-        new OAuth2TokenType(OAuth2ParameterNames.CODE);
+            new OAuth2TokenType(OAuth2ParameterNames.CODE);
     private static final OAuth2TokenType ID_TOKEN_TOKEN_TYPE =
-        new OAuth2TokenType(OidcParameterNames.ID_TOKEN);
+            new OAuth2TokenType(OidcParameterNames.ID_TOKEN);
     // 使用自定义接口，如果只使用官方接口建议使用官方的提供者
     private final CustomAuthorizationService authorizationService;
     private final OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator;
@@ -78,22 +79,22 @@ public class CustomAuthorizationCodeAccessTokenProvider implements Authenticatio
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         OAuth2AuthorizationCodeAuthenticationToken authorizationCodeAuthentication =
-            (OAuth2AuthorizationCodeAuthenticationToken) authentication;
+                (OAuth2AuthorizationCodeAuthenticationToken) authentication;
 
         OAuth2ClientAuthenticationToken clientPrincipal =
-            AuthorizationServerUtils.getAuthenticatedClientElseThrowInvalidClient(authorizationCodeAuthentication);
+                AuthorizationServerUtils.getAuthenticatedClientElseThrowInvalidClient(authorizationCodeAuthentication);
         RegisteredClient registeredClient = clientPrincipal.getRegisteredClient();
 
         OAuth2Authorization authorization = this.authorizationService.findByToken(
-            authorizationCodeAuthentication.getCode(), AUTHORIZATION_CODE_TOKEN_TYPE);
+                authorizationCodeAuthentication.getCode(), AUTHORIZATION_CODE_TOKEN_TYPE);
         if (authorization == null) {
             throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_GRANT);
         }
         OAuth2Authorization.Token<OAuth2AuthorizationCode> authorizationCode =
-            authorization.getToken(OAuth2AuthorizationCode.class);
+                authorization.getToken(OAuth2AuthorizationCode.class);
 
         OAuth2AuthorizationRequest authorizationRequest = authorization.getAttribute(
-            OAuth2AuthorizationRequest.class.getName());
+                OAuth2AuthorizationRequest.class.getName());
 
         if (!registeredClient.getClientId().equals(authorizationRequest.getClientId())) {
             if (!authorizationCode.isInvalidated()) {
@@ -105,7 +106,7 @@ public class CustomAuthorizationCodeAccessTokenProvider implements Authenticatio
         }
 
         if (StringUtils.hasText(authorizationRequest.getRedirectUri()) &&
-            !authorizationRequest.getRedirectUri().equals(authorizationCodeAuthentication.getRedirectUri())) {
+                !authorizationRequest.getRedirectUri().equals(authorizationCodeAuthentication.getRedirectUri())) {
             throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_GRANT);
         }
 
@@ -115,13 +116,13 @@ public class CustomAuthorizationCodeAccessTokenProvider implements Authenticatio
 
         // @formatter:off
         DefaultOAuth2TokenContext.Builder tokenContextBuilder = DefaultOAuth2TokenContext.builder()
-            .registeredClient(registeredClient)
-            .principal(authorization.getAttribute(Principal.class.getName()))
-            .authorizationServerContext(AuthorizationServerContextHolder.getContext())
-            .authorization(authorization)
-            .authorizedScopes(authorization.getAuthorizedScopes())
-            .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-            .authorizationGrant(authorizationCodeAuthentication);
+                .registeredClient(registeredClient)
+                .principal(authorization.getAttribute(Principal.class.getName()))
+                .authorizationServerContext(AuthorizationServerContextHolder.getContext())
+                .authorization(authorization)
+                .authorizedScopes(authorization.getAuthorizedScopes())
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .authorizationGrant(authorizationCodeAuthentication);
         // @formatter:on
 
         OAuth2Authorization.Builder authorizationBuilder = OAuth2Authorization.from(authorization);
@@ -131,15 +132,15 @@ public class CustomAuthorizationCodeAccessTokenProvider implements Authenticatio
         OAuth2Token generatedAccessToken = this.tokenGenerator.generate(tokenContext);
         if (generatedAccessToken == null) {
             OAuth2Error error = new OAuth2Error(OAuth2ErrorCodes.SERVER_ERROR,
-                "The token generator failed to generate the access token.", ERROR_URI);
+                    "The token generator failed to generate the access token.", ERROR_URI);
             throw new OAuth2AuthenticationException(error);
         }
         OAuth2AccessToken accessToken = new OAuth2AccessToken(OAuth2AccessToken.TokenType.BEARER,
-            generatedAccessToken.getTokenValue(), generatedAccessToken.getIssuedAt(),
-            generatedAccessToken.getExpiresAt(), tokenContext.getAuthorizedScopes());
+                generatedAccessToken.getTokenValue(), generatedAccessToken.getIssuedAt(),
+                generatedAccessToken.getExpiresAt(), tokenContext.getAuthorizedScopes());
         if (generatedAccessToken instanceof ClaimAccessor) {
             authorizationBuilder.token(accessToken, (metadata) ->
-                metadata.put(OAuth2Authorization.Token.CLAIMS_METADATA_NAME, ((ClaimAccessor) generatedAccessToken).getClaims()));
+                    metadata.put(OAuth2Authorization.Token.CLAIMS_METADATA_NAME, ((ClaimAccessor) generatedAccessToken).getClaims()));
         } else {
             authorizationBuilder.accessToken(accessToken);
         }
@@ -147,14 +148,14 @@ public class CustomAuthorizationCodeAccessTokenProvider implements Authenticatio
         // ----- Refresh token -----
         OAuth2RefreshToken refreshToken = null;
         if (registeredClient.getAuthorizationGrantTypes().contains(AuthorizationGrantType.REFRESH_TOKEN) &&
-            // Do not issue refresh token to public client
-            !clientPrincipal.getClientAuthenticationMethod().equals(ClientAuthenticationMethod.NONE)) {
+                // Do not issue refresh token to public client
+                !clientPrincipal.getClientAuthenticationMethod().equals(ClientAuthenticationMethod.NONE)) {
 
             tokenContext = tokenContextBuilder.tokenType(OAuth2TokenType.REFRESH_TOKEN).build();
             OAuth2Token generatedRefreshToken = this.tokenGenerator.generate(tokenContext);
             if (!(generatedRefreshToken instanceof OAuth2RefreshToken)) {
                 OAuth2Error error = new OAuth2Error(OAuth2ErrorCodes.SERVER_ERROR,
-                    "The token generator failed to generate the refresh token.", ERROR_URI);
+                        "The token generator failed to generate the refresh token.", ERROR_URI);
                 throw new OAuth2AuthenticationException(error);
             }
             refreshToken = (OAuth2RefreshToken) generatedRefreshToken;
@@ -166,20 +167,20 @@ public class CustomAuthorizationCodeAccessTokenProvider implements Authenticatio
         if (authorizationRequest.getScopes().contains(OidcScopes.OPENID)) {
             // @formatter:off
             tokenContext = tokenContextBuilder
-                .tokenType(ID_TOKEN_TOKEN_TYPE)
-                .authorization(authorizationBuilder.build())    // ID token customizer may need access to the access token and/or refresh token
-                .build();
+                    .tokenType(ID_TOKEN_TOKEN_TYPE)
+                    .authorization(authorizationBuilder.build())    // ID token customizer may need access to the access token and/or refresh token
+                    .build();
             // @formatter:on
             OAuth2Token generatedIdToken = this.tokenGenerator.generate(tokenContext);
             if (!(generatedIdToken instanceof Jwt)) {
                 OAuth2Error error = new OAuth2Error(OAuth2ErrorCodes.SERVER_ERROR,
-                    "The token generator failed to generate the ID token.", ERROR_URI);
+                        "The token generator failed to generate the ID token.", ERROR_URI);
                 throw new OAuth2AuthenticationException(error);
             }
             idToken = new OidcIdToken(generatedIdToken.getTokenValue(), generatedIdToken.getIssuedAt(),
-                generatedIdToken.getExpiresAt(), ((Jwt) generatedIdToken).getClaims());
+                    generatedIdToken.getExpiresAt(), ((Jwt) generatedIdToken).getClaims());
             authorizationBuilder.token(idToken, (metadata) ->
-                metadata.put(OAuth2Authorization.Token.CLAIMS_METADATA_NAME, idToken.getClaims()));
+                    metadata.put(OAuth2Authorization.Token.CLAIMS_METADATA_NAME, idToken.getClaims()));
         } else {
             idToken = null;
         }
@@ -195,7 +196,7 @@ public class CustomAuthorizationCodeAccessTokenProvider implements Authenticatio
         if (TokenSettingUtils.getSingleAccessToken(registeredClient.getTokenSettings())) {
             // 已存在的令牌
             List<OAuth2Authorization> existingAuthorizations = this.authorizationService.findByPrincipal(
-                authorization.getPrincipalName()
+                    authorization.getPrincipalName()
             );
             if (!CollectionUtils.isEmpty(existingAuthorizations)) {
                 // 删除 非新生成的授权信息
@@ -216,7 +217,7 @@ public class CustomAuthorizationCodeAccessTokenProvider implements Authenticatio
         }
 
         return new OAuth2AccessTokenAuthenticationToken(
-            registeredClient, clientPrincipal, accessToken, refreshToken, additionalParameters);
+                registeredClient, clientPrincipal, accessToken, refreshToken, additionalParameters);
     }
 
     @Override

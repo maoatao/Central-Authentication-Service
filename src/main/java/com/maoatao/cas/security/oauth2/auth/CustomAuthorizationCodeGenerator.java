@@ -17,7 +17,8 @@ import java.util.Objects;
 
 /**
  * 自定义OAuth2授权码生成器
- * <p>Customized by {@link org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationProvider}.OAuth2AuthorizationCodeGenerator
+ * <p>
+ * Customized by {@link org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationProvider}.OAuth2AuthorizationCodeGenerator
  *
  * @author MaoAtao
  * @date 2022-10-06 21:47:14
@@ -38,7 +39,7 @@ public class CustomAuthorizationCodeGenerator implements OAuth2TokenGenerator<OA
     @Override
     public OAuth2AuthorizationCode generate(OAuth2TokenContext context) {
         if (context.getTokenType() == null ||
-            !OAuth2ParameterNames.CODE.equals(context.getTokenType().getValue())) {
+                !OAuth2ParameterNames.CODE.equals(context.getTokenType().getValue())) {
             return null;
         }
         RegisteredClient registeredClient = context.getRegisteredClient();

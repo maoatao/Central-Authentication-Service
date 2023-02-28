@@ -55,7 +55,8 @@ import java.util.UUID;
 
 /**
  * 自定义客户端注册提供者
- * <p>Customized by {@link org.springframework.security.oauth2.server.authorization.oidc.authentication.OidcClientRegistrationAuthenticationProvider}
+ * <p>
+ * Customized by {@link org.springframework.security.oauth2.server.authorization.oidc.authentication.OidcClientRegistrationAuthenticationProvider}
  *
  * @author MaoAtao
  * @date 2022-10-17 00:21:16
@@ -79,7 +80,7 @@ public class CustomClientRegistrationProvider implements AuthenticationProvider 
      * @since 0.2.3
      */
     public CustomClientRegistrationProvider(RegisteredClientRepository registeredClientRepository,
-                                                OAuth2AuthorizationService authorizationService, OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator) {
+                                            OAuth2AuthorizationService authorizationService, OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator) {
         Assert.notNull(registeredClientRepository, "registeredClientRepository cannot be null");
         Assert.notNull(authorizationService, "authorizationService cannot be null");
         Assert.notNull(tokenGenerator, "tokenGenerator cannot be null");

@@ -1,8 +1,10 @@
 package com.maoatao.cas.config;
 
+import com.maoatao.cas.security.CustomUserDetailsAuthenticationProvider;
 import com.maoatao.cas.security.oauth2.auth.CustomAccessTokenGenerator;
 import com.maoatao.cas.security.oauth2.auth.RedisAuthorizationService;
 import com.maoatao.cas.security.filter.BearerTokenFilterConfigurer;
+import com.maoatao.cas.security.service.CustomUserDetailsService;
 import com.maoatao.cas.util.AuthorizationServerUtils;
 import com.maoatao.cas.security.oauth2.auth.CustomRefreshTokenGenerator;
 import com.maoatao.cas.security.generator.UUIDStringKeyGenerator;
@@ -17,6 +19,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -90,6 +93,16 @@ public class AuthorizationServerConfig {
     }
 
     /**
+     * 用户详细信息身份验证提供程序
+     */
+    @Bean
+    public AbstractUserDetailsAuthenticationProvider abstractUserDetailsAuthenticationProvider(CustomUserDetailsService userDetailsService) {
+        CustomUserDetailsAuthenticationProvider customUserDetailsAuthenticationProvider = new CustomUserDetailsAuthenticationProvider();
+        customUserDetailsAuthenticationProvider.setUserDetailsService(userDetailsService);
+        return customUserDetailsAuthenticationProvider;
+    }
+
+    /**
      * 认证管理(password模式需要配置AuthenticationManager)
      */
     @Bean
@@ -145,8 +158,8 @@ public class AuthorizationServerConfig {
     @Bean
     public JWKSource<SecurityContext> jwkSource() {
         KeyPair keyPair = AuthorizationServerUtils.generateRsaKey();
-        RSAPublicKey publicKey = (RSAPublicKey)keyPair.getPublic();
-        RSAPrivateKey privateKey = (RSAPrivateKey)keyPair.getPrivate();
+        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
         RSAKey rsaKey = new RSAKey.Builder(publicKey)
                 .privateKey(privateKey)
                 .keyID(UUID.randomUUID().toString())
