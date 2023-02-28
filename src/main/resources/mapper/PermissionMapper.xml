@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.maoatao.cas.core.mapper.PermissionMapper">
+
+    <resultMap id="permissionMap" type="com.maoatao.cas.core.entity.PermissionEntity">
+        <id property="id" column="id"/>
+        <result property="clientId" column="client_id"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="enabled" column="enabled"/>
+    </resultMap>
+
+    <select id="getPermissionByUser" resultType="com.maoatao.cas.core.entity.PermissionEntity">
+        SELECT c.name, c.client_id
+        FROM `t_uac_user_role` a,
+             `t_uac_role_permission` b,
+             `t_uac_permission` c
+        WHERE a.`role_id` = b.`role_id`
+          AND b.`permission_id` = c.`id`
+          AND c.`enabled` = b'1'
+          AND a.`user_id` = #{userId};
+    </select>
+</mapper>

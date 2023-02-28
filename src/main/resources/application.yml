@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: @artifactId@
+  datasource:
+    url: jdbc:mysql://localhost:3306/cas?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      #最大连接数，默认是 10
+      maximum-pool-size: 30
+      #最小空闲连接数
+      minimum-idle: 10
+      #连接的超时时间，默认30000 (毫秒)
+      connection-timeout: 60000
+      #空闲连接最大存活时间（毫秒）
+      idle-timeout: 60000
+      #池中连接的最长生命周期，值 0 表示无限生命周期（毫秒）
+      max-lifetime: 600000
+      #连接到数据库时等待最长时间(秒)
+      login-timeout: 5
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: root
+      database: 0
+      timeout: 1000
+      lettuce:
+        pool:
+          # 最大可用连接数（默认为8，负数表示无限）
+          max-active: 8
+          # 最大空闲连接数（默认为8，负数表示无限）
+          max-idle: 8
+          # 最小空闲连接数（默认为0，该值只有为正数才有作用）
+          min-idle: 0
+          # 从连接池中获取连接最大等待时间（默认为-1，单位为毫秒，负数表示无限）
+          max-wait: -1
+
+mybatis-plus:
+  global-config:
+    banner: false
+    db-config:
+      id-type: auto
+      field-strategy: not_empty
+      #驼峰下划线转换
+      column-underline: true
+      #逻辑删除配置
+      logic-delete-value: 0
+      logic-not-delete-value: 1
+      db-type: mysql
+    refresh: false
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+  mapper-locations: classpath:/mapper/**.xml
+
+logging:
+  level:
+    com.maoatao.cas*: debug
