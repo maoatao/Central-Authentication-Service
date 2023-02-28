@@ -7,6 +7,7 @@ import com.maoatao.cas.core.service.PermissionService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,9 +39,9 @@ public class PermissionController {
      * @return 分页权限列表
      */
     @GetMapping("/page")
-    @Operation(summary = "getPermissionPage", description = "分页查询权限列表")
-    public Page<PermissionEntity> getPermissionPage(PageParam pageParam, PermissionEntity permissionEntity) {
-        return permissionService.getPermissionPage(pageParam, permissionEntity);
+    @Operation(summary = "getPage", description = "分页查询权限列表")
+    public Page<PermissionEntity> getPage(PageParam pageParam, PermissionEntity permissionEntity) {
+        return permissionService.getPage(pageParam, permissionEntity);
     }
 
     /**
@@ -50,9 +51,12 @@ public class PermissionController {
      * @return 权限对象
      */
     @GetMapping("/{id}")
-    @Operation(summary = "getPermissionById", description = "通过id查询权限")
-    public PermissionEntity getPermissionById(@PathVariable @Parameter(name = "id", description = "权限id") String id) {
-        return permissionService.getPermissionById(id);
+    @Operation(summary = "getById", description = "通过id查询权限")
+    public PermissionEntity getById(@PathVariable
+                                    @Parameter(name = "id", description = "权限id")
+                                    @NotNull(message = "权限id不能为空")
+                                    Long id) {
+        return permissionService.getById(id);
     }
 
     /**
@@ -62,9 +66,9 @@ public class PermissionController {
      * @return 新增操作结果
      */
     @PostMapping
-    @Operation(summary = "addPermission", description = "新增权限")
-    public Boolean addPermission(PermissionEntity permissionEntity) {
-        return permissionService.addPermission(permissionEntity);
+    @Operation(summary = "save", description = "新增权限")
+    public Boolean save(PermissionEntity permissionEntity) {
+        return permissionService.save(permissionEntity);
     }
 
     /**
@@ -74,9 +78,9 @@ public class PermissionController {
      * @return 修改操作结果
      */
     @PutMapping
-    @Operation(summary = "updatePermissionById", description = "修改权限")
-    public Boolean updatePermissionById(PermissionEntity permissionEntity) {
-        return permissionService.updatePermissionById(permissionEntity);
+    @Operation(summary = "updateById", description = "修改权限")
+    public Boolean updateById(PermissionEntity permissionEntity) {
+        return permissionService.updateById(permissionEntity);
     }
 
     /**
@@ -86,9 +90,12 @@ public class PermissionController {
      * @return 删除操作结果
      */
     @DeleteMapping("/{id}")
-    @Operation(summary = "deletePermissionById", description = "通过id删除权限")
-    public Boolean deletePermissionById(@PathVariable @Parameter(name = "id", description = "权限id") String id) {
-        return permissionService.deletePermissionById(id);
+    @Operation(summary = "removeById", description = "通过id删除权限")
+    public Boolean removeById(@PathVariable
+                              @Parameter(name = "id", description = "权限id")
+                              @NotNull(message = "权限id不能为空")
+                              Long id) {
+        return permissionService.removeById(id);
     }
 
 }

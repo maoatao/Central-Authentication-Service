@@ -7,6 +7,7 @@ import com.maoatao.cas.core.service.UserRoleService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 
 /**
  * 用户角色关系管理
@@ -39,9 +39,9 @@ public class UserRoleController {
      * @return 分页用户角色关系列表
      */
     @GetMapping("/page")
-    @Operation(summary = "getUserRolePage", description = "分页查询用户角色关系列表")
-    public Page<UserRoleEntity> getUserRolePage(PageParam pageParam, UserRoleEntity userRoleEntity) {
-        return userRoleService.getUserRolePage(pageParam, userRoleEntity);
+    @Operation(summary = "getPage", description = "分页查询用户角色关系列表")
+    public Page<UserRoleEntity> getPage(PageParam pageParam, UserRoleEntity userRoleEntity) {
+        return userRoleService.getPage(pageParam, userRoleEntity);
     }
 
     /**
@@ -51,9 +51,12 @@ public class UserRoleController {
      * @return 用户角色关系对象
      */
     @GetMapping("/{id}")
-    @Operation(summary = "getUserRoleById", description = "通过id查询用户角色关系")
-    public UserRoleEntity getUserRoleById(@PathVariable @Parameter(name = "id", description = "用户角色关系id") String id) {
-        return userRoleService.getUserRoleById(id);
+    @Operation(summary = "getById", description = "通过id查询用户角色关系")
+    public UserRoleEntity getById(@PathVariable
+                                  @Parameter(name = "id", description = "用户角色关系id")
+                                  @NotNull(message = "用户角色关系id不能为空")
+                                  Long id) {
+        return userRoleService.getById(id);
     }
 
     /**
@@ -63,9 +66,9 @@ public class UserRoleController {
      * @return 新增操作结果
      */
     @PostMapping
-    @Operation(summary = "addUserRole", description = "新增用户角色关系")
-    public Boolean addUserRole(UserRoleEntity userRoleEntity) {
-        return userRoleService.addUserRole(userRoleEntity);
+    @Operation(summary = "save", description = "新增用户角色关系")
+    public Boolean save(UserRoleEntity userRoleEntity) {
+        return userRoleService.save(userRoleEntity);
     }
 
     /**
@@ -75,9 +78,9 @@ public class UserRoleController {
      * @return 修改操作结果
      */
     @PutMapping
-    @Operation(summary = "updateUserRoleById", description = "修改用户角色关系")
-    public Boolean updateUserRoleById(UserRoleEntity userRoleEntity) {
-        return userRoleService.updateUserRoleById(userRoleEntity);
+    @Operation(summary = "updateById", description = "修改用户角色关系")
+    public Boolean updateById(UserRoleEntity userRoleEntity) {
+        return userRoleService.updateById(userRoleEntity);
     }
 
     /**
@@ -87,8 +90,11 @@ public class UserRoleController {
      * @return 删除操作结果
      */
     @DeleteMapping("/{id}")
-    @Operation(summary = "deleteUserRoleById", description = "通过id删除用户角色关系")
-    public Boolean deleteUserRoleById(@PathVariable @Parameter(name = "id", description = "用户角色关系id") String id) {
-        return userRoleService.deleteUserRoleById(id);
+    @Operation(summary = "removeById", description = "通过id删除用户角色关系")
+    public Boolean removeById(@PathVariable
+                              @Parameter(name = "id", description = "用户角色关系id")
+                              @NotNull(message = "用户角色关系id不能为空")
+                              Long id) {
+        return userRoleService.removeById(id);
     }
 }

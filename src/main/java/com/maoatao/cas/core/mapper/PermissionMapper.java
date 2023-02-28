@@ -18,8 +18,8 @@ public interface PermissionMapper extends BaseMapper<PermissionEntity> {
     /**
      * 获取权限列表
      *
-     * @param userId   用户ID
+     * @param userId 用户ID
      * @return 权限列表
      */
-    List<PermissionEntity> getPermissionByUser(String userId);
+    List<PermissionEntity> getPermissionByUser(Long userId);
 }

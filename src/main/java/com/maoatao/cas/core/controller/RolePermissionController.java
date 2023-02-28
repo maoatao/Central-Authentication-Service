@@ -7,6 +7,7 @@ import com.maoatao.cas.core.param.PageParam;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 
 /**
  * 角色权限关系管理
@@ -39,9 +39,9 @@ public class RolePermissionController {
      * @return 分页角色权限关系列表
      */
     @GetMapping("/page")
-    @Operation(summary = "getRolePermissionPage", description = "分页查询角色权限关系列表")
-    public Page<RolePermissionEntity> getRolePermissionPage(PageParam pageParam, RolePermissionEntity rolePermissionEntity) {
-        return rolePermissionService.getRolePermissionPage(pageParam, rolePermissionEntity);
+    @Operation(summary = "getPage", description = "分页查询角色权限关系列表")
+    public Page<RolePermissionEntity> getPage(PageParam pageParam, RolePermissionEntity rolePermissionEntity) {
+        return rolePermissionService.getPage(pageParam, rolePermissionEntity);
     }
 
     /**
@@ -51,9 +51,12 @@ public class RolePermissionController {
      * @return 角色权限关系对象
      */
     @GetMapping("/{id}")
-    @Operation(summary = "getRolePermissionById", description = "通过id查询角色权限关系")
-    public RolePermissionEntity getRolePermissionById(@PathVariable @Parameter(name = "id", description = "角色权限关系id") String id) {
-        return rolePermissionService.getRolePermissionById(id);
+    @Operation(summary = "getById", description = "通过id查询角色权限关系")
+    public RolePermissionEntity getById(@PathVariable
+                                        @Parameter(name = "id", description = "角色权限关系id")
+                                        @NotNull(message = "角色权限关系id不能为空")
+                                        Long id) {
+        return rolePermissionService.getById(id);
     }
 
     /**
@@ -63,9 +66,9 @@ public class RolePermissionController {
      * @return 新增操作结果
      */
     @PostMapping
-    @Operation(summary = "addRolePermission", description = "新增角色权限关系")
-    public Boolean addRolePermission(RolePermissionEntity rolePermissionEntity) {
-        return rolePermissionService.addRolePermission(rolePermissionEntity);
+    @Operation(summary = "save", description = "新增角色权限关系")
+    public Boolean save(RolePermissionEntity rolePermissionEntity) {
+        return rolePermissionService.save(rolePermissionEntity);
     }
 
     /**
@@ -75,9 +78,9 @@ public class RolePermissionController {
      * @return 修改操作结果
      */
     @PutMapping
-    @Operation(summary = "updateRolePermissionById", description = "修改角色权限关系")
-    public Boolean updateRolePermissionById(RolePermissionEntity rolePermissionEntity) {
-        return rolePermissionService.updateRolePermissionById(rolePermissionEntity);
+    @Operation(summary = "updateById", description = "修改角色权限关系")
+    public Boolean updateById(RolePermissionEntity rolePermissionEntity) {
+        return rolePermissionService.updateById(rolePermissionEntity);
     }
 
     /**
@@ -87,8 +90,11 @@ public class RolePermissionController {
      * @return 删除操作结果
      */
     @DeleteMapping("/{id}")
-    @Operation(summary = "deleteRolePermissionById", description = "通过id删除角色权限关系")
-    public Boolean deleteRolePermissionById(@PathVariable @Parameter(name = "id", description = "角色权限关系id") String id) {
-        return rolePermissionService.deleteRolePermissionById(id);
+    @Operation(summary = "removeById", description = "通过id删除角色权限关系")
+    public Boolean removeById(@PathVariable
+                              @Parameter(name = "id", description = "角色权限关系id")
+                              @NotNull(message = "角色权限关系id不能为空")
+                              Long id) {
+        return rolePermissionService.removeById(id);
     }
 }

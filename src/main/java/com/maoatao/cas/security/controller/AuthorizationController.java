@@ -1,8 +1,8 @@
-package com.maoatao.cas.core.controller;
+package com.maoatao.cas.security.controller;
 
-import com.maoatao.cas.core.service.AuthorizationService;
-import com.maoatao.cas.core.param.GenerateAuthorizationCodeParams;
-import com.maoatao.cas.security.AuthorizationInfo;
+import com.maoatao.cas.security.service.AuthorizationService;
+import com.maoatao.cas.security.bean.GenerateAuthorizationCodeParams;
+import com.maoatao.cas.security.bean.AuthorizationInfo;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;

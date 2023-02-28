@@ -25,7 +25,7 @@
         <hutool.version>5.8.11</hutool.version>
         <mysql-connector.version>8.0.32</mysql-connector.version>
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
-        <synapse.version>1.0.1</synapse.version>
+        <synapse.version>1.0.2-SNAPSHOT</synapse.version>
         <springdoc.version>2.0.2</springdoc.version>
         <knife4j.version>3.0.3</knife4j.version>
         <hutool.version>5.8.12</hutool.version>

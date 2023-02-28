@@ -1,7 +1,7 @@
-package com.maoatao.cas.core.service;
+package com.maoatao.cas.security.service;
 
-import com.maoatao.cas.core.param.GenerateAuthorizationCodeParams;
-import com.maoatao.cas.security.AuthorizationInfo;
+import com.maoatao.cas.security.bean.GenerateAuthorizationCodeParams;
+import com.maoatao.cas.security.bean.AuthorizationInfo;
 
 /**
  * 自定义授权接口

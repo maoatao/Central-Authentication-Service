@@ -1,4 +1,4 @@
-package com.maoatao.cas.core.param;
+package com.maoatao.cas.security.bean;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -23,17 +23,17 @@ public class GenerateAuthorizationCodeParams implements Serializable {
     @Serial
     private static final long serialVersionUID = -7286826147280035652L;
     /**
-     * 客户端id
+     * OAuth2 客户端id
      */
-    @Schema(description = "客户端ID")
+    @Schema(description = "OAuth2 客户端id")
     private String clientId;
     /**
-     * 客户端id
+     * 用户名
      */
     @Schema(description = "用户名")
     private String username;
     /**
-     * 客户端id
+     * 密码
      */
     @Schema(description = "密码")
     private String password;

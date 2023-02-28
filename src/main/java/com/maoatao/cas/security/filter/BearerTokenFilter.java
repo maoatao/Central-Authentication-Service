@@ -1,7 +1,5 @@
 package com.maoatao.cas.security.filter;
 
-import com.maoatao.cas.security.SecurityConstants;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
@@ -25,8 +23,9 @@ import java.security.Principal;
  * @author MaoAtao
  * @date 2022-10-24 11:17:31
  */
-@Slf4j
 public class BearerTokenFilter extends GenericFilterBean {
+
+    private static final String TOKEM_TYPE_BEARER = "Bearer";
 
     private final OAuth2AuthorizationService oAuth2AuthorizationService;
 
@@ -43,11 +42,11 @@ public class BearerTokenFilter extends GenericFilterBean {
 
     private void doFilterInternal(HttpServletRequest httpServletRequest) {
         String token = httpServletRequest.getHeader("Authorization");
-        if (!StringUtils.hasText(token) || !token.startsWith(SecurityConstants.TOKEM_TYPE_BEARER)) {
+        if (!StringUtils.hasText(token) || !token.startsWith(TOKEM_TYPE_BEARER)) {
             return;
         }
         // 去掉令牌前缀
-        token = token.replace(SecurityConstants.TOKEM_TYPE_BEARER, "").trim();
+        token = token.replace(TOKEM_TYPE_BEARER, "").trim();
         OAuth2Authorization authorization = oAuth2AuthorizationService.findByToken(token, OAuth2TokenType.ACCESS_TOKEN);
         SecurityContextHolder.getContext().setAuthentication(null);
         if (authorization == null || authorization.getAccessToken() == null || !authorization.getAccessToken().isActive()) {

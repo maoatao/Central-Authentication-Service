@@ -1,12 +1,12 @@
-package com.maoatao.cas.core.service.impl;
+package com.maoatao.cas.security.service.impl;
 
-import com.maoatao.cas.core.service.AuthorizationService;
+import com.maoatao.cas.security.service.AuthorizationService;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
-import com.maoatao.cas.security.UUIDStringKeyGenerator;
-import com.maoatao.cas.core.param.GenerateAuthorizationCodeParams;
-import com.maoatao.cas.security.AuthorizationInfo;
+import com.maoatao.cas.security.generator.UUIDStringKeyGenerator;
+import com.maoatao.cas.security.bean.GenerateAuthorizationCodeParams;
+import com.maoatao.cas.security.bean.AuthorizationInfo;
 import com.maoatao.cas.util.ServletUtils;
-import com.maoatao.synapse.core.lang.SynaAssertException;
+import com.maoatao.synapse.core.lang.SynaException;
 import com.maoatao.synapse.core.util.SynaAssert;
 import lombok.extern.slf4j.Slf4j;
 import cn.hutool.core.util.StrUtil;
@@ -254,17 +254,11 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         Set<String> scopes = params.getScopes();
         SynaAssert.notEmpty(scopes, errorMsg);
         for (String s : scopes) {
-            if (!registeredClient.getScopes().contains(s)) {
-                throw new SynaAssertException(errorMsg);
-            }
+            SynaAssert.isTrue(registeredClient.getScopes().contains(s), errorMsg);
         }
         if (registeredClient.getClientSettings().isRequireProofKey()) {
-            if (StrUtil.isBlank(params.getCodeChallengeMethod())) {
-                throw new SynaAssertException("无效的请求参数[codeChallengeMethod]");
-            }
-            if (StrUtil.isBlank(params.getCodeChallenge())) {
-                throw new SynaAssertException("无效的请求参数[codeChallenge]");
-            }
+            SynaAssert.isTrue(StrUtil.isNotBlank(params.getCodeChallengeMethod()), "无效的请求参数[codeChallengeMethod]");
+            SynaAssert.isTrue(StrUtil.isNotBlank(params.getCodeChallenge()), "无效的请求参数[codeChallenge]");
         }
     }
 }

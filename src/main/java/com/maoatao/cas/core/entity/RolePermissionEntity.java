@@ -16,7 +16,7 @@ import java.io.Serial;
  * @date 2022-12-12 14:18:23
  */
 @Data
-@TableName("t_uac_role_permission")
+@TableName("t_cas_role_permission")
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "角色权限关系")
 public class RolePermissionEntity extends Model<RolePermissionEntity> {
@@ -25,20 +25,20 @@ public class RolePermissionEntity extends Model<RolePermissionEntity> {
     private static final long serialVersionUID = 1296674573072507831L;
 
     /**
-     * id
+     * 主键id(自增)
      */
     @TableId
-    @Schema(description = "id")
-    private String id;
+    @Schema(description = "主键id(自增)")
+    private Long id;
     /**
      * 用户id
      */
     @Schema(description = "用户id")
-    private String roleId;
+    private Long roleId;
     /**
-     * 用户id
+     * 权限id
      */
-    @Schema(description = "用户id")
-    private String permissionId;
+    @Schema(description = "权限id")
+    private Long permissionId;
 
 }

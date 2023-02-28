@@ -7,6 +7,7 @@ import com.maoatao.cas.core.service.RoleService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 
 /**
  * 角色管理
@@ -41,7 +41,7 @@ public class RoleController {
     @GetMapping("/page")
     @Operation(summary = "getRolePage", description = "分页查询角色列表")
     public Page<RoleEntity> getRolePage(PageParam pageParam, RoleEntity roleEntity) {
-        return roleService.getRolePage(pageParam, roleEntity);
+        return roleService.getPage(pageParam, roleEntity);
     }
 
     /**
@@ -52,8 +52,11 @@ public class RoleController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "getRoleById", description = "通过id查询角色")
-    public RoleEntity getRoleById(@PathVariable @Parameter(name = "id", description = "角色id") String id) {
-        return roleService.getRoleById(id);
+    public RoleEntity getRoleById(@PathVariable
+                                  @Parameter(name = "id", description = "角色id")
+                                  @NotNull(message = "角色id不能为空")
+                                  Long id) {
+        return roleService.getById(id);
     }
 
     /**
@@ -65,7 +68,7 @@ public class RoleController {
     @PostMapping
     @Operation(summary = "addRole", description = "新增角色")
     public Boolean addRole(RoleEntity roleEntity) {
-        return roleService.addRole(roleEntity);
+        return roleService.save(roleEntity);
     }
 
     /**
@@ -77,7 +80,7 @@ public class RoleController {
     @PutMapping
     @Operation(summary = "updateRoleById", description = "修改角色")
     public Boolean updateRoleById(RoleEntity roleEntity) {
-        return roleService.updateRoleById(roleEntity);
+        return roleService.updateById(roleEntity);
     }
 
     /**
@@ -88,7 +91,10 @@ public class RoleController {
      */
     @DeleteMapping("/{id}")
     @Operation(summary = "deleteRoleById", description = "通过id删除角色")
-    public Boolean deleteRoleById(@PathVariable @Parameter(name = "id", description = "角色id") String id) {
-        return roleService.deleteRoleById(id);
+    public Boolean deleteRoleById(@PathVariable
+                                  @Parameter(name = "id", description = "角色id")
+                                  @NotNull(message = "角色id不能为空")
+                                  Long id) {
+        return roleService.removeById(id);
     }
 }

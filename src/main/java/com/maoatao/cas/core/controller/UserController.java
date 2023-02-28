@@ -7,6 +7,7 @@ import com.maoatao.cas.core.param.PageParam;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 
 /**
  * 用户管理
@@ -39,9 +39,9 @@ public class UserController {
      * @return 分页用户列表
      */
     @GetMapping("/page")
-    @Operation(summary = "getUserPage", description = "分页查询用户列表")
-    public Page<UserEntity> getUserPage(PageParam pageParam, UserEntity entity) {
-        return userService.getUserPage(pageParam, entity);
+    @Operation(summary = "getPage", description = "分页查询用户列表")
+    public Page<UserEntity> getPage(PageParam pageParam, UserEntity entity) {
+        return userService.getPage(pageParam, entity);
     }
 
     /**
@@ -51,9 +51,12 @@ public class UserController {
      * @return 用户对象
      */
     @GetMapping("/{id}")
-    @Operation(summary = "getUserById", description = "通过id查询用户")
-    public UserEntity getUserById(@PathVariable @Parameter(name = "id", description = "用户id") String id) {
-        return userService.getUserById(id);
+    @Operation(summary = "getById", description = "通过id查询用户")
+    public UserEntity getById(@PathVariable
+                              @Parameter(name = "id", description = "用户id")
+                              @NotNull(message = "用户id不能为空")
+                              Long id) {
+        return userService.getById(id);
     }
 
     /**
@@ -63,9 +66,9 @@ public class UserController {
      * @return 新增操作结果
      */
     @PostMapping
-    @Operation(summary = "addUser", description = "新增用户")
-    public Boolean addUser(UserEntity entity) {
-        return userService.addUser(entity);
+    @Operation(summary = "save", description = "新增用户")
+    public Boolean save(UserEntity entity) {
+        return userService.save(entity);
     }
 
     /**
@@ -75,9 +78,9 @@ public class UserController {
      * @return 修改操作结果
      */
     @PutMapping
-    @Operation(summary = "updateUserById", description = "修改用户")
-    public Boolean updateUserById(UserEntity entity) {
-        return userService.updateUserById(entity);
+    @Operation(summary = "updateById", description = "修改用户")
+    public Boolean updateById(UserEntity entity) {
+        return userService.updateById(entity);
     }
 
     /**
@@ -87,8 +90,11 @@ public class UserController {
      * @return 删除操作结果
      */
     @DeleteMapping("/{id}")
-    @Operation(summary = "deleteUserById", description = "通过id删除用户")
-    public Boolean deleteUserById(@PathVariable @Parameter(name = "id", description = "用户id") String id) {
-        return userService.deleteUserById(id);
+    @Operation(summary = "removeById", description = "通过id删除用户")
+    public Boolean removeById(@PathVariable
+                              @Parameter(name = "id", description = "用户id")
+                              @NotNull(message = "用户id不能为空")
+                              Long id) {
+        return userService.removeById(id);
     }
 }

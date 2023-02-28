@@ -2,12 +2,10 @@ package com.maoatao.cas.config;
 
 import com.maoatao.cas.security.oauth2.auth.CustomAccessTokenGenerator;
 import com.maoatao.cas.security.oauth2.auth.RedisAuthorizationService;
-import com.maoatao.cas.security.CustomUserDetailsServiceImpl;
 import com.maoatao.cas.security.filter.BearerTokenFilterConfigurer;
 import com.maoatao.cas.util.AuthorizationServerUtils;
 import com.maoatao.cas.security.oauth2.auth.CustomRefreshTokenGenerator;
-import com.maoatao.cas.security.UUIDStringKeyGenerator;
-import com.maoatao.cas.security.SecurityConstants;
+import com.maoatao.cas.security.generator.UUIDStringKeyGenerator;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -59,19 +57,18 @@ import java.util.UUID;
 @EnableWebSecurity
 public class AuthorizationServerConfig {
 
+    private static final String OAUTH2_REDIS_KEY_PREFIX = "OAuth2:";
+
     /**
      * 配置OAuth2
      */
     @Bean
     @Order(1)
-    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http,
-                                                                      CustomUserDetailsServiceImpl customUserDetailsService) throws Exception {
+    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
         AuthorizationServerUtils.applyConfigurer(http);
         http.exceptionHandling(exceptions ->
                 exceptions.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
         );
-        // 扩展UserDetailsService
-        http.userDetailsService(customUserDetailsService);
         return http.build();
     }
 
@@ -113,7 +110,7 @@ public class AuthorizationServerConfig {
      */
     @Bean
     public OAuth2AuthorizationService oAuth2AuthorizationService() {
-        return new RedisAuthorizationService(SecurityConstants.OAUTH2_REDIS_KEY_PREFIX);
+        return new RedisAuthorizationService(OAUTH2_REDIS_KEY_PREFIX);
     }
 
     /**

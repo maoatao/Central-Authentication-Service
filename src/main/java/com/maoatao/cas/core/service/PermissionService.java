@@ -22,39 +22,7 @@ public interface PermissionService extends IService<PermissionEntity> {
      * @param permissionEntity 权限
      * @return 分页权限列表
      */
-    Page<PermissionEntity> getPermissionPage(PageParam pageParam, PermissionEntity permissionEntity);
-
-    /**
-     * 通过id查询权限
-     *
-     * @param id 权限id
-     * @return 权限对象
-     */
-    PermissionEntity getPermissionById(String id);
-
-    /**
-     * 新增权限
-     *
-     * @param permissionEntity 权限
-     * @return 新增操作结果
-     */
-    Boolean addPermission(PermissionEntity permissionEntity);
-
-    /**
-     * 修改权限
-     *
-     * @param permissionEntity 权限
-     * @return 修改操作结果
-     */
-    Boolean updatePermissionById(PermissionEntity permissionEntity);
-
-    /**
-     * 通过id删除权限
-     *
-     * @param id 权限id
-     * @return 删除操作结果
-     */
-    Boolean deletePermissionById(String id);
+    Page<PermissionEntity> getPage(PageParam pageParam, PermissionEntity permissionEntity);
 
     /**
      * 获取权限列表
@@ -62,5 +30,5 @@ public interface PermissionService extends IService<PermissionEntity> {
      * @param userId 用户ID
      * @return 权限列表
      */
-    List<PermissionEntity> getPermissionByUser(String userId);
+    List<PermissionEntity> getPermissionByUser(Long userId);
 }

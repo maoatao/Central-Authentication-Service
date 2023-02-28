@@ -20,39 +20,7 @@ public interface UserService extends IService<UserEntity> {
      * @param entity    请求参数
      * @return 分页用户列表
      */
-    Page<UserEntity> getUserPage(PageParam pageParam, UserEntity entity);
-
-    /**
-     * 通过id查询用户
-     *
-     * @param id 用户id
-     * @return 用户对象
-     */
-    UserEntity getUserById(String id);
-
-    /**
-     * 新增用户
-     *
-     * @param entity 请求参数
-     * @return 新增操作结果
-     */
-    Boolean addUser(UserEntity entity);
-
-    /**
-     * 修改用户
-     *
-     * @param entity 请求参数
-     * @return 修改操作结果
-     */
-    Boolean updateUserById(UserEntity entity);
-
-    /**
-     * 通过id删除用户
-     *
-     * @param id 用户id
-     * @return 删除操作结果
-     */
-    Boolean deleteUserById(String id);
+    Page<UserEntity> getPage(PageParam pageParam, UserEntity entity);
 
     /**
      * 通过用户名称和客户端ID获取用户信息

@@ -16,7 +16,7 @@ import java.io.Serial;
  * @date 2022-12-12 14:18:22
  */
 @Data
-@TableName("t_uac_user_role")
+@TableName("t_cas_user_role")
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "用户角色关系")
 public class UserRoleEntity extends Model<UserRoleEntity> {
@@ -25,20 +25,19 @@ public class UserRoleEntity extends Model<UserRoleEntity> {
     private static final long serialVersionUID = -4722252259023056863L;
 
     /**
-     * id
+     * 主键id(自增)
      */
     @TableId
-    @Schema(description = "id")
-    private String id;
+    @Schema(description = "主键id(自增)")
+    private Long id;
     /**
      * 用户id
      */
     @Schema(description = "用户id")
-    private String userId;
+    private Long userId;
     /**
      * 角色id
      */
     @Schema(description = "角色id")
-    private String roleId;
-
+    private Long roleId;
 }

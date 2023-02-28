@@ -16,7 +16,7 @@ import java.io.Serial;
  * @date 2022-12-12 14:18:23
  */
 @Data
-@TableName("t_uac_permission")
+@TableName("t_cas_permission")
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "权限")
 public class PermissionEntity extends Model<PermissionEntity> {
@@ -25,15 +25,15 @@ public class PermissionEntity extends Model<PermissionEntity> {
     private static final long serialVersionUID = 8835416927286873660L;
 
     /**
-     * 权限id
+     * 主键id(自增)
      */
     @TableId
-    @Schema(description = "权限id")
-    private String id;
+    @Schema(description = "主键id(自增)")
+    private Long id;
     /**
-     * 客户端id
+     * OAuth2 客户端id
      */
-    @Schema(description = "客户端id")
+    @Schema(description = "OAuth2 客户端id")
     private String clientId;
     /**
      * 权限名
@@ -50,5 +50,4 @@ public class PermissionEntity extends Model<PermissionEntity> {
      */
     @Schema(description = "0:不可用,1:可用")
     private Boolean enabled;
-
 }

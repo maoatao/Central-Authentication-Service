@@ -23,33 +23,12 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     @Autowired
     private PermissionMapper permissionMapper;
 
-    @Override
-    public Page<PermissionEntity> getPermissionPage(PageParam pageParam, PermissionEntity permissionEntity) {
+    public Page<PermissionEntity> getPage(PageParam pageParam, PermissionEntity permissionEntity) {
         return page(new Page<>(pageParam.getPageNo(), pageParam.getPageSize()), Wrappers.query(permissionEntity));
     }
 
     @Override
-    public PermissionEntity getPermissionById(String id) {
-        return getById(id);
-    }
-
-    @Override
-    public Boolean addPermission(PermissionEntity permissionEntity) {
-        return save(permissionEntity);
-    }
-
-    @Override
-    public Boolean updatePermissionById(PermissionEntity permissionEntity) {
-        return updateById(permissionEntity);
-    }
-
-    @Override
-    public Boolean deletePermissionById(String id) {
-        return removeById(id);
-    }
-
-    @Override
-    public List<PermissionEntity> getPermissionByUser(String userId) {
+    public List<PermissionEntity> getPermissionByUser(Long userId) {
         return permissionMapper.getPermissionByUser(userId);
     }
 }

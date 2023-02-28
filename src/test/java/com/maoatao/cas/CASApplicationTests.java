@@ -1,7 +1,8 @@
 package com.maoatao.cas;
 
+import com.maoatao.cas.security.bean.CustomUserDetails;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
-import com.maoatao.cas.security.UUIDStringKeyGenerator;
+import com.maoatao.cas.security.generator.UUIDStringKeyGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -63,12 +64,12 @@ class CASApplicationTests {
      */
     @Test
     void testSaveUser() {
-        UserDetails userDetails = User.builder().
-            passwordEncoder(s -> "{bcrypt}" + new BCryptPasswordEncoder().encode(s))
-            .username("user")
-            .password("password")
-            .roles("USER")
-            .build();
+        UserDetails userDetails = new CustomUserDetails("messaging-client", User.builder()
+                .passwordEncoder(s -> "{bcrypt}" + new BCryptPasswordEncoder().encode(s))
+                .username("user")
+                .password("password")
+                .roles("USER")
+                .build());
         userDetailsManager.createUser(userDetails);
     }
 
@@ -78,20 +79,20 @@ class CASApplicationTests {
     @Test
     void testSaveClient() {
         RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
-            .clientId("messaging-client")
-            .clientSecret("{bcrypt}" + new BCryptPasswordEncoder().encode("123456"))
-            .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-            .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-            .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-            .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-            .redirectUri("http://127.0.0.1:8080/authorized")
-            // 便于调试授权码流程
-            .redirectUri("https://cn.bing.com")
-            .scope("message.read")
-            .scope("message.write")
-            .clientSettings(ClientSettings.builder().requireProofKey(true).build())
-            .tokenSettings(TokenSettings.builder().accessTokenFormat(OAuth2TokenFormat.REFERENCE).build())
-            .build();
+                .clientId("messaging-client")
+                .clientSecret("{bcrypt}" + new BCryptPasswordEncoder().encode("123456"))
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+                .redirectUri("http://127.0.0.1:8080/authorized")
+                // 便于调试授权码流程
+                .redirectUri("https://cn.bing.com")
+                .scope("message.read")
+                .scope("message.write")
+                .clientSettings(ClientSettings.builder().requireProofKey(true).build())
+                .tokenSettings(TokenSettings.builder().accessTokenFormat(OAuth2TokenFormat.REFERENCE).build())
+                .build();
         registeredClientRepository.save(registeredClient);
     }
 
@@ -103,22 +104,22 @@ class CASApplicationTests {
     @Test
     void testSaveOidcClient() {
         RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
-            .clientId("oidc-client")
-            .clientSecret("{bcrypt}" + new BCryptPasswordEncoder().encode("123456"))
-            .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-            .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-            .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-            .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-            .redirectUri("http://127.0.0.1:8080/login/oauth2/code/oidc-client-oidc")
-            .redirectUri("http://127.0.0.1:8080/authorized")
-            // 便于调试授权码流程
-            .redirectUri("https://cn.bing.com")
-            .scope(OidcScopes.OPENID)
-            .scope("client.create")
-            .scope("client.read")
-            .clientSettings(ClientSettings.builder().requireProofKey(true).requireAuthorizationConsent(true).build())
-            .tokenSettings(TokenSettings.builder().accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED).build())
-            .build();
+                .clientId("oidc-client")
+                .clientSecret("{bcrypt}" + new BCryptPasswordEncoder().encode("123456"))
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+                .redirectUri("http://127.0.0.1:8080/login/oauth2/code/oidc-client-oidc")
+                .redirectUri("http://127.0.0.1:8080/authorized")
+                // 便于调试授权码流程
+                .redirectUri("https://cn.bing.com")
+                .scope(OidcScopes.OPENID)
+                .scope("client.create")
+                .scope("client.read")
+                .clientSettings(ClientSettings.builder().requireProofKey(true).requireAuthorizationConsent(true).build())
+                .tokenSettings(TokenSettings.builder().accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED).build())
+                .build();
         registeredClientRepository.save(registeredClient);
     }
 
@@ -149,33 +150,33 @@ class CASApplicationTests {
         }
 
         OAuth2AuthorizationRequest authorizationRequest = OAuth2AuthorizationRequest.authorizationCode()
-            .authorizationUri("http://localhost:8080/oauth2/authorize")
-            .clientId(registeredClient.getClientId())
-            .scopes(scopes)
-            .additionalParameters(additionalParameters)
-            .build();
+                .authorizationUri("http://localhost:8080/oauth2/authorize")
+                .clientId(registeredClient.getClientId())
+                .scopes(scopes)
+                .additionalParameters(additionalParameters)
+                .build();
 
         OAuth2TokenContext tokenContext = DefaultOAuth2TokenContext.builder()
-            .registeredClient(registeredClient)
-            .principal(principal)
-            .tokenType(new OAuth2TokenType(OAuth2ParameterNames.CODE))
-            .authorizedScopes(scopes)
-            .build();
+                .registeredClient(registeredClient)
+                .principal(principal)
+                .tokenType(new OAuth2TokenType(OAuth2ParameterNames.CODE))
+                .authorizedScopes(scopes)
+                .build();
 
         OAuth2AuthorizationCode authorizationCode = new CustomAuthorizationCodeGenerator(new UUIDStringKeyGenerator()).generate(tokenContext);
         if (authorizationCode != null) {
 
-            //控制台输出授权码
+            // 控制台输出授权码
             System.out.println(authorizationCode.getTokenValue());
 
             OAuth2Authorization authorization = OAuth2Authorization.withRegisteredClient(registeredClient)
-                .principalName(principal.getName())
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .attribute(Principal.class.getName(), principal)
-                .attribute(OAuth2AuthorizationRequest.class.getName(), authorizationRequest)
-                .authorizedScopes(scopes)
-                .token(authorizationCode)
-                .build();
+                    .principalName(principal.getName())
+                    .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                    .attribute(Principal.class.getName(), principal)
+                    .attribute(OAuth2AuthorizationRequest.class.getName(), authorizationRequest)
+                    .authorizedScopes(scopes)
+                    .token(authorizationCode)
+                    .build();
             this.authorizationService.save(authorization);
         }
     }

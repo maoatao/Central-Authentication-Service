@@ -16,7 +16,7 @@ import java.io.Serial;
  * @date 2022-12-12 14:18:22
  */
 @Data
-@TableName("t_uac_user")
+@TableName("t_cas_user")
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "用户表")
 public class UserEntity extends Model<UserEntity> {
@@ -25,20 +25,25 @@ public class UserEntity extends Model<UserEntity> {
     private static final long serialVersionUID = -5231977144633077127L;
 
     /**
-     * 用户id
+     * 主键id(自增)
      */
     @TableId
-    @Schema(description = "用户id")
-    private String id;
+    @Schema(description = "主键id(自增)")
+    private Long id;
     /**
-     * 开放平台id
+     * CAS 开放id(唯一)
      */
-    @Schema(description = "开放平台id")
+    @Schema(description = "CAS 开放id")
     private String openId;
     /**
-     * 用户名(唯一)
+     * OAuth2 客户端id
      */
-    @Schema(description = "用户名(唯一)")
+    @Schema(description = "OAuth2 客户端id")
+    private String clientId;
+    /**
+     * 用户名
+     */
+    @Schema(description = "用户名")
     private String name;
     /**
      * 密码
@@ -46,9 +51,8 @@ public class UserEntity extends Model<UserEntity> {
     @Schema(description = "密码")
     private String password;
     /**
-     * 0:不可用,1:可用
+     * 是否启用;0:禁用,1:启用
      */
-    @Schema(description = "false:不可用,true:可用")
+    @Schema(description = "false:禁用,true:启用")
     private boolean enabled;
-
 }
