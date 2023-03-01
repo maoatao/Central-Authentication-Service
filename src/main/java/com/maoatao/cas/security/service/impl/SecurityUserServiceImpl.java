@@ -12,6 +12,7 @@ import com.maoatao.cas.security.bean.SecurityUser;
 import com.maoatao.cas.security.service.SecurityUserService;
 import com.maoatao.synapse.core.util.SynaAssert;
 import com.maoatao.synapse.core.util.SynaSafes;
+import com.maoatao.synapse.core.util.SynaStrings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -66,7 +67,9 @@ public class SecurityUserServiceImpl implements SecurityUserService {
     @Override
     public CustomUserDetails getUser(String username, Object details) throws UsernameNotFoundException {
         UserEntity userEntity = userService.getByNameAndClient(username, details.toString());
-        SynaAssert.notNull(userEntity, "用户 {} 不存在!", username);
+        if (userEntity == null) {
+            throw new UsernameNotFoundException(SynaStrings.format("用户 {} 不存在!", username));
+        }
         SynaAssert.isTrue(userEntity.getEnabled(), "用户 {} 已被禁用", username);
         return SecurityUser.builder()
                 .clientId(userEntity.getClientId())
