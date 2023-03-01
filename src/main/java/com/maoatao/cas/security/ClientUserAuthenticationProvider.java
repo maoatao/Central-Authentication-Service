@@ -1,6 +1,6 @@
 package com.maoatao.cas.security;
 
-import com.maoatao.cas.security.service.CustomUserDetailsService;
+import com.maoatao.cas.security.service.ClientUserService;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -41,7 +41,7 @@ public class ClientUserAuthenticationProvider extends AbstractUserDetailsAuthent
      */
     private volatile String userNotFoundEncodedPassword;
 
-    private CustomUserDetailsService userDetailsService;
+    private ClientUserService clientUserService;
 
     private UserDetailsPasswordService userDetailsPasswordService;
 
@@ -68,7 +68,7 @@ public class ClientUserAuthenticationProvider extends AbstractUserDetailsAuthent
 
     @Override
     protected void doAfterPropertiesSet() {
-        Assert.notNull(this.userDetailsService, "A UserDetailsService must be set");
+        Assert.notNull(this.clientUserService, "A UserDetailsService must be set");
     }
 
     /**
@@ -81,7 +81,7 @@ public class ClientUserAuthenticationProvider extends AbstractUserDetailsAuthent
         try {
             // 上游构建 AuthorizationService buildPrincipal 时, details 设定为 clientId
             // 通过用户名和客户端 id 查询一个用户
-            UserDetails loadedUser = this.getUserDetailsService().getUser(username, authentication.getDetails());
+            UserDetails loadedUser = this.getClientUserService().getUser(username, authentication.getDetails());
             if (loadedUser == null) {
                 throw new InternalAuthenticationServiceException(
                         "UserDetailsService returned null, which is an interface contract violation");
@@ -141,12 +141,12 @@ public class ClientUserAuthenticationProvider extends AbstractUserDetailsAuthent
         return this.passwordEncoder;
     }
 
-    public void setUserDetailsService(CustomUserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
+    public void setClientUserService(ClientUserService clientUserService) {
+        this.clientUserService = clientUserService;
     }
 
-    protected CustomUserDetailsService getUserDetailsService() {
-        return this.userDetailsService;
+    protected ClientUserService getClientUserService() {
+        return this.clientUserService;
     }
 
     public void setUserDetailsPasswordService(UserDetailsPasswordService userDetailsPasswordService) {

@@ -3,7 +3,7 @@ package com.maoatao.cas;
 import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
 import com.maoatao.cas.security.generator.UUIDStringKeyGenerator;
-import com.maoatao.cas.security.service.CustomUserDetailsService;
+import com.maoatao.cas.security.service.ClientUserService;
 import com.maoatao.synapse.core.lang.SynaException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +47,7 @@ class CASApplicationTests {
      * 初始化客户端信息
      */
     @Autowired
-    private CustomUserDetailsService userDetailsService;
+    private ClientUserService userDetailsService;
 
     /**
      * 创建clientId信息

@@ -11,7 +11,7 @@ import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.security.bean.CustomUserDetails;
 import com.maoatao.cas.security.bean.CustomAuthority;
 import com.maoatao.cas.security.bean.ClientUser;
-import com.maoatao.cas.security.service.CustomUserDetailsService;
+import com.maoatao.cas.security.service.ClientUserService;
 import com.maoatao.synapse.core.util.SynaAssert;
 import com.maoatao.synapse.core.util.SynaSafes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * @date 2021-05-13 15:16:19
  */
 @Service
-public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
+public class ClientUserServiceImpl implements ClientUserService {
 
     @Autowired
     private UserService userService;

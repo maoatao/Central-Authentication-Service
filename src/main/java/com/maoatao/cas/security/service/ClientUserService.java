@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
  * @author MaoAtao
  * @date 2023-02-28 21:59:35
  */
-public interface CustomUserDetailsService {
+public interface ClientUserService {
 
     /**
      * 通过用户名和用户详细信息

@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.Tolerate;
 
 import java.io.Serial;
 
@@ -16,6 +18,7 @@ import java.io.Serial;
  * @date 2022-12-12 14:18:23
  */
 @Data
+@Builder
 @TableName("t_cas_role")
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "角色")
@@ -51,4 +54,6 @@ public class RoleEntity extends Model<RoleEntity> {
     @Schema(description = "0:不可用,1:可用")
     private Boolean enabled;
 
+    @Tolerate
+    public RoleEntity() {}
 }
