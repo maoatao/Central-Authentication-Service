@@ -25,6 +25,8 @@ public interface SecurityUserService {
 
     /**
      * 创建用户
+     * <p>
+     * 请传入未加密的密码,该方法将自动加密
      *
      * @param userDetails 用户详情
      * @return 创建成功返回true
@@ -33,6 +35,8 @@ public interface SecurityUserService {
 
     /**
      * 更新用户
+     * <p>
+     * 此方法不允许修改密码,传入无效
      *
      * @param userDetails 用户详情
      * @return 更新成功返回true
@@ -52,8 +56,8 @@ public interface SecurityUserService {
      *
      * @param username    用户名
      * @param clientId    客户端 Id
-     * @param oldPassword 旧密码
-     * @param newPassword 新密码
+     * @param oldPassword 旧密码(未加密)
+     * @param newPassword 新密码(加密的密码,该方法将自动加密)
      * @return 修改成功返回true
      */
     boolean changePassword(String username, String clientId, String oldPassword, String newPassword);

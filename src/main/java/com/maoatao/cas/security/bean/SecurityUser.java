@@ -9,8 +9,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.Assert;
 
 import java.io.Serial;
@@ -24,7 +22,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.function.Function;
 
 /**
  * 自定义客户端用户
@@ -170,70 +167,6 @@ public class SecurityUser implements CustomUserDetails, CredentialsContainer {
         return new SecurityUser.UserBuilder();
     }
 
-    /**
-     * <p>
-     * <b>WARNING:</b> This method is considered unsafe for production and is only
-     * intended for sample applications.
-     * </p>
-     * <p>
-     * Creates a user and automatically encodes the provided password using
-     * {@code PasswordEncoderFactories.createDelegatingPasswordEncoder()}. For example:
-     * </p>
-     *
-     * <pre>
-     * <code>
-     * UserDetails user = CustomUser.withDefaultPasswordEncoder()
-     *     .username("user")
-     *     .password("password")
-     *     .roles("USER")
-     *     .build();
-     * // outputs {bcrypt}$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzG3YB1tlRy.fqvM/BG
-     * System.out.println(user.getPassword());
-     * </code> </pre>
-     * <p>
-     * This is not safe for production (it is intended for getting started experience)
-     * because the password "password" is compiled into the source code and then is
-     * included in memory at the time of creation. This means there are still ways to
-     * recover the plain text password making it unsafe. It does provide a slight
-     * improvement to using plain text passwords since the UserDetails password is
-     * securely hashed. This means if the UserDetails password is accidentally exposed,
-     * the password is securely stored.
-     * <p>
-     * In a production setting, it is recommended to hash the password ahead of time. For
-     * example:
-     *
-     * <pre>
-     * <code>
-     * PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-     * // outputs {bcrypt}$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzG3YB1tlRy.fqvM/BG
-     * // remember the password that is printed out and use in the next step
-     * System.out.println(encoder.encode("password"));
-     * </code> </pre>
-     *
-     * <pre>
-     * <code>
-     * UserDetails user = CustomUser.withUsername("user")
-     *     .password("{bcrypt}$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzG3YB1tlRy.fqvM/BG")
-     *     .roles("USER")
-     *     .build();
-     * </code> </pre>
-     *
-     * @return a UserBuilder that automatically encodes the password with the default
-     * PasswordEncoder
-     * @deprecated Using this method is not considered safe for production, but is
-     * acceptable for demos and getting started. For production purposes, ensure the
-     * password is encoded externally. See the method Javadoc for additional details.
-     * There are no plans to remove this support. It is deprecated to indicate that this
-     * is considered insecure for production purposes.
-     */
-    @Deprecated
-    public static SecurityUser.UserBuilder withDefaultPasswordEncoder() {
-        log.warn("CustomUser.withDefaultPasswordEncoder() is considered unsafe for production "
-                + "and is only intended for sample applications.");
-        PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-        return builder().passwordEncoder(encoder::encode);
-    }
-
     public static SecurityUser.UserBuilder withUserDetails(UserDetails userDetails) {
         // @formatter:off
         return withUsername(userDetails.getUsername())
@@ -289,8 +222,6 @@ public class SecurityUser implements CustomUserDetails, CredentialsContainer {
 
         private boolean disabled;
 
-        private Function<String, String> passwordEncoder = (password) -> password;
-
         /**
          * Creates a new instance
          */
@@ -333,20 +264,6 @@ public class SecurityUser implements CustomUserDetails, CredentialsContainer {
         public SecurityUser.UserBuilder password(String password) {
             Assert.notNull(password, "password cannot be null");
             this.password = password;
-            return this;
-        }
-
-        /**
-         * Encodes the current password (if non-null) and any future passwords supplied to
-         * {@link #password(String)}.
-         *
-         * @param encoder the encoder to use
-         * @return the {@link SecurityUser.UserBuilder} for method chaining (i.e. to populate
-         * additional attributes for this user)
-         */
-        public SecurityUser.UserBuilder passwordEncoder(Function<String, String> encoder) {
-            Assert.notNull(encoder, "encoder cannot be null");
-            this.passwordEncoder = encoder;
             return this;
         }
 
@@ -474,8 +391,7 @@ public class SecurityUser implements CustomUserDetails, CredentialsContainer {
         }
 
         public CustomUserDetails build() {
-            String encodedPassword = this.passwordEncoder.apply(this.password);
-            return new SecurityUser(this.clientId, this.username, encodedPassword, !this.disabled, !this.accountExpired,
+            return new SecurityUser(this.clientId, this.username, this.password, !this.disabled, !this.accountExpired,
                     !this.credentialsExpired, !this.accountLocked, this.authorities);
         }
 

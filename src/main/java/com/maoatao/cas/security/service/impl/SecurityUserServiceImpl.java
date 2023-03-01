@@ -1,6 +1,5 @@
 package com.maoatao.cas.security.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.IterUtil;
 import com.maoatao.cas.core.entity.UserEntity;
 import com.maoatao.cas.core.service.PermissionService;
@@ -85,11 +84,11 @@ public class SecurityUserServiceImpl implements SecurityUserService {
     @Transactional(rollbackFor = Exception.class)
     public long createUser(CustomUserDetails userDetails) {
         checkClient(userDetails.getClientId());
-        SynaAssert.isNull(userService.getByNameAndClient(userDetails.getUsername(), userDetails.getClientId()), "用户名 {} 已存在", userDetails.getUsername());
+        checkUserName(userDetails.getUsername(), userDetails.getClientId());
         UserEntity userEntity = UserEntity.builder()
                 .clientId(userDetails.getClientId())
                 .name(userDetails.getUsername())
-                .password(userDetails.getPassword())
+                .password(passwordEncoder.encode(userDetails.getPassword()))
                 .enabled(userDetails.isEnabled())
                 .build();
         SynaAssert.isTrue(userService.save(userEntity), "新增用户失败!");
@@ -106,11 +105,12 @@ public class SecurityUserServiceImpl implements SecurityUserService {
     public boolean updateUser(CustomUserDetails userDetails) {
         checkClient(userDetails.getClientId());
         UserEntity existed = getAndCheckUser(userDetails.getUsername(), userDetails.getClientId());
-        BeanUtil.copyProperties(UserEntity.builder()
-                .clientId(userDetails.getClientId())
-                .name(userDetails.getUsername())
-                .enabled(userDetails.isEnabled())
-                .build(), existed);
+        if (!existed.getClientId().equals(userDetails.getClientId())) {
+            checkUserName(userDetails.getUsername(), userDetails.getClientId());
+            existed.setClientId(userDetails.getClientId());
+        }
+        existed.setName(userDetails.getUsername());
+        existed.setEnabled(userDetails.isEnabled());
         SynaAssert.isTrue(userService.updateById(existed), "更新用户失败!");
         SynaAssert.isTrue(
                 userRoleService.updateUserRole(getAndCheckRoleIds(userDetails.getAuthorities(), userDetails.getClientId()), existed.getId()),
@@ -148,6 +148,17 @@ public class SecurityUserServiceImpl implements SecurityUserService {
      */
     private void checkClient(String clientId) {
         SynaAssert.notNull(registeredClientRepository.findByClientId(clientId), "客户端 {} 不存在!", clientId);
+    }
+
+    /**
+     * 校验用户名在自定客户端是否存在
+     *
+     * @param username 用户名称
+     * @param clientId 客户端 id
+     */
+    private void checkUserName(String username, String clientId) {
+        SynaAssert.isNull(userService.getByNameAndClient(username, clientId), "用户名 {} 已存在", username);
+
     }
 
     /**

@@ -66,13 +66,13 @@ class CASApplicationTests {
      */
     @Test
     void save_user_test() {
-        securityUserService.createUser(SecurityUser.builder()
+        long userId = securityUserService.createUser(SecurityUser.builder()
                 .clientId("messaging-client")
-                .passwordEncoder(s -> passwordEncoder.encode(s))
                 .username("user")
                 .password("password")
                 .roles("USER")
                 .build());
+        System.out.println(userId);
     }
 
     /**
