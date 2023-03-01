@@ -1,9 +1,9 @@
-package com.maoatao.cas.core.controller;
+package com.maoatao.cas.web.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.core.entity.UserEntity;
 import com.maoatao.cas.core.service.UserService;
-import com.maoatao.cas.core.param.PageParam;
+import com.maoatao.cas.web.param.UserParam;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,23 +32,22 @@ public class UserController {
     private UserService userService;
 
     /**
-     * 分页查询用户列表
+     * 分页
      *
-     * @param pageParam 分页对象
-     * @param entity    请求参数
-     * @return 分页用户列表
+     * @param param 参数
+     * @return 分页
      */
     @GetMapping("/page")
     @Operation(summary = "getPage", description = "分页查询用户列表")
-    public Page<UserEntity> getPage(PageParam pageParam, UserEntity entity) {
-        return userService.getPage(pageParam, entity);
+    public Page<UserEntity> getPage(UserParam param) {
+        return userService.getPage(param);
     }
 
     /**
-     * 通过id查询用户
+     * 通过id查询
      *
      * @param id 用户id
-     * @return 用户对象
+     * @return 用户
      */
     @GetMapping("/{id}")
     @Operation(summary = "getById", description = "通过id查询用户")
@@ -60,41 +59,41 @@ public class UserController {
     }
 
     /**
-     * 新增用户
+     * 新增
      *
-     * @param entity 请求参数
-     * @return 新增操作结果
+     * @param param 参数
+     * @return 新增成功返回true
      */
     @PostMapping
     @Operation(summary = "save", description = "新增用户")
-    public Boolean save(UserEntity entity) {
-        return userService.save(entity);
+    public Boolean save(UserParam param) {
+        return userService.save(param);
     }
 
     /**
-     * 修改用户
+     * 更新
      *
-     * @param entity 请求参数
-     * @return 修改操作结果
+     * @param param 参数
+     * @return 更新成功返回true
      */
     @PutMapping
-    @Operation(summary = "updateById", description = "修改用户")
-    public Boolean updateById(UserEntity entity) {
-        return userService.updateById(entity);
+    @Operation(summary = "update", description = "修改用户")
+    public Boolean update(UserParam param) {
+        return userService.update(param);
     }
 
     /**
-     * 通过id删除用户
+     * 删除
      *
-     * @param id 用户id
-     * @return 删除操作结果
+     * @param id 主键id
+     * @return 删除成功返回true
      */
     @DeleteMapping("/{id}")
-    @Operation(summary = "removeById", description = "通过id删除用户")
-    public Boolean removeById(@PathVariable
+    @Operation(summary = "remove", description = "通过id删除用户")
+    public Boolean remove(@PathVariable
                               @Parameter(name = "id", description = "用户id")
                               @NotNull(message = "用户id不能为空")
                               Long id) {
-        return userService.removeById(id);
+        return userService.remove(id);
     }
 }

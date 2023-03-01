@@ -1,7 +1,7 @@
-package com.maoatao.cas.core.controller;
+package com.maoatao.cas.web.controller;
 
 import com.maoatao.cas.security.service.AuthorizationService;
-import com.maoatao.cas.security.bean.GenerateAuthorizationCodeParams;
+import com.maoatao.cas.web.param.GenerateAuthorizationCodeParams;
 import com.maoatao.cas.security.bean.AuthorizationInfo;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,13 +53,13 @@ public class AuthorizationController {
     }
 
     /**
-     * 获取授权信息(其他服务调用)
+     * 查询授权信息(其他服务调用)
      *
      * @param accessToken 令牌
      * @return 授权信息
      */
     @GetMapping
-    @Operation(summary = "getAuthorizationInfo", description = "获取授权信息")
+    @Operation(summary = "getAuthorizationInfo", description = "查询授权信息")
     public AuthorizationInfo getAuthorizationInfo(@RequestHeader(value = "Authorization") String accessToken) {
         return authorizationService.getAuthorizationInfo(accessToken);
     }

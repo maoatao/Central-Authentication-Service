@@ -16,7 +16,7 @@ import java.util.List;
 public interface PermissionMapper extends BaseMapper<PermissionEntity> {
 
     /**
-     * 获取权限列表
+     * 查询权限列表
      *
      * @param userId 用户ID
      * @return 权限列表

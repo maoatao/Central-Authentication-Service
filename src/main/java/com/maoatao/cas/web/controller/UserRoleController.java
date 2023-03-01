@@ -1,9 +1,9 @@
-package com.maoatao.cas.core.controller;
+package com.maoatao.cas.web.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.core.entity.UserRoleEntity;
-import com.maoatao.cas.core.param.PageParam;
 import com.maoatao.cas.core.service.UserRoleService;
+import com.maoatao.cas.web.param.UserRoleParam;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,23 +32,22 @@ public class UserRoleController {
     private UserRoleService userRoleService;
 
     /**
-     * 分页查询用户角色关系列表
+     * 分页
      *
-     * @param pageParam      分页对象
-     * @param userRoleEntity 用户角色关系
-     * @return 分页用户角色关系列表
+     * @param param 参数
+     * @return 分页
      */
     @GetMapping("/page")
     @Operation(summary = "getPage", description = "分页查询用户角色关系列表")
-    public Page<UserRoleEntity> getPage(PageParam pageParam, UserRoleEntity userRoleEntity) {
-        return userRoleService.getPage(pageParam, userRoleEntity);
+    public Page<UserRoleEntity> getPage(UserRoleParam param) {
+        return userRoleService.getPage(param);
     }
 
     /**
-     * 通过id查询用户角色关系
+     * 通过id查询
      *
-     * @param id 用户角色关系id
-     * @return 用户角色关系对象
+     * @param id 主键id
+     * @return 用户角色关系
      */
     @GetMapping("/{id}")
     @Operation(summary = "getById", description = "通过id查询用户角色关系")
@@ -60,41 +59,41 @@ public class UserRoleController {
     }
 
     /**
-     * 新增用户角色关系
+     * 新增
      *
-     * @param userRoleEntity 用户角色关系
-     * @return 新增操作结果
+     * @param param 参数
+     * @return 新增成功返回true
      */
     @PostMapping
     @Operation(summary = "save", description = "新增用户角色关系")
-    public Boolean save(UserRoleEntity userRoleEntity) {
-        return userRoleService.save(userRoleEntity);
+    public Boolean save(UserRoleParam param) {
+        return userRoleService.save(param);
     }
 
     /**
-     * 修改用户角色关系
+     * 更新
      *
-     * @param userRoleEntity 用户角色关系
-     * @return 修改操作结果
+     * @param param 参数
+     * @return 更新成功返回true
      */
     @PutMapping
-    @Operation(summary = "updateById", description = "修改用户角色关系")
-    public Boolean updateById(UserRoleEntity userRoleEntity) {
-        return userRoleService.updateById(userRoleEntity);
+    @Operation(summary = "update", description = "修改用户角色关系")
+    public Boolean update(UserRoleParam param) {
+        return userRoleService.update(param);
     }
 
     /**
-     * 通过id删除用户角色关系
+     * 删除
      *
-     * @param id 用户角色关系id
-     * @return 删除操作结果
+     * @param id 主键id
+     * @return 删除成功返回true
      */
     @DeleteMapping("/{id}")
-    @Operation(summary = "removeById", description = "通过id删除用户角色关系")
-    public Boolean removeById(@PathVariable
+    @Operation(summary = "remove", description = "通过id删除用户角色关系")
+    public Boolean remove(@PathVariable
                               @Parameter(name = "id", description = "用户角色关系id")
                               @NotNull(message = "用户角色关系id不能为空")
                               Long id) {
-        return userRoleService.removeById(id);
+        return userRoleService.remove(id);
     }
 }

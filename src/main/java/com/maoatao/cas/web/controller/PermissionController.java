@@ -1,9 +1,9 @@
-package com.maoatao.cas.core.controller;
+package com.maoatao.cas.web.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.core.entity.PermissionEntity;
-import com.maoatao.cas.core.param.PageParam;
 import com.maoatao.cas.core.service.PermissionService;
+import com.maoatao.cas.web.param.PermissionParam;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,23 +32,22 @@ public class PermissionController {
     private PermissionService permissionService;
 
     /**
-     * 分页查询权限列表
+     * 分页
      *
-     * @param pageParam        分页对象
-     * @param permissionEntity 权限
-     * @return 分页权限列表
+     * @param param 参数
+     * @return 分页
      */
     @GetMapping("/page")
     @Operation(summary = "getPage", description = "分页查询权限列表")
-    public Page<PermissionEntity> getPage(PageParam pageParam, PermissionEntity permissionEntity) {
-        return permissionService.getPage(pageParam, permissionEntity);
+    public Page<PermissionEntity> getPage(PermissionParam param) {
+        return permissionService.getPage(param);
     }
 
     /**
-     * 通过id查询权限
+     * 通过id查询
      *
-     * @param id 权限id
-     * @return 权限对象
+     * @param id 主键id
+     * @return 权限
      */
     @GetMapping("/{id}")
     @Operation(summary = "getById", description = "通过id查询权限")
@@ -60,42 +59,42 @@ public class PermissionController {
     }
 
     /**
-     * 新增权限
+     * 新增
      *
-     * @param permissionEntity 权限
-     * @return 新增操作结果
+     * @param param 参数
+     * @return 新增成功返回true
      */
     @PostMapping
     @Operation(summary = "save", description = "新增权限")
-    public Boolean save(PermissionEntity permissionEntity) {
-        return permissionService.save(permissionEntity);
+    public Boolean save(PermissionParam param) {
+        return permissionService.save(param);
     }
 
     /**
-     * 修改权限
+     * 更新
      *
-     * @param permissionEntity 权限
-     * @return 修改操作结果
+     * @param param 参数
+     * @return 更新成功返回true
      */
     @PutMapping
-    @Operation(summary = "updateById", description = "修改权限")
-    public Boolean updateById(PermissionEntity permissionEntity) {
-        return permissionService.updateById(permissionEntity);
+    @Operation(summary = "update", description = "修改权限")
+    public Boolean update(PermissionParam param) {
+        return permissionService.update(param);
     }
 
     /**
-     * 通过id删除权限
+     * 删除
      *
-     * @param id 权限id
-     * @return 删除操作结果
+     * @param id 主键id
+     * @return 删除成功返回true
      */
     @DeleteMapping("/{id}")
-    @Operation(summary = "removeById", description = "通过id删除权限")
-    public Boolean removeById(@PathVariable
-                              @Parameter(name = "id", description = "权限id")
-                              @NotNull(message = "权限id不能为空")
-                              Long id) {
-        return permissionService.removeById(id);
+    @Operation(summary = "remove", description = "通过id删除权限")
+    public Boolean remove(@PathVariable
+                          @Parameter(name = "id", description = "权限id")
+                          @NotNull(message = "权限id不能为空")
+                          Long id) {
+        return permissionService.remove(id);
     }
 
 }

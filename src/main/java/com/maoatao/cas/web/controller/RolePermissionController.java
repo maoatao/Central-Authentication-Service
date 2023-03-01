@@ -1,9 +1,9 @@
-package com.maoatao.cas.core.controller;
+package com.maoatao.cas.web.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.core.entity.RolePermissionEntity;
 import com.maoatao.cas.core.service.RolePermissionService;
-import com.maoatao.cas.core.param.PageParam;
+import com.maoatao.cas.web.param.RolePermissionParam;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,23 +32,22 @@ public class RolePermissionController {
     private RolePermissionService rolePermissionService;
 
     /**
-     * 分页查询角色权限关系列表
+     * 分页
      *
-     * @param pageParam            分页对象
-     * @param rolePermissionEntity 角色权限关系
-     * @return 分页角色权限关系列表
+     * @param param 参数
+     * @return 分页
      */
     @GetMapping("/page")
     @Operation(summary = "getPage", description = "分页查询角色权限关系列表")
-    public Page<RolePermissionEntity> getPage(PageParam pageParam, RolePermissionEntity rolePermissionEntity) {
-        return rolePermissionService.getPage(pageParam, rolePermissionEntity);
+    public Page<RolePermissionEntity> getPage(RolePermissionParam param) {
+        return rolePermissionService.getPage(param);
     }
 
     /**
-     * 通过id查询角色权限关系
+     * 通过id查询
      *
-     * @param id 角色权限关系id
-     * @return 角色权限关系对象
+     * @param id 主键id
+     * @return 角色权限关系
      */
     @GetMapping("/{id}")
     @Operation(summary = "getById", description = "通过id查询角色权限关系")
@@ -60,41 +59,41 @@ public class RolePermissionController {
     }
 
     /**
-     * 新增角色权限关系
+     * 新增
      *
-     * @param rolePermissionEntity 角色权限关系
-     * @return 新增操作结果
+     * @param param 参数
+     * @return 新增成功返回true
      */
     @PostMapping
     @Operation(summary = "save", description = "新增角色权限关系")
-    public Boolean save(RolePermissionEntity rolePermissionEntity) {
-        return rolePermissionService.save(rolePermissionEntity);
+    public Boolean save(RolePermissionParam param) {
+        return rolePermissionService.save(param);
     }
 
     /**
-     * 修改角色权限关系
+     * 更新
      *
-     * @param rolePermissionEntity 角色权限关系
-     * @return 修改操作结果
+     * @param param 参数
+     * @return 更新成功返回true
      */
     @PutMapping
-    @Operation(summary = "updateById", description = "修改角色权限关系")
-    public Boolean updateById(RolePermissionEntity rolePermissionEntity) {
-        return rolePermissionService.updateById(rolePermissionEntity);
+    @Operation(summary = "update", description = "修改角色权限关系")
+    public Boolean update(RolePermissionParam param) {
+        return rolePermissionService.update(param);
     }
 
     /**
-     * 通过id删除角色权限关系
+     * 删除
      *
-     * @param id 角色权限关系id
-     * @return 删除操作结果
+     * @param id 主键id
+     * @return 删除成功返回true
      */
     @DeleteMapping("/{id}")
-    @Operation(summary = "removeById", description = "通过id删除角色权限关系")
-    public Boolean removeById(@PathVariable
-                              @Parameter(name = "id", description = "角色权限关系id")
-                              @NotNull(message = "角色权限关系id不能为空")
-                              Long id) {
-        return rolePermissionService.removeById(id);
+    @Operation(summary = "remove", description = "通过id删除角色权限关系")
+    public Boolean remove(@PathVariable
+                          @Parameter(name = "id", description = "角色权限关系id")
+                          @NotNull(message = "角色权限关系id不能为空")
+                          Long id) {
+        return rolePermissionService.remove(id);
     }
 }

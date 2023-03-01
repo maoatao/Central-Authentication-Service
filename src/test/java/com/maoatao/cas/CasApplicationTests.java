@@ -38,7 +38,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 @SpringBootTest
-class CASApplicationTests {
+class CasApplicationTests {
 
     @Autowired
     private PasswordEncoder passwordEncoder;

@@ -3,7 +3,7 @@ package com.maoatao.cas.core.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.maoatao.cas.core.entity.RolePermissionEntity;
-import com.maoatao.cas.core.param.PageParam;
+import com.maoatao.cas.web.param.RolePermissionParam;
 
 /**
  * 角色权限关系
@@ -14,11 +14,34 @@ import com.maoatao.cas.core.param.PageParam;
 public interface RolePermissionService extends IService<RolePermissionEntity> {
 
     /**
-     * 分页查询角色权限关系列表
+     * 分页
      *
-     * @param pageParam            分页对象
-     * @param rolePermissionEntity 角色权限关系
-     * @return 分页角色权限关系列表
+     * @param param 参数
+     * @return 分页
      */
-    Page<RolePermissionEntity> getPage(PageParam pageParam, RolePermissionEntity rolePermissionEntity);
+    Page<RolePermissionEntity> getPage(RolePermissionParam param);
+
+    /**
+     * 新增
+     *
+     * @param param 参数
+     * @return 新增成功返回true
+     */
+    boolean save(RolePermissionParam param);
+
+    /**
+     * 更新
+     *
+     * @param param 参数
+     * @return 更新成功返回true
+     */
+    boolean update(RolePermissionParam param);
+
+    /**
+     * 删除
+     *
+     * @param id 主键id
+     * @return 删除成功返回true
+     */
+    boolean remove(Long id);
 }

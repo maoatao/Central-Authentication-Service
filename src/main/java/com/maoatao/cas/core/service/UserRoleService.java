@@ -3,7 +3,7 @@ package com.maoatao.cas.core.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.maoatao.cas.core.entity.UserRoleEntity;
-import com.maoatao.cas.core.param.PageParam;
+import com.maoatao.cas.web.param.UserRoleParam;
 
 import java.util.List;
 
@@ -16,13 +16,12 @@ import java.util.List;
 public interface UserRoleService extends IService<UserRoleEntity> {
 
     /**
-     * 分页查询用户角色关系列表
+     * 分页
      *
-     * @param pageParam      分页对象
-     * @param userRoleEntity 用户角色关系
-     * @return 分页用户角色关系列表
+     * @param param 参数
+     * @return 分页
      */
-    Page<UserRoleEntity> getPage(PageParam pageParam, UserRoleEntity userRoleEntity);
+    Page<UserRoleEntity> getPage(UserRoleParam param);
 
     /**
      * 更新用户角色
@@ -34,4 +33,28 @@ public interface UserRoleService extends IService<UserRoleEntity> {
      * @return 更新成功返回 true
      */
     boolean updateUserRole(List<Long> roleIds, long userId);
+
+    /**
+     * 新增
+     *
+     * @param param 参数
+     * @return 新增成功返回true
+     */
+    boolean save(UserRoleParam param);
+
+    /**
+     * 更新
+     *
+     * @param param 参数
+     * @return 更新成功返回true
+     */
+    boolean update(UserRoleParam param);
+
+    /**
+     * 删除
+     *
+     * @param id 主键id
+     * @return 删除成功返回true
+     */
+    boolean remove(Long id);
 }

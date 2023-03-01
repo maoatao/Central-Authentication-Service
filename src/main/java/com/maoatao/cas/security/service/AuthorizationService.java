@@ -1,6 +1,6 @@
 package com.maoatao.cas.security.service;
 
-import com.maoatao.cas.security.bean.GenerateAuthorizationCodeParams;
+import com.maoatao.cas.web.param.GenerateAuthorizationCodeParams;
 import com.maoatao.cas.security.bean.AuthorizationInfo;
 
 /**
@@ -28,7 +28,7 @@ public interface AuthorizationService {
     Boolean revokeAccessToken(String accessToken);
 
     /**
-     * 获取授权信息
+     * 查询授权信息
      *
      * @param accessToken 令牌
      * @return 授权信息

@@ -15,7 +15,7 @@ import java.util.List;
 public interface CustomAuthorizationService extends OAuth2AuthorizationService {
 
     /**
-     * 通过主体名称获取授权集合
+     * 通过主体名称查询授权集合
      *
      * @param principalName 主体名称
      * @return 授权集合

@@ -12,10 +12,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @date 2022-10-23 23:31:22
  */
 @SpringBootApplication
-public class CASApplication {
+public class CasApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(CASApplication.class, args);
+        SpringApplication.run(CasApplication.class, args);
     }
 
 }

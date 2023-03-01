@@ -4,7 +4,7 @@ import com.maoatao.cas.security.ClientUserAuthenticationProvider;
 import com.maoatao.cas.security.service.AuthorizationService;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
 import com.maoatao.cas.security.generator.UUIDStringKeyGenerator;
-import com.maoatao.cas.security.bean.GenerateAuthorizationCodeParams;
+import com.maoatao.cas.web.param.GenerateAuthorizationCodeParams;
 import com.maoatao.cas.security.bean.AuthorizationInfo;
 import com.maoatao.cas.util.ServletUtils;
 import com.maoatao.synapse.core.lang.SynaException;

@@ -1,8 +1,10 @@
-package com.maoatao.cas.security.bean;
+package com.maoatao.cas.web.param;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.security.oauth2.core.endpoint.PkceParameterNames;
+import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -23,34 +25,42 @@ public class GenerateAuthorizationCodeParams implements Serializable {
     @Serial
     private static final long serialVersionUID = -7286826147280035652L;
     /**
-     * OAuth2 客户端id
+     * 注册客户端id
      */
-    @Schema(description = "OAuth2 客户端id")
+    @NotNull(message = "注册客户端id不能为空")
+    @Schema(description = "注册客户端id")
     private String clientId;
     /**
      * 用户名
      */
+    @NotNull(message = "用户名不能为空")
     @Schema(description = "用户名")
     private String username;
     /**
      * 密码
      */
+    @NotNull(message = "密码不能为空")
     @Schema(description = "密码")
     private String password;
     /**
-     * 范围
+     * 授权范围
      */
-    @Schema(description = "令牌范围")
+    @NotNull(message = "授权范围不能为空")
+    @Schema(description = "授权范围")
     private Set<String> scopes;
     /**
-     * 校验方法
+     * PKCE协议额外参数:校验方法
+     * <p>
+     * {@link ClientSettings#isRequireProofKey} 为 true 时必传且不能为空
      */
-    @Schema(description = "校验授权码的方法")
+    @Schema(description = "PKCE协议额外参数:校验方法")
     private String codeChallengeMethod;
     /**
-     * 校验值
+     * PKCE协议额外参数:校验值
+     * <p>
+     * {@link ClientSettings#isRequireProofKey} 为 true 时必传且不能为空
      */
-    @Schema(description = "校验授权码的值")
+    @Schema(description = "PKCE协议额外参数:校验值")
     private String codeChallenge;
 
     public Map<String, Object> getAdditionalParameters() {

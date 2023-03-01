@@ -59,7 +59,7 @@ public class SecurityUserServiceImpl implements SecurityUserService {
      * @return 权限列表
      */
     private List<CustomAuthority> getAuthorities(Long userId) {
-        return SynaSafes.of(permissionService.getByUser(userId)).stream()
+        return SynaSafes.of(permissionService.listByUser(userId)).stream()
                 .map(o -> CustomAuthority.builder().authority(o.getName()).client(o.getClientId()).build())
                 .toList();
     }

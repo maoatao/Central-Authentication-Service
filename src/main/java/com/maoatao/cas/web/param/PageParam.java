@@ -1,6 +1,7 @@
-package com.maoatao.cas.core.param;
+package com.maoatao.cas.web.param;
 
 import com.maoatao.synapse.core.bean.BaseParam;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -17,7 +18,7 @@ import java.io.Serial;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class PageParam extends BaseParam {
+public abstract class PageParam extends BaseParam {
     @Serial
     private static final long serialVersionUID = 3465282147815463165L;
 
@@ -26,6 +27,7 @@ public class PageParam extends BaseParam {
      */
     @NotNull(message = "当前页数不能为空")
     @Min(value = 1, message = "当前页数不能小于{value}")
+    @Schema(description = "当前页数")
     private Long pageNo;
 
     /**
@@ -34,5 +36,6 @@ public class PageParam extends BaseParam {
     @NotNull(message = "每页条数不能为空")
     @Min(value = 1, message = "每页条数不能小于{value}")
     @Max(value = 1000, message = "每页条数不能大于{value}")
+    @Schema(description = "每页条数")
     private Long pageSize;
 }

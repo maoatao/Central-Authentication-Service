@@ -1,13 +1,14 @@
 package com.maoatao.cas.core.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.maoatao.cas.core.entity.RoleEntity;
-import com.maoatao.cas.core.param.PageParam;
 import com.maoatao.cas.core.mapper.RoleMapper;
 import com.maoatao.cas.core.service.RoleService;
+import com.maoatao.cas.web.param.RoleParam;
 import com.maoatao.synapse.core.util.SynaAssert;
 import com.maoatao.synapse.core.util.SynaSafes;
 import org.springframework.stereotype.Service;
@@ -24,8 +25,8 @@ import java.util.List;
 public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> implements RoleService {
 
     @Override
-    public Page<RoleEntity> getPage(PageParam pageParam, RoleEntity roleEntity) {
-        return page(new Page<>(pageParam.getPageNo(), pageParam.getPageSize()), Wrappers.query(roleEntity));
+    public Page<RoleEntity> getPage(RoleParam param) {
+        return page(new Page<>(param.getPageNo(), param.getPageSize()), Wrappers.query(BeanUtil.copyProperties(param, RoleEntity.class)));
     }
 
     @Override
@@ -35,5 +36,26 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> impleme
         return SynaSafes.of(list(
                 Wrappers.<RoleEntity>lambdaQuery().in(RoleEntity::getName, roleNames).eq(RoleEntity::getClientId, clientId)
         ));
+    }
+
+    @Override
+    public boolean save(RoleParam param) {
+        return save(BeanUtil.copyProperties(param, RoleEntity.class));
+    }
+
+    @Override
+    public boolean update(RoleParam param) {
+        checkExisted(param.getId());
+        return updateById(BeanUtil.copyProperties(param, RoleEntity.class));
+    }
+
+    @Override
+    public boolean remove(Long id) {
+        checkExisted(id);
+        return removeById(id);
+    }
+
+    private void checkExisted(Long id) {
+        SynaAssert.notNull(getById(id), "{}号角色不存在!");
     }
 }

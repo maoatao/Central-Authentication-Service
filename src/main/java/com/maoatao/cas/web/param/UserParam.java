@@ -1,15 +1,9 @@
-package com.maoatao.cas.core.entity;
+package com.maoatao.cas.web.param;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Tolerate;
 
 import java.io.Serial;
 
@@ -20,36 +14,32 @@ import java.io.Serial;
  * @date 2022-12-12 14:18:22
  */
 @Data
-@Builder
-@TableName("t_cas_user")
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "用户表")
-public class UserEntity extends Model<UserEntity> {
+public class UserParam extends PageParam {
 
     @Serial
-    private static final long serialVersionUID = -5231977144633077127L;
-
+    private static final long serialVersionUID = 4486807411370303523L;
     /**
      * 主键id(自增)
      */
-    @TableId
-    @TableField(fill = FieldFill.UPDATE)
     @Schema(description = "主键id(自增)")
     private Long id;
     /**
      * CAS 开放id(唯一)
      */
-    @TableField(fill = FieldFill.INSERT)
     @Schema(description = "CAS 开放id")
     private String openId;
     /**
      * OAuth2 客户端id
      */
+    @NotNull(message = "注册客户端id不能为空")
     @Schema(description = "OAuth2 客户端id")
     private String clientId;
     /**
      * 用户名
      */
+    @NotNull(message = "用户名不能为空")
     @Schema(description = "用户名")
     private String name;
     /**
@@ -62,7 +52,4 @@ public class UserEntity extends Model<UserEntity> {
      */
     @Schema(description = "false:禁用,true:启用")
     private Boolean enabled;
-
-    @Tolerate
-    public UserEntity() {}
 }
