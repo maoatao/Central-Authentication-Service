@@ -10,6 +10,7 @@ import com.maoatao.cas.core.param.PageParam;
 import com.maoatao.cas.core.service.UserRoleService;
 import com.maoatao.synapse.core.util.SynaAssert;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -28,6 +29,7 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRoleEnt
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateUserRole(List<Long> roleIds, long userId) {
         if (IterUtil.isEmpty(roleIds)) {
             return remove(Wrappers.<UserRoleEntity>lambdaQuery().eq(UserRoleEntity::getUserId, userId));

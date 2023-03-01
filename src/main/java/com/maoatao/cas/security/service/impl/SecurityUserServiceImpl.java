@@ -1,7 +1,6 @@
 package com.maoatao.cas.security.service.impl;
 
 import cn.hutool.core.collection.IterUtil;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.maoatao.cas.core.entity.UserEntity;
 import com.maoatao.cas.core.service.PermissionService;
 import com.maoatao.cas.core.service.RoleService;
@@ -51,11 +50,11 @@ public class SecurityUserServiceImpl implements SecurityUserService {
     /**
      * 获取权限
      *
-     * @param id 用户id
+     * @param userId 用户id
      * @return 权限列表
      */
-    private List<CustomAuthority> getAuthorities(Long id) {
-        return SynaSafes.of(permissionService.getPermissionByUser(id)).stream()
+    private List<CustomAuthority> getAuthorities(Long userId) {
+        return SynaSafes.of(permissionService.getByUser(userId)).stream()
                 .map(o -> CustomAuthority.builder().authority(o.getName()).client(o.getClientId()).build())
                 .toList();
     }
