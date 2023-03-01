@@ -1,4 +1,4 @@
-package com.maoatao.cas.security.controller;
+package com.maoatao.cas.core.controller;
 
 import com.maoatao.cas.security.service.AuthorizationService;
 import com.maoatao.cas.security.bean.GenerateAuthorizationCodeParams;
