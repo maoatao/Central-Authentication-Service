@@ -84,7 +84,10 @@ public class ClientUserServiceImpl implements ClientUserService {
     public long createUser(CustomUserDetails userDetails) {
         SynaAssert.notNull(registeredClientRepository.findByClientId(userDetails.getClientId()), "注册客户端不存在!");
         long userId = saveUser(userDetails);
-        updateUserRole(getAndCheckRoleIds(userDetails.getAuthorities(), userDetails.getClientId()), userId);
+        SynaAssert.isTrue(
+                userRoleService.updateUserRole(getAndCheckRoleIds(userDetails.getAuthorities(), userDetails.getClientId()), userId),
+                "更新用户角色失败!"
+        );
         return userId;
     }
 
@@ -124,6 +127,7 @@ public class ClientUserServiceImpl implements ClientUserService {
                 .enabled(userDetails.isEnabled())
                 .build();
         SynaAssert.isTrue(userService.save(userEntity), "新增用户失败!");
+        SynaAssert.notNull(userEntity.getId(), "新增用户失败:用户 ID 为空!");
         return userEntity.getId();
     }
 
@@ -144,36 +148,11 @@ public class ClientUserServiceImpl implements ClientUserService {
                 .map(GrantedAuthority::getAuthority)
                 .distinct()
                 .toList();
-        // 通过角色名和客户端 id 查询
-        List<RoleEntity> existedRoles = roleService.list(
-                Wrappers.<RoleEntity>lambdaQuery()
-                        .in(RoleEntity::getName, roleNames)
-                        .eq(RoleEntity::getClientId, clientId)
-        );
-        return existedRoles.stream()
+        return roleService.listByRolesAndClient(roleNames, clientId).stream()
                 .map(o -> {
                     SynaAssert.isTrue(roleNames.contains(o.getName()), "角色 {} 不存在", o.getName());
                     return o.getId();
                 })
                 .toList();
-    }
-
-    private void updateUserRole(List<Long> roleIds, long userId) {
-        if (IterUtil.isEmpty(roleIds)) {
-            return;
-        }
-        // 查询已有,排除已有,列出新增和删除
-        List<Long> existed = userRoleService.list(Wrappers.<UserRoleEntity>lambdaQuery().eq(UserRoleEntity::getUserId, userId))
-                .stream()
-                .map(UserRoleEntity::getRoleId).toList();
-        // 已有不在入参为删除
-        List<Long> preDelete = existed.stream().filter(o -> !roleIds.contains(o)).toList();
-        // 入参不在已有为新增
-        List<Long> preAdd = roleIds.stream().filter(o -> !existed.contains(o)).toList();
-        SynaAssert.isTrue(userRoleService.removeBatchByIds(preDelete), "删除用户角色失败!");
-        List<UserRoleEntity> newUserRoles = preAdd.stream()
-                .map(o -> UserRoleEntity.builder().userId(userId).roleId(o).build())
-                .toList();
-        SynaAssert.isTrue(userRoleService.saveBatch(newUserRoles), "新增用户角色失败!");
     }
 }

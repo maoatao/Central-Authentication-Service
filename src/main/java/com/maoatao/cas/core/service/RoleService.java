@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.maoatao.cas.core.entity.RoleEntity;
 import com.maoatao.cas.core.param.PageParam;
 
+import java.util.List;
+
 /**
  * 角色
  *
@@ -21,4 +23,13 @@ public interface RoleService extends IService<RoleEntity> {
      * @return 分页角色列表
      */
     Page<RoleEntity> getPage(PageParam pageParam, RoleEntity roleEntity);
+
+    /**
+     * 通过角色名称和客户端 id 获取角色
+     *
+     * @param roleNames 角色名称集合
+     * @param clientId  客户端 id
+     * @return 角色集合
+     */
+    List<RoleEntity> listByRolesAndClient(List<String> roleNames, String clientId);
 }
