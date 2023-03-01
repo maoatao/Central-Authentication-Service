@@ -54,5 +54,5 @@ public class UserEntity extends Model<UserEntity> {
      * 是否启用;0:禁用,1:启用
      */
     @Schema(description = "false:禁用,true:启用")
-    private boolean enabled;
+    private Boolean enabled;
 }

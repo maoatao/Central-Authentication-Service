@@ -1,4 +1,4 @@
-package com.maoatao.cas.security;
+package com.maoatao.cas.security.bean;
 
 import org.springframework.security.core.userdetails.UserDetails;
 

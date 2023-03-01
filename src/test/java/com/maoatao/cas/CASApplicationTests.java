@@ -1,17 +1,17 @@
 package com.maoatao.cas;
 
-import com.maoatao.cas.security.bean.CustomUser;
+import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
 import com.maoatao.cas.security.generator.UUIDStringKeyGenerator;
 import com.maoatao.cas.security.service.CustomUserDetailsService;
+import com.maoatao.synapse.core.lang.SynaException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
@@ -40,6 +40,9 @@ import java.util.UUID;
 @SpringBootTest
 class CASApplicationTests {
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     /**
      * 初始化客户端信息
      */
@@ -62,10 +65,10 @@ class CASApplicationTests {
      * 创建用户信息
      */
     @Test
-    void testSaveUser() {
-        userDetailsService.createUser(CustomUser.builder()
+    void save_user_test() {
+        userDetailsService.createUser(ClientUser.builder()
                 .clientId("messaging-client")
-                .passwordEncoder(s -> "{bcrypt}" + new BCryptPasswordEncoder().encode(s))
+                .passwordEncoder(s -> passwordEncoder.encode(s))
                 .username("user")
                 .password("password")
                 .roles("USER")
@@ -76,10 +79,10 @@ class CASApplicationTests {
      * 创建测试客户端
      */
     @Test
-    void testSaveClient() {
+    void save_client_test() {
         RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("messaging-client")
-                .clientSecret("{bcrypt}" + new BCryptPasswordEncoder().encode("123456"))
+                .clientSecret(passwordEncoder.encode("123456"))
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
@@ -101,10 +104,10 @@ class CASApplicationTests {
      * 创建oidc测试客户端
      */
     @Test
-    void testSaveOidcClient() {
+    void save_oidc_client_test() {
         RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("oidc-client")
-                .clientSecret("{bcrypt}" + new BCryptPasswordEncoder().encode("123456"))
+                .clientSecret(passwordEncoder.encode("123456"))
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
@@ -123,7 +126,7 @@ class CASApplicationTests {
     }
 
     @Test
-    void testGenerateAuthorizationCode() {
+    void generate_authorization_code_test() {
         String username = "user";
         String password = "password";
         String clientId = "messaging-client";
@@ -141,11 +144,11 @@ class CASApplicationTests {
 
         RegisteredClient registeredClient = this.registeredClientRepository.findByClientId(clientId);
         if (registeredClient == null) {
-            throw new RuntimeException(OAuth2ErrorCodes.INVALID_REQUEST + ":" + OAuth2ParameterNames.CLIENT_ID);
+            throw new SynaException(OAuth2ErrorCodes.INVALID_REQUEST + ":" + OAuth2ParameterNames.CLIENT_ID);
         }
 
         if (!registeredClient.getAuthorizationGrantTypes().contains(AuthorizationGrantType.AUTHORIZATION_CODE)) {
-            throw new RuntimeException(OAuth2ErrorCodes.UNAUTHORIZED_CLIENT + ":" + OAuth2ParameterNames.CLIENT_ID);
+            throw new SynaException(OAuth2ErrorCodes.UNAUTHORIZED_CLIENT + ":" + OAuth2ParameterNames.CLIENT_ID);
         }
 
         OAuth2AuthorizationRequest authorizationRequest = OAuth2AuthorizationRequest.authorizationCode()

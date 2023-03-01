@@ -22,7 +22,7 @@ import org.springframework.util.Assert;
  * @author MaoAtao
  * @date 2023-02-28 21:35:51
  */
-public class CustomUserDetailsAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
+public class ClientUserAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 
     /**
      * The plaintext password used to perform
@@ -45,7 +45,7 @@ public class CustomUserDetailsAuthenticationProvider extends AbstractUserDetails
 
     private UserDetailsPasswordService userDetailsPasswordService;
 
-    public CustomUserDetailsAuthenticationProvider() {
+    public ClientUserAuthenticationProvider() {
         setPasswordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder());
     }
 
@@ -71,12 +71,16 @@ public class CustomUserDetailsAuthenticationProvider extends AbstractUserDetails
         Assert.notNull(this.userDetailsService, "A UserDetailsService must be set");
     }
 
+    /**
+     * 修改了该方法
+     */
     @Override
     protected final UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication)
             throws AuthenticationException {
         prepareTimingAttackProtection();
         try {
-            // TODO: 2023/2/28 怎么向Details塞参数? WebAuthenticationDetails
+            // 上游构建 AuthorizationService buildPrincipal 时, details 设定为 clientId
+            // 通过用户名和客户端 id 查询一个用户
             UserDetails loadedUser = this.getUserDetailsService().getUser(username, authentication.getDetails());
             if (loadedUser == null) {
                 throw new InternalAuthenticationServiceException(

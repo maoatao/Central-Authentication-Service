@@ -1,5 +1,6 @@
 package com.maoatao.cas.security.service.impl;
 
+import com.maoatao.cas.security.ClientUserAuthenticationProvider;
 import com.maoatao.cas.security.service.AuthorizationService;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
 import com.maoatao.cas.security.generator.UUIDStringKeyGenerator;
@@ -59,7 +60,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     public String generateAuthorizationCode(GenerateAuthorizationCodeParams params) {
         RegisteredClient registeredClient = getRegisteredClient(params.getClientId());
         checkParams(params, registeredClient);
-        Authentication principal = buildPrincipal(params.getUsername(), params.getPassword());
+        Authentication principal = buildPrincipal(params.getClientId(), params.getUsername(), params.getPassword());
         OAuth2TokenContext tokenContext = buildTokenContext(params, registeredClient, principal);
         OAuth2AuthorizationCode authorizationCode = buildAuthorizationCode(tokenContext);
         saveAuthorization(params, registeredClient, principal, authorizationCode);
@@ -103,21 +104,25 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
     /**
      * 构建身份验证
+     * <p>
+     * {@link ClientUserAuthenticationProvider}
      *
+     * @param clientId 客户端 Id
      * @param username 用户名
      * @param password 密码
      * @return 用户身份验证
      */
-    private Authentication buildPrincipal(String username, String password) {
+    private Authentication buildPrincipal(String clientId, String username, String password) {
         Authentication authentication;
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+        authenticationToken.setDetails(clientId);
         try {
             authentication = authenticationManager.authenticate(authenticationToken);
         } catch (Exception e) {
-            throw new RuntimeException("用户身份验证失败!", e);
+            throw new SynaException("用户身份验证失败!", e);
         }
         if (authentication == null) {
-            throw new RuntimeException("生成用户身份验证失败!");
+            throw new SynaException("生成用户身份验证失败!");
         }
         return authentication;
     }
@@ -131,10 +136,10 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     private RegisteredClient getRegisteredClient(String clientId) {
         RegisteredClient registeredClient = registeredClientRepository.findByClientId(clientId);
         if (registeredClient == null) {
-            throw new RuntimeException("无效的客户端!");
+            throw new SynaException("无效的客户端!");
         }
         if (!registeredClient.getAuthorizationGrantTypes().contains(AuthorizationGrantType.AUTHORIZATION_CODE)) {
-            throw new RuntimeException("无效的授权类型!");
+            throw new SynaException("无效的授权类型!");
         }
         return registeredClient;
     }
@@ -157,7 +162,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
                     .additionalParameters(params.getAdditionalParameters())
                     .build();
         } catch (Exception e) {
-            throw new RuntimeException("生成用户身份验证失败!", e);
+            throw new SynaException("生成用户身份验证失败!", e);
         }
         return authorizationRequest;
     }
@@ -180,7 +185,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
                     .authorizedScopes(params.getScopes())
                     .build();
         } catch (Exception e) {
-            throw new RuntimeException("生成令牌上下文失败!", e);
+            throw new SynaException("生成令牌上下文失败!", e);
         }
         return tokenContext;
     }
@@ -196,10 +201,10 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         try {
             authorizationCode = TOKEN_GENERATOR.generate(tokenContext);
         } catch (Exception e) {
-            throw new RuntimeException("授权码生成失败!", e);
+            throw new SynaException("授权码生成失败!", e);
         }
         if (authorizationCode == null) {
-            throw new RuntimeException("授权码生成失败!");
+            throw new SynaException("授权码生成失败!");
         }
         return authorizationCode;
     }
@@ -228,12 +233,12 @@ public class AuthorizationServiceImpl implements AuthorizationService {
                     .token(authorizationCode)
                     .build();
         } catch (Exception e) {
-            throw new RuntimeException("生成授权信息失败!", e);
+            throw new SynaException("生成授权信息失败!", e);
         }
         try {
             oAuth2AuthorizationService.save(authorization);
         } catch (Exception e) {
-            throw new RuntimeException("保存授权信息失败!", e);
+            throw new SynaException("保存授权信息失败!", e);
         }
     }
 

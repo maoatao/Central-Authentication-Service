@@ -8,9 +8,9 @@ import com.maoatao.cas.core.service.PermissionService;
 import com.maoatao.cas.core.service.RoleService;
 import com.maoatao.cas.core.service.UserRoleService;
 import com.maoatao.cas.core.service.UserService;
-import com.maoatao.cas.security.CustomUserDetails;
+import com.maoatao.cas.security.bean.CustomUserDetails;
 import com.maoatao.cas.security.bean.CustomAuthority;
-import com.maoatao.cas.security.bean.CustomUser;
+import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.security.service.CustomUserDetailsService;
 import com.maoatao.synapse.core.util.SynaAssert;
 import com.maoatao.synapse.core.util.SynaSafes;
@@ -64,8 +64,8 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
     public CustomUserDetails getUser(String username, Object details) throws UsernameNotFoundException {
         UserEntity userEntity = getUser(username, details.toString());
         SynaAssert.notNull(userEntity, "用户名或密码错误");
-        SynaAssert.isTrue(userEntity.isEnabled(), "该用户已被禁用");
-        return CustomUser.builder()
+        SynaAssert.isTrue(userEntity.getEnabled(), "该用户已被禁用");
+        return ClientUser.builder()
                 .clientId(userEntity.getClientId())
                 .username(userEntity.getName())
                 .password(userEntity.getPassword())
@@ -80,7 +80,7 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean createUser(CustomUserDetails user) {
-        if (user instanceof CustomUser userDetails) {
+        if (user instanceof ClientUser userDetails) {
             SynaAssert.notNull(registeredClientRepository.findByClientId(userDetails.getClientId()), "注册客户端不存在!");
             // TODO: 2023/2/28 校验用户已存在
             UserEntity userEntity = new UserEntity();

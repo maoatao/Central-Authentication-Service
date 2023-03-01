@@ -1,6 +1,6 @@
 package com.maoatao.cas.security.service;
 
-import com.maoatao.cas.security.CustomUserDetails;
+import com.maoatao.cas.security.bean.CustomUserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**

@@ -1,7 +1,6 @@
 package com.maoatao.cas.security.bean;
 
-import com.maoatao.cas.security.CustomUserDetails;
-import com.maoatao.cas.security.CustomUserDetailsAuthenticationProvider;
+import com.maoatao.cas.security.ClientUserAuthenticationProvider;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +27,7 @@ import java.util.TreeSet;
 import java.util.function.Function;
 
 /**
- * 自定义用户详情
+ * 自定义客户端用户
  * <p>
  * Customized by {@link org.springframework.security.core.userdetails.User}
  *
@@ -38,7 +37,7 @@ import java.util.function.Function;
 @Slf4j
 @Getter
 @ToString
-public class CustomUser implements CustomUserDetails, CredentialsContainer {
+public class ClientUser implements CustomUserDetails, CredentialsContainer {
 
     @Serial
     private static final long serialVersionUID = -1660229161744567202L;
@@ -62,13 +61,13 @@ public class CustomUser implements CustomUserDetails, CredentialsContainer {
     /**
      * Calls the more complex constructor with all boolean arguments set to {@code true}.
      */
-    public CustomUser(String clientId, String username, String password, Collection<? extends GrantedAuthority> authorities) {
+    public ClientUser(String clientId, String username, String password, Collection<? extends GrantedAuthority> authorities) {
         this(clientId, username, password, true, true, true, true, authorities);
     }
 
     /**
      * Construct the <code>CustomUser</code> with the details required by
-     * {@link CustomUserDetailsAuthenticationProvider}.
+     * {@link ClientUserAuthenticationProvider}.
      *
      * @param clientId              客户端 Id
      * @param username              the username presented to the
@@ -85,7 +84,7 @@ public class CustomUser implements CustomUserDetails, CredentialsContainer {
      * @throws IllegalArgumentException if a <code>null</code> value was passed either as
      *                                  a parameter or as an element in the <code>GrantedAuthority</code> collection
      */
-    public CustomUser(String clientId, String username, String password, boolean enabled, boolean accountNonExpired,
+    public ClientUser(String clientId, String username, String password, boolean enabled, boolean accountNonExpired,
                       boolean credentialsNonExpired, boolean accountNonLocked,
                       Collection<? extends GrantedAuthority> authorities) {
         Assert.isTrue(username != null && !"".equals(username) && password != null,
@@ -144,7 +143,7 @@ public class CustomUser implements CustomUserDetails, CredentialsContainer {
         Assert.notNull(authorities, "Cannot pass a null GrantedAuthority collection");
         // Ensure array iteration order is predictable (as per
         // UserDetails.getAuthorities() contract and SEC-717)
-        SortedSet<GrantedAuthority> sortedAuthorities = new TreeSet<>(new CustomUser.AuthorityComparator());
+        SortedSet<GrantedAuthority> sortedAuthorities = new TreeSet<>(new ClientUser.AuthorityComparator());
         for (GrantedAuthority grantedAuthority : authorities) {
             Assert.notNull(grantedAuthority, "GrantedAuthority list cannot contain any null elements");
             sortedAuthorities.add(grantedAuthority);
@@ -158,7 +157,7 @@ public class CustomUser implements CustomUserDetails, CredentialsContainer {
      * @param username the username to use
      * @return the UserBuilder
      */
-    public static CustomUser.UserBuilder withUsername(String username) {
+    public static ClientUser.UserBuilder withUsername(String username) {
         return builder().username(username);
     }
 
@@ -167,8 +166,8 @@ public class CustomUser implements CustomUserDetails, CredentialsContainer {
      *
      * @return the UserBuilder
      */
-    public static CustomUser.UserBuilder builder() {
-        return new CustomUser.UserBuilder();
+    public static ClientUser.UserBuilder builder() {
+        return new ClientUser.UserBuilder();
     }
 
     /**
@@ -228,14 +227,14 @@ public class CustomUser implements CustomUserDetails, CredentialsContainer {
      * is considered insecure for production purposes.
      */
     @Deprecated
-    public static CustomUser.UserBuilder withDefaultPasswordEncoder() {
+    public static ClientUser.UserBuilder withDefaultPasswordEncoder() {
         log.warn("CustomUser.withDefaultPasswordEncoder() is considered unsafe for production "
                 + "and is only intended for sample applications.");
         PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
         return builder().passwordEncoder(encoder::encode);
     }
 
-    public static CustomUser.UserBuilder withUserDetails(UserDetails userDetails) {
+    public static ClientUser.UserBuilder withUserDetails(UserDetails userDetails) {
         // @formatter:off
         return withUsername(userDetails.getUsername())
                 .password(userDetails.getPassword())
@@ -302,10 +301,10 @@ public class CustomUser implements CustomUserDetails, CredentialsContainer {
          * Populates the clientId. This attribute is required.
          *
          * @param clientId the clientId. Cannot be null.
-         * @return the {@link CustomUser.UserBuilder} for method chaining (i.e. to populate
+         * @return the {@link ClientUser.UserBuilder} for method chaining (i.e. to populate
          * additional attributes for this user)
          */
-        public CustomUser.UserBuilder clientId(String clientId) {
+        public ClientUser.UserBuilder clientId(String clientId) {
             Assert.notNull(clientId, "clientId cannot be null");
             this.clientId = clientId;
             return this;
@@ -315,10 +314,10 @@ public class CustomUser implements CustomUserDetails, CredentialsContainer {
          * Populates the username. This attribute is required.
          *
          * @param username the username. Cannot be null.
-         * @return the {@link CustomUser.UserBuilder} for method chaining (i.e. to populate
+         * @return the {@link ClientUser.UserBuilder} for method chaining (i.e. to populate
          * additional attributes for this user)
          */
-        public CustomUser.UserBuilder username(String username) {
+        public ClientUser.UserBuilder username(String username) {
             Assert.notNull(username, "username cannot be null");
             this.username = username;
             return this;
@@ -328,10 +327,10 @@ public class CustomUser implements CustomUserDetails, CredentialsContainer {
          * Populates the password. This attribute is required.
          *
          * @param password the password. Cannot be null.
-         * @return the {@link CustomUser.UserBuilder} for method chaining (i.e. to populate
+         * @return the {@link ClientUser.UserBuilder} for method chaining (i.e. to populate
          * additional attributes for this user)
          */
-        public CustomUser.UserBuilder password(String password) {
+        public ClientUser.UserBuilder password(String password) {
             Assert.notNull(password, "password cannot be null");
             this.password = password;
             return this;
@@ -342,10 +341,10 @@ public class CustomUser implements CustomUserDetails, CredentialsContainer {
          * {@link #password(String)}.
          *
          * @param encoder the encoder to use
-         * @return the {@link CustomUser.UserBuilder} for method chaining (i.e. to populate
+         * @return the {@link ClientUser.UserBuilder} for method chaining (i.e. to populate
          * additional attributes for this user)
          */
-        public CustomUser.UserBuilder passwordEncoder(Function<String, String> encoder) {
+        public ClientUser.UserBuilder passwordEncoder(Function<String, String> encoder) {
             Assert.notNull(encoder, "encoder cannot be null");
             this.passwordEncoder = encoder;
             return this;
@@ -373,10 +372,10 @@ public class CustomUser implements CustomUserDetails, CredentialsContainer {
          *
          * @param roles the roles for this user (i.e. USER, ADMIN, etc). Cannot be null,
          *              contain null values or start with "ROLE_"
-         * @return the {@link CustomUser.UserBuilder} for method chaining (i.e. to populate
+         * @return the {@link ClientUser.UserBuilder} for method chaining (i.e. to populate
          * additional attributes for this user)
          */
-        public CustomUser.UserBuilder roles(String... roles) {
+        public ClientUser.UserBuilder roles(String... roles) {
             List<GrantedAuthority> authorities = new ArrayList<>(roles.length);
             for (String role : roles) {
                 Assert.isTrue(!role.startsWith("ROLE_"),
@@ -391,11 +390,11 @@ public class CustomUser implements CustomUserDetails, CredentialsContainer {
          *
          * @param authorities the authorities for this user. Cannot be null, or contain
          *                    null values
-         * @return the {@link CustomUser.UserBuilder} for method chaining (i.e. to populate
+         * @return the {@link ClientUser.UserBuilder} for method chaining (i.e. to populate
          * additional attributes for this user)
          * @see #roles(String...)
          */
-        public CustomUser.UserBuilder authorities(GrantedAuthority... authorities) {
+        public ClientUser.UserBuilder authorities(GrantedAuthority... authorities) {
             return authorities(Arrays.asList(authorities));
         }
 
@@ -404,11 +403,11 @@ public class CustomUser implements CustomUserDetails, CredentialsContainer {
          *
          * @param authorities the authorities for this user. Cannot be null, or contain
          *                    null values
-         * @return the {@link CustomUser.UserBuilder} for method chaining (i.e. to populate
+         * @return the {@link ClientUser.UserBuilder} for method chaining (i.e. to populate
          * additional attributes for this user)
          * @see #roles(String...)
          */
-        public CustomUser.UserBuilder authorities(Collection<? extends GrantedAuthority> authorities) {
+        public ClientUser.UserBuilder authorities(Collection<? extends GrantedAuthority> authorities) {
             this.authorities = new ArrayList<>(authorities);
             return this;
         }
@@ -418,11 +417,11 @@ public class CustomUser implements CustomUserDetails, CredentialsContainer {
          *
          * @param authorities the authorities for this user (i.e. ROLE_USER, ROLE_ADMIN,
          *                    etc). Cannot be null, or contain null values
-         * @return the {@link CustomUser.UserBuilder} for method chaining (i.e. to populate
+         * @return the {@link ClientUser.UserBuilder} for method chaining (i.e. to populate
          * additional attributes for this user)
          * @see #roles(String...)
          */
-        public CustomUser.UserBuilder authorities(String... authorities) {
+        public ClientUser.UserBuilder authorities(String... authorities) {
             return authorities(AuthorityUtils.createAuthorityList(authorities));
         }
 
@@ -430,10 +429,10 @@ public class CustomUser implements CustomUserDetails, CredentialsContainer {
          * Defines if the account is expired or not. Default is false.
          *
          * @param accountExpired true if the account is expired, false otherwise
-         * @return the {@link CustomUser.UserBuilder} for method chaining (i.e. to populate
+         * @return the {@link ClientUser.UserBuilder} for method chaining (i.e. to populate
          * additional attributes for this user)
          */
-        public CustomUser.UserBuilder accountExpired(boolean accountExpired) {
+        public ClientUser.UserBuilder accountExpired(boolean accountExpired) {
             this.accountExpired = accountExpired;
             return this;
         }
@@ -442,10 +441,10 @@ public class CustomUser implements CustomUserDetails, CredentialsContainer {
          * Defines if the account is locked or not. Default is false.
          *
          * @param accountLocked true if the account is locked, false otherwise
-         * @return the {@link CustomUser.UserBuilder} for method chaining (i.e. to populate
+         * @return the {@link ClientUser.UserBuilder} for method chaining (i.e. to populate
          * additional attributes for this user)
          */
-        public CustomUser.UserBuilder accountLocked(boolean accountLocked) {
+        public ClientUser.UserBuilder accountLocked(boolean accountLocked) {
             this.accountLocked = accountLocked;
             return this;
         }
@@ -454,10 +453,10 @@ public class CustomUser implements CustomUserDetails, CredentialsContainer {
          * Defines if the credentials are expired or not. Default is false.
          *
          * @param credentialsExpired true if the credentials are expired, false otherwise
-         * @return the {@link CustomUser.UserBuilder} for method chaining (i.e. to populate
+         * @return the {@link ClientUser.UserBuilder} for method chaining (i.e. to populate
          * additional attributes for this user)
          */
-        public CustomUser.UserBuilder credentialsExpired(boolean credentialsExpired) {
+        public ClientUser.UserBuilder credentialsExpired(boolean credentialsExpired) {
             this.credentialsExpired = credentialsExpired;
             return this;
         }
@@ -466,17 +465,17 @@ public class CustomUser implements CustomUserDetails, CredentialsContainer {
          * Defines if the account is disabled or not. Default is false.
          *
          * @param disabled true if the account is disabled, false otherwise
-         * @return the {@link CustomUser.UserBuilder} for method chaining (i.e. to populate
+         * @return the {@link ClientUser.UserBuilder} for method chaining (i.e. to populate
          * additional attributes for this user)
          */
-        public CustomUser.UserBuilder disabled(boolean disabled) {
+        public ClientUser.UserBuilder disabled(boolean disabled) {
             this.disabled = disabled;
             return this;
         }
 
         public CustomUserDetails build() {
             String encodedPassword = this.passwordEncoder.apply(this.password);
-            return new CustomUser(this.username, encodedPassword, clientId, !this.disabled, !this.accountExpired,
+            return new ClientUser(this.clientId, this.username, encodedPassword, !this.disabled, !this.accountExpired,
                     !this.credentialsExpired, !this.accountLocked, this.authorities);
         }
 

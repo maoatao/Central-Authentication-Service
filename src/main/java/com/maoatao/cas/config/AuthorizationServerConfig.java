@@ -1,6 +1,6 @@
 package com.maoatao.cas.config;
 
-import com.maoatao.cas.security.CustomUserDetailsAuthenticationProvider;
+import com.maoatao.cas.security.ClientUserAuthenticationProvider;
 import com.maoatao.cas.security.oauth2.auth.CustomAccessTokenGenerator;
 import com.maoatao.cas.security.oauth2.auth.RedisAuthorizationService;
 import com.maoatao.cas.security.filter.BearerTokenFilterConfigurer;
@@ -24,6 +24,8 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.security.oauth2.core.oidc.endpoint.OidcParameterNames;
 import org.springframework.security.oauth2.jwt.JwsHeader;
@@ -94,12 +96,14 @@ public class AuthorizationServerConfig {
 
     /**
      * 用户详细信息身份验证提供程序
+     * <p>
+     * 自定义查询用户,通过用户名称和客户端 id 查询一个用户.提供多客户端同名用户身份验证
      */
     @Bean
     public AbstractUserDetailsAuthenticationProvider abstractUserDetailsAuthenticationProvider(CustomUserDetailsService userDetailsService) {
-        CustomUserDetailsAuthenticationProvider customUserDetailsAuthenticationProvider = new CustomUserDetailsAuthenticationProvider();
-        customUserDetailsAuthenticationProvider.setUserDetailsService(userDetailsService);
-        return customUserDetailsAuthenticationProvider;
+        ClientUserAuthenticationProvider clientUserAuthenticationProvider = new ClientUserAuthenticationProvider();
+        clientUserAuthenticationProvider.setUserDetailsService(userDetailsService);
+        return clientUserAuthenticationProvider;
     }
 
     /**
@@ -158,8 +162,8 @@ public class AuthorizationServerConfig {
     @Bean
     public JWKSource<SecurityContext> jwkSource() {
         KeyPair keyPair = AuthorizationServerUtils.generateRsaKey();
-        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
-        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
+        RSAPublicKey publicKey = (RSAPublicKey)keyPair.getPublic();
+        RSAPrivateKey privateKey = (RSAPrivateKey)keyPair.getPrivate();
         RSAKey rsaKey = new RSAKey.Builder(publicKey)
                 .privateKey(privateKey)
                 .keyID(UUID.randomUUID().toString())
@@ -193,6 +197,11 @@ public class AuthorizationServerConfig {
                 claims.claim("customerClaim", "这是一个自定义id_token claim");
             }
         };
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
 
