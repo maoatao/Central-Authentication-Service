@@ -16,6 +16,7 @@ import com.maoatao.synapse.core.util.SynaSafes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +49,9 @@ public class SecurityUserServiceImpl implements SecurityUserService {
     @Autowired
     private RegisteredClientRepository registeredClientRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     /**
      * 获取权限
      *
@@ -64,7 +68,7 @@ public class SecurityUserServiceImpl implements SecurityUserService {
     public CustomUserDetails getUser(String username, Object details) throws UsernameNotFoundException {
         UserEntity userEntity = userService.getByNameAndClient(username, details.toString());
         SynaAssert.notNull(userEntity, "用户 {} 不存在!", username);
-        SynaAssert.isTrue(userEntity.getEnabled(), "该用户已被禁用");
+        SynaAssert.isTrue(userEntity.getEnabled(), "用户 {} 已被禁用", username);
         return SecurityUser.builder()
                 .clientId(userEntity.getClientId())
                 .username(userEntity.getName())
@@ -101,13 +105,12 @@ public class SecurityUserServiceImpl implements SecurityUserService {
     @Transactional(rollbackFor = Exception.class)
     public boolean updateUser(CustomUserDetails userDetails) {
         checkClient(userDetails.getClientId());
-        UserEntity existed = userService.getByNameAndClient(userDetails.getUsername(), userDetails.getClientId());
-        SynaAssert.notNull(existed, "用户 {} 不存在!", userDetails.getUsername());
-        existed = BeanUtil.copyProperties(UserEntity.builder()
+        UserEntity existed = getAndCheckUser(userDetails.getUsername(), userDetails.getClientId());
+        BeanUtil.copyProperties(UserEntity.builder()
                 .clientId(userDetails.getClientId())
                 .name(userDetails.getUsername())
                 .enabled(userDetails.isEnabled())
-                .build(), UserEntity.class);
+                .build(), existed);
         SynaAssert.isTrue(userService.updateById(existed), "更新用户失败!");
         SynaAssert.isTrue(
                 userRoleService.updateUserRole(getAndCheckRoleIds(userDetails.getAuthorities(), userDetails.getClientId()), existed.getId()),
@@ -118,22 +121,46 @@ public class SecurityUserServiceImpl implements SecurityUserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean deleteUser(String username) {
+    public boolean deleteUser(String username, String clientId) {
+        UserEntity existed = getAndCheckUser(username, clientId);
+        SynaAssert.isTrue(userService.removeById(existed), "删除用户失败!");
+        SynaAssert.isTrue(userRoleService.updateUserRole(null, existed.getId()), "删除用户解绑角色失败!");
         return true;
     }
 
     @Override
-    public boolean changePassword(String oldPassword, String newPassword) {
-        return true;
+    public boolean changePassword(String username, String clientId, String oldPassword, String newPassword) {
+        UserEntity existed = getAndCheckUser(username, clientId);
+        SynaAssert.isTrue(passwordEncoder.matches(oldPassword, existed.getPassword()), "修改密码失败:原密码错误!");
+        existed.setPassword(passwordEncoder.encode(newPassword));
+        return userService.updateById(existed);
     }
 
     @Override
     public boolean userExists(String username, String clientId) {
-        return true;
+        return userService.getByNameAndClient(username, clientId) != null;
     }
 
+    /**
+     * 校验客户端是否存在
+     *
+     * @param clientId 客户端 id
+     */
     private void checkClient(String clientId) {
-        SynaAssert.notNull(registeredClientRepository.findByClientId(clientId), "注册客户端不存在!");
+        SynaAssert.notNull(registeredClientRepository.findByClientId(clientId), "客户端 {} 不存在!", clientId);
+    }
+
+    /**
+     * 按用户名称和客户端 id 获取并校验用户是否存在
+     *
+     * @param username 用户名称
+     * @param clientId 客户端 id
+     * @return 用户
+     */
+    private UserEntity getAndCheckUser(String username, String clientId) {
+        UserEntity existed = userService.getByNameAndClient(username, clientId);
+        SynaAssert.notNull(existed, "用户 {} 不存在!", username);
+        return existed;
     }
 
     /**

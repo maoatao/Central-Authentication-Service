@@ -23,7 +23,7 @@ public interface UserService extends IService<UserEntity> {
     Page<UserEntity> getPage(PageParam pageParam, UserEntity entity);
 
     /**
-     * 按名称和客户获取用户
+     * 按用户名称和客户端 id 获取用户
      *
      * @param name     名称
      * @param clientId 客户端 id

@@ -45,16 +45,18 @@ public interface SecurityUserService {
      * @param username 用户名
      * @return 删除成功返回true
      */
-    boolean deleteUser(String username);
+    boolean deleteUser(String username, String clientId);
 
     /**
      * 修改密码
      *
+     * @param username    用户名
+     * @param clientId    客户端 Id
      * @param oldPassword 旧密码
      * @param newPassword 新密码
      * @return 修改成功返回true
      */
-    boolean changePassword(String oldPassword, String newPassword);
+    boolean changePassword(String username, String clientId, String oldPassword, String newPassword);
 
     /**
      * 存在用户
