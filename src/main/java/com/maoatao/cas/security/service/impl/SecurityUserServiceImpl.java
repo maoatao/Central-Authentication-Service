@@ -1,5 +1,6 @@
 package com.maoatao.cas.security.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.IterUtil;
 import com.maoatao.cas.core.entity.UserEntity;
 import com.maoatao.cas.core.service.PermissionService;
@@ -8,7 +9,7 @@ import com.maoatao.cas.core.service.UserRoleService;
 import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.security.bean.CustomUserDetails;
 import com.maoatao.cas.security.bean.CustomAuthority;
-import com.maoatao.cas.security.bean.ClientUser;
+import com.maoatao.cas.security.bean.SecurityUser;
 import com.maoatao.cas.security.service.SecurityUserService;
 import com.maoatao.synapse.core.util.SynaAssert;
 import com.maoatao.synapse.core.util.SynaSafes;
@@ -64,7 +65,7 @@ public class SecurityUserServiceImpl implements SecurityUserService {
         UserEntity userEntity = userService.getByNameAndClient(username, details.toString());
         SynaAssert.notNull(userEntity, "用户 {} 不存在!", username);
         SynaAssert.isTrue(userEntity.getEnabled(), "该用户已被禁用");
-        return ClientUser.builder()
+        return SecurityUser.builder()
                 .clientId(userEntity.getClientId())
                 .username(userEntity.getName())
                 .password(userEntity.getPassword())
@@ -79,43 +80,8 @@ public class SecurityUserServiceImpl implements SecurityUserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public long createUser(CustomUserDetails userDetails) {
-        SynaAssert.notNull(registeredClientRepository.findByClientId(userDetails.getClientId()), "注册客户端不存在!");
-        long userId = saveUser(userDetails);
-        SynaAssert.isTrue(
-                userRoleService.updateUserRole(getAndCheckRoleIds(userDetails.getAuthorities(), userDetails.getClientId()), userId),
-                "新用户绑定角色失败!"
-        );
-        return userId;
-    }
-
-    @Override
-    public boolean updateUser(CustomUserDetails userDetails) {
-        return false;
-    }
-
-    @Override
-    public boolean deleteUser(String username) {
-        return false;
-    }
-
-    @Override
-    public boolean changePassword(String oldPassword, String newPassword) {
-        return false;
-    }
-
-    @Override
-    public boolean userExists(String username, String clientId) {
-        return false;
-    }
-
-    /**
-     * 新增用户
-     *
-     * @param userDetails 用户详情
-     * @return 用户id(表主键)
-     */
-    private long saveUser(CustomUserDetails userDetails) {
-        SynaAssert.isNull(getUser(userDetails.getUsername(), userDetails.getClientId()), "用户名 {} 已存在", userDetails.getUsername());
+        checkClient(userDetails.getClientId());
+        SynaAssert.isNull(userService.getByNameAndClient(userDetails.getUsername(), userDetails.getClientId()), "用户名 {} 已存在", userDetails.getUsername());
         UserEntity userEntity = UserEntity.builder()
                 .clientId(userDetails.getClientId())
                 .name(userDetails.getUsername())
@@ -124,7 +90,50 @@ public class SecurityUserServiceImpl implements SecurityUserService {
                 .build();
         SynaAssert.isTrue(userService.save(userEntity), "新增用户失败!");
         SynaAssert.notNull(userEntity.getId(), "新增用户失败:用户 ID 为空!");
+        SynaAssert.isTrue(
+                userRoleService.updateUserRole(getAndCheckRoleIds(userDetails.getAuthorities(), userDetails.getClientId()), userEntity.getId()),
+                "新用户绑定角色失败!"
+        );
         return userEntity.getId();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateUser(CustomUserDetails userDetails) {
+        checkClient(userDetails.getClientId());
+        UserEntity existed = userService.getByNameAndClient(userDetails.getUsername(), userDetails.getClientId());
+        SynaAssert.notNull(existed, "用户 {} 不存在!", userDetails.getUsername());
+        existed = BeanUtil.copyProperties(UserEntity.builder()
+                .clientId(userDetails.getClientId())
+                .name(userDetails.getUsername())
+                .enabled(userDetails.isEnabled())
+                .build(), UserEntity.class);
+        SynaAssert.isTrue(userService.updateById(existed), "更新用户失败!");
+        SynaAssert.isTrue(
+                userRoleService.updateUserRole(getAndCheckRoleIds(userDetails.getAuthorities(), userDetails.getClientId()), existed.getId()),
+                "更新用户绑定角色失败!"
+        );
+        return true;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean deleteUser(String username) {
+        return true;
+    }
+
+    @Override
+    public boolean changePassword(String oldPassword, String newPassword) {
+        return true;
+    }
+
+    @Override
+    public boolean userExists(String username, String clientId) {
+        return true;
+    }
+
+    private void checkClient(String clientId) {
+        SynaAssert.notNull(registeredClientRepository.findByClientId(clientId), "注册客户端不存在!");
     }
 
     /**

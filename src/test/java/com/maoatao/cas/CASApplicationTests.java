@@ -1,6 +1,6 @@
 package com.maoatao.cas;
 
-import com.maoatao.cas.security.bean.ClientUser;
+import com.maoatao.cas.security.bean.SecurityUser;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
 import com.maoatao.cas.security.generator.UUIDStringKeyGenerator;
 import com.maoatao.cas.security.service.SecurityUserService;
@@ -66,7 +66,7 @@ class CASApplicationTests {
      */
     @Test
     void save_user_test() {
-        securityUserService.createUser(ClientUser.builder()
+        securityUserService.createUser(SecurityUser.builder()
                 .clientId("messaging-client")
                 .passwordEncoder(s -> passwordEncoder.encode(s))
                 .username("user")
