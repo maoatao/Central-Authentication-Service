@@ -5,7 +5,7 @@
 ## 介绍
 
 Central Authentication Service (CAS 中央认证服务 OAuth2.1协议)
-基于spring-authorization-server开发
+基于Spring Authorization Server开发
 
 ## 帮助
 
