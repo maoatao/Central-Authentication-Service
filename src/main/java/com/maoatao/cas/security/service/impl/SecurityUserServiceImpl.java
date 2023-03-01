@@ -2,9 +2,7 @@ package com.maoatao.cas.security.service.impl;
 
 import cn.hutool.core.collection.IterUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.maoatao.cas.core.entity.RoleEntity;
 import com.maoatao.cas.core.entity.UserEntity;
-import com.maoatao.cas.core.entity.UserRoleEntity;
 import com.maoatao.cas.core.service.PermissionService;
 import com.maoatao.cas.core.service.RoleService;
 import com.maoatao.cas.core.service.UserRoleService;
@@ -12,7 +10,7 @@ import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.security.bean.CustomUserDetails;
 import com.maoatao.cas.security.bean.CustomAuthority;
 import com.maoatao.cas.security.bean.ClientUser;
-import com.maoatao.cas.security.service.ClientUserService;
+import com.maoatao.cas.security.service.SecurityUserService;
 import com.maoatao.synapse.core.util.SynaAssert;
 import com.maoatao.synapse.core.util.SynaSafes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +31,7 @@ import java.util.List;
  * @date 2021-05-13 15:16:19
  */
 @Service
-public class ClientUserServiceImpl implements ClientUserService {
+public class SecurityUserServiceImpl implements SecurityUserService {
 
     @Autowired
     private UserService userService;

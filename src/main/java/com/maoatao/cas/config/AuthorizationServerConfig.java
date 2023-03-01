@@ -4,7 +4,7 @@ import com.maoatao.cas.security.ClientUserAuthenticationProvider;
 import com.maoatao.cas.security.oauth2.auth.CustomAccessTokenGenerator;
 import com.maoatao.cas.security.oauth2.auth.RedisAuthorizationService;
 import com.maoatao.cas.security.filter.BearerTokenFilterConfigurer;
-import com.maoatao.cas.security.service.ClientUserService;
+import com.maoatao.cas.security.service.SecurityUserService;
 import com.maoatao.cas.util.AuthorizationServerUtils;
 import com.maoatao.cas.security.oauth2.auth.CustomRefreshTokenGenerator;
 import com.maoatao.cas.security.generator.UUIDStringKeyGenerator;
@@ -100,7 +100,7 @@ public class AuthorizationServerConfig {
      * 自定义查询用户,通过用户名称和客户端 id 查询一个用户.提供多客户端同名用户身份验证
      */
     @Bean
-    public AbstractUserDetailsAuthenticationProvider abstractUserDetailsAuthenticationProvider(ClientUserService userDetailsService) {
+    public AbstractUserDetailsAuthenticationProvider abstractUserDetailsAuthenticationProvider(SecurityUserService userDetailsService) {
         ClientUserAuthenticationProvider clientUserAuthenticationProvider = new ClientUserAuthenticationProvider();
         clientUserAuthenticationProvider.setClientUserService(userDetailsService);
         return clientUserAuthenticationProvider;

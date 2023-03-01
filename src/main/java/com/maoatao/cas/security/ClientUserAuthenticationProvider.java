@@ -1,6 +1,6 @@
 package com.maoatao.cas.security;
 
-import com.maoatao.cas.security.service.ClientUserService;
+import com.maoatao.cas.security.service.SecurityUserService;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -41,7 +41,7 @@ public class ClientUserAuthenticationProvider extends AbstractUserDetailsAuthent
      */
     private volatile String userNotFoundEncodedPassword;
 
-    private ClientUserService clientUserService;
+    private SecurityUserService securityUserService;
 
     private UserDetailsPasswordService userDetailsPasswordService;
 
@@ -68,7 +68,7 @@ public class ClientUserAuthenticationProvider extends AbstractUserDetailsAuthent
 
     @Override
     protected void doAfterPropertiesSet() {
-        Assert.notNull(this.clientUserService, "A UserDetailsService must be set");
+        Assert.notNull(this.securityUserService, "A UserDetailsService must be set");
     }
 
     /**
@@ -141,12 +141,12 @@ public class ClientUserAuthenticationProvider extends AbstractUserDetailsAuthent
         return this.passwordEncoder;
     }
 
-    public void setClientUserService(ClientUserService clientUserService) {
-        this.clientUserService = clientUserService;
+    public void setClientUserService(SecurityUserService securityUserService) {
+        this.securityUserService = securityUserService;
     }
 
-    protected ClientUserService getClientUserService() {
-        return this.clientUserService;
+    protected SecurityUserService getClientUserService() {
+        return this.securityUserService;
     }
 
     public void setUserDetailsPasswordService(UserDetailsPasswordService userDetailsPasswordService) {
