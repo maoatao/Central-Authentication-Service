@@ -40,11 +40,11 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRoleEnt
         List<Long> preDelete = existed.stream().filter(o -> !roleIds.contains(o)).toList();
         // 入参不在已有为新增
         List<Long> preAdd = roleIds.stream().filter(o -> !existed.contains(o)).toList();
-        SynaAssert.isTrue(removeBatchByIds(preDelete), "删除用户角色失败!");
+        SynaAssert.isTrue(removeBatchByIds(preDelete), "删除用户角色关系失败!");
         List<UserRoleEntity> newUserRoles = preAdd.stream()
                 .map(o -> UserRoleEntity.builder().userId(userId).roleId(o).build())
                 .toList();
-        SynaAssert.isTrue(saveBatch(newUserRoles), "新增用户角色失败!");
+        SynaAssert.isTrue(saveBatch(newUserRoles), "新增用户角色关系失败!");
         return true;
     }
 }

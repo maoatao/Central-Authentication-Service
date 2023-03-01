@@ -21,4 +21,13 @@ public interface UserService extends IService<UserEntity> {
      * @return 分页用户列表
      */
     Page<UserEntity> getPage(PageParam pageParam, UserEntity entity);
+
+    /**
+     * 按名称和客户获取用户
+     *
+     * @param name     名称
+     * @param clientId 客户端 id
+     * @return 用户不存在返回 null
+     */
+    UserEntity getByNameAndClient(String name, String clientId);
 }

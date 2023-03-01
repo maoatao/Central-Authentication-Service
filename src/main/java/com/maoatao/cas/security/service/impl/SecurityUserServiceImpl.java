@@ -62,8 +62,8 @@ public class SecurityUserServiceImpl implements SecurityUserService {
 
     @Override
     public CustomUserDetails getUser(String username, Object details) throws UsernameNotFoundException {
-        UserEntity userEntity = getUser(username, details.toString());
-        SynaAssert.notNull(userEntity, "用户名或密码错误");
+        UserEntity userEntity = userService.getByNameAndClient(username, details.toString());
+        SynaAssert.notNull(userEntity, "用户 {} 不存在!", username);
         SynaAssert.isTrue(userEntity.getEnabled(), "该用户已被禁用");
         return ClientUser.builder()
                 .clientId(userEntity.getClientId())
@@ -84,7 +84,7 @@ public class SecurityUserServiceImpl implements SecurityUserService {
         long userId = saveUser(userDetails);
         SynaAssert.isTrue(
                 userRoleService.updateUserRole(getAndCheckRoleIds(userDetails.getAuthorities(), userDetails.getClientId()), userId),
-                "更新用户角色失败!"
+                "新用户绑定角色失败!"
         );
         return userId;
     }
@@ -109,13 +109,12 @@ public class SecurityUserServiceImpl implements SecurityUserService {
         return false;
     }
 
-    private UserEntity getUser(String username, String clientId) {
-        UserEntity userEntity = new UserEntity();
-        userEntity.setName(username);
-        userEntity.setClientId(clientId);
-        return userService.getOne(Wrappers.query(userEntity));
-    }
-
+    /**
+     * 新增用户
+     *
+     * @param userDetails 用户详情
+     * @return 用户id(表主键)
+     */
     private long saveUser(CustomUserDetails userDetails) {
         SynaAssert.isNull(getUser(userDetails.getUsername(), userDetails.getClientId()), "用户名 {} 已存在", userDetails.getUsername());
         UserEntity userEntity = UserEntity.builder()
