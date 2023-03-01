@@ -26,18 +26,18 @@ public interface ClientUserService {
     /**
      * 创建用户
      *
-     * @param user 用户详情
+     * @param userDetails 用户详情
      * @return 创建成功返回true
      */
-    boolean createUser(CustomUserDetails user);
+    long createUser(CustomUserDetails userDetails);
 
     /**
      * 更新用户
      *
-     * @param user 用户详情
+     * @param userDetails 用户详情
      * @return 更新成功返回true
      */
-    boolean updateUser(CustomUserDetails user);
+    boolean updateUser(CustomUserDetails userDetails);
 
     /**
      * 删除用户

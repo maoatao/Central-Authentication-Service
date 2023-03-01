@@ -1,5 +1,6 @@
 package com.maoatao.cas.security.service.impl;
 
+import cn.hutool.core.collection.IterUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.maoatao.cas.core.entity.RoleEntity;
 import com.maoatao.cas.core.entity.UserEntity;
@@ -15,14 +16,15 @@ import com.maoatao.cas.security.service.ClientUserService;
 import com.maoatao.synapse.core.util.SynaAssert;
 import com.maoatao.synapse.core.util.SynaSafes;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * OAuth2 认证授权要用到的查询用户 逻辑
@@ -79,42 +81,15 @@ public class ClientUserServiceImpl implements ClientUserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean createUser(CustomUserDetails user) {
-        if (user instanceof ClientUser userDetails) {
-            SynaAssert.notNull(registeredClientRepository.findByClientId(userDetails.getClientId()), "注册客户端不存在!");
-            // TODO: 2023/2/28 校验用户已存在
-            UserEntity userEntity = new UserEntity();
-            userEntity.setClientId(userDetails.getClientId());
-            userEntity.setName(userDetails.getUsername());
-            userEntity.setPassword(userDetails.getPassword());
-            userEntity.setEnabled(userDetails.isEnabled());
-            SynaAssert.isTrue(userService.save(userEntity), "新增用户失败!");
-            Set<RoleEntity> roleEntities = userDetails.getAuthorities().stream()
-                    .map(o -> {
-                        RoleEntity roleEntity = new RoleEntity();
-                        roleEntity.setClientId(userDetails.getClientId());
-                        roleEntity.setName(o.getAuthority());
-                        return roleEntity;
-                    })
-                    .collect(Collectors.toSet());
-            SynaAssert.isTrue(roleService.saveBatch(roleEntities), "新增角色失败!");
-            Set<UserRoleEntity> userRoleEntities = roleEntities.stream()
-                    .map(o -> {
-                        UserRoleEntity userRoleEntity = new UserRoleEntity();
-                        userRoleEntity.setUserId(userEntity.getId());
-                        userRoleEntity.setRoleId(o.getId());
-                        return userRoleEntity;
-                    })
-                    .collect(Collectors.toSet());
-            SynaAssert.isTrue(userRoleService.saveBatch(userRoleEntities), "新增用户角色失败!");
-        } else {
-            throw new UnsupportedOperationException("不支持的新增用户参数");
-        }
-        return false;
+    public long createUser(CustomUserDetails userDetails) {
+        SynaAssert.notNull(registeredClientRepository.findByClientId(userDetails.getClientId()), "注册客户端不存在!");
+        long userId = saveUser(userDetails);
+        updateUserRole(getAndCheckRoleIds(userDetails.getAuthorities(), userDetails.getClientId()), userId);
+        return userId;
     }
 
     @Override
-    public boolean updateUser(CustomUserDetails user) {
+    public boolean updateUser(CustomUserDetails userDetails) {
         return false;
     }
 
@@ -138,5 +113,67 @@ public class ClientUserServiceImpl implements ClientUserService {
         userEntity.setName(username);
         userEntity.setClientId(clientId);
         return userService.getOne(Wrappers.query(userEntity));
+    }
+
+    private long saveUser(CustomUserDetails userDetails) {
+        SynaAssert.isNull(getUser(userDetails.getUsername(), userDetails.getClientId()), "用户名 {} 已存在", userDetails.getUsername());
+        UserEntity userEntity = UserEntity.builder()
+                .clientId(userDetails.getClientId())
+                .name(userDetails.getUsername())
+                .password(userDetails.getPassword())
+                .enabled(userDetails.isEnabled())
+                .build();
+        SynaAssert.isTrue(userService.save(userEntity), "新增用户失败!");
+        return userEntity.getId();
+    }
+
+    /**
+     * 获取并检查角色ID
+     * <p>
+     * 给用户新增角色时,这些角色必须已存在
+     *
+     * @param authorities 角色集合
+     * @param clientId    客户端 id
+     * @return 如果角色都存在, 返回这些角色的 id
+     */
+    private List<Long> getAndCheckRoleIds(Collection<? extends GrantedAuthority> authorities, String clientId) {
+        if (IterUtil.isEmpty(authorities)) {
+            return Collections.emptyList();
+        }
+        List<String> roleNames = authorities.stream()
+                .map(GrantedAuthority::getAuthority)
+                .distinct()
+                .toList();
+        // 通过角色名和客户端 id 查询
+        List<RoleEntity> existedRoles = roleService.list(
+                Wrappers.<RoleEntity>lambdaQuery()
+                        .in(RoleEntity::getName, roleNames)
+                        .eq(RoleEntity::getClientId, clientId)
+        );
+        return existedRoles.stream()
+                .map(o -> {
+                    SynaAssert.isTrue(roleNames.contains(o.getName()), "角色 {} 不存在", o.getName());
+                    return o.getId();
+                })
+                .toList();
+    }
+
+    private void updateUserRole(List<Long> roleIds, long userId) {
+        if (IterUtil.isEmpty(roleIds)) {
+            return;
+        }
+        // 查询已有,排除已有,列出新增和删除
+        List<Long> existed = userRoleService.list(Wrappers.<UserRoleEntity>lambdaQuery().eq(UserRoleEntity::getUserId, userId))
+                .stream()
+                .map(UserRoleEntity::getRoleId).toList();
+        // 已有不在入参为删除
+        List<Long> preDelete = existed.stream().filter(o -> !roleIds.contains(o)).toList();
+        // 入参不在已有为新增
+        List<Long> preAdd = roleIds.stream().filter(o -> !existed.contains(o)).toList();
+        SynaAssert.isTrue(userRoleService.removeBatchByIds(preDelete), "删除用户角色失败!");
+        List<UserRoleEntity> newUserRoles = preAdd.stream()
+                .map(o -> UserRoleEntity.builder().userId(userId).roleId(o).build())
+                .toList();
+        SynaAssert.isTrue(userRoleService.saveBatch(newUserRoles), "新增用户角色失败!");
     }
 }
