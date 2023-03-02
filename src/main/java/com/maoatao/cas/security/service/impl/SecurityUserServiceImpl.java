@@ -52,18 +52,6 @@ public class SecurityUserServiceImpl implements SecurityUserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    /**
-     * 获取权限
-     *
-     * @param userId 用户id
-     * @return 权限列表
-     */
-    private List<CustomAuthority> getAuthorities(Long userId) {
-        return SynaSafes.of(permissionService.listByUser(userId)).stream()
-                .map(o -> CustomAuthority.builder().authority(o.getName()).client(o.getClientId()).build())
-                .toList();
-    }
-
     @Override
     public CustomUserDetails getUser(String username, Object details) throws UsernameNotFoundException {
         UserEntity userEntity = userService.getByNameAndClient(username, details.toString());
@@ -142,6 +130,18 @@ public class SecurityUserServiceImpl implements SecurityUserService {
     @Override
     public boolean userExists(String username, String clientId) {
         return userService.getByNameAndClient(username, clientId) != null;
+    }
+
+    /**
+     * 获取权限
+     *
+     * @param userId 用户id
+     * @return 权限列表
+     */
+    private List<CustomAuthority> getAuthorities(Long userId) {
+        return SynaSafes.of(permissionService.listByUser(userId)).stream()
+                .map(o -> CustomAuthority.builder().authority(o.getName()).client(o.getClientId()).build())
+                .toList();
     }
 
     /**
