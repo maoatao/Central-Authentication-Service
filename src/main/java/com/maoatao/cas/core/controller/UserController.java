@@ -1,9 +1,9 @@
-package com.maoatao.cas.web.controller;
+package com.maoatao.cas.core.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.core.entity.UserEntity;
 import com.maoatao.cas.core.service.UserService;
-import com.maoatao.cas.web.param.UserParam;
+import com.maoatao.cas.core.param.UserParam;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -66,7 +66,7 @@ public class UserController {
      */
     @PostMapping
     @Operation(summary = "save", description = "新增用户")
-    public Boolean save(UserParam param) {
+    public long save(UserParam param) {
         return userService.save(param);
     }
 
@@ -78,7 +78,7 @@ public class UserController {
      */
     @PutMapping
     @Operation(summary = "update", description = "修改用户")
-    public Boolean update(UserParam param) {
+    public boolean update(UserParam param) {
         return userService.update(param);
     }
 
@@ -90,7 +90,7 @@ public class UserController {
      */
     @DeleteMapping("/{id}")
     @Operation(summary = "remove", description = "通过id删除用户")
-    public Boolean remove(@PathVariable
+    public boolean remove(@PathVariable
                               @Parameter(name = "id", description = "用户id")
                               @NotNull(message = "用户id不能为空")
                               Long id) {

@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.maoatao.cas.core.entity.RoleEntity;
 import com.maoatao.cas.core.mapper.RoleMapper;
 import com.maoatao.cas.core.service.RoleService;
-import com.maoatao.cas.web.param.RoleParam;
+import com.maoatao.cas.core.param.RoleParam;
 import com.maoatao.synapse.core.util.SynaAssert;
 import com.maoatao.synapse.core.util.SynaSafes;
 import org.springframework.stereotype.Service;

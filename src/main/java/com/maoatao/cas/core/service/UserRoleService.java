@@ -3,7 +3,7 @@ package com.maoatao.cas.core.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.maoatao.cas.core.entity.UserRoleEntity;
-import com.maoatao.cas.web.param.UserRoleParam;
+import com.maoatao.cas.core.param.UserRoleParam;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ public interface UserRoleService extends IService<UserRoleEntity> {
      * 以入参角色 id 为准,如果传入空表示删除该用户的所有角色
      *
      * @param roleIds 角色 id 集合
-     * @param userId  用户 id
+     * @param userId  用户 id (未作存在校验,使用前请确认是否存在)
      * @return 更新成功返回 true
      */
     boolean updateUserRole(List<Long> roleIds, long userId);

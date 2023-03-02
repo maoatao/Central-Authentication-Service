@@ -6,11 +6,11 @@ import com.maoatao.cas.core.entity.RolePermissionEntity;
 import com.maoatao.cas.core.service.PermissionService;
 import com.maoatao.cas.core.service.RolePermissionService;
 import com.maoatao.cas.core.service.RoleService;
+import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
-import com.maoatao.cas.security.generator.UUIDStringKeyGenerator;
-import com.maoatao.cas.security.service.SecurityUserService;
+import com.maoatao.cas.security.UUIDStringKeyGenerator;
 import com.maoatao.cas.util.Ids;
-import com.maoatao.cas.web.param.UserParam;
+import com.maoatao.cas.core.param.UserParam;
 import com.maoatao.synapse.core.lang.SynaException;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -57,15 +57,9 @@ class CasApplicationTests {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    /**
-     * 初始化客户端信息
-     */
     @Autowired
-    private SecurityUserService securityUserService;
+    private UserService userService;
 
-    /**
-     * 创建clientId信息
-     */
     @Autowired
     private RegisteredClientRepository registeredClientRepository;
 
@@ -189,7 +183,7 @@ class CasApplicationTests {
         param.setPassword(TEST_USER_PASSWORD);
         // 角色前缀同步骤 2 说明
         param.setRoles(Collections.singletonList("ROLE_".concat(TEST_ROLE_NAME)));
-        long userId = securityUserService.createUser(param);
+        long userId = userService.save(param);
         // id 为数据库自增,添加成功一定大于 0
         Assert.assertTrue(userId > 0);
     }

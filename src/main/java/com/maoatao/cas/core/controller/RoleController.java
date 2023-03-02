@@ -1,9 +1,9 @@
-package com.maoatao.cas.web.controller;
+package com.maoatao.cas.core.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.core.entity.RoleEntity;
 import com.maoatao.cas.core.service.RoleService;
-import com.maoatao.cas.web.param.RoleParam;
+import com.maoatao.cas.core.param.RoleParam;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -66,7 +66,7 @@ public class RoleController {
      */
     @PostMapping
     @Operation(summary = "save", description = "新增角色")
-    public Boolean save(RoleParam param) {
+    public boolean save(RoleParam param) {
         return roleService.save(param);
     }
 
@@ -78,7 +78,7 @@ public class RoleController {
      */
     @PutMapping
     @Operation(summary = "update", description = "修改角色")
-    public Boolean update(RoleParam param) {
+    public boolean update(RoleParam param) {
         return roleService.update(param);
     }
 
@@ -90,7 +90,7 @@ public class RoleController {
      */
     @DeleteMapping("/{id}")
     @Operation(summary = "remove", description = "通过id删除角色")
-    public Boolean remove(@PathVariable
+    public boolean remove(@PathVariable
                           @Parameter(name = "id", description = "角色id")
                           @NotNull(message = "角色id不能为空")
                           Long id) {

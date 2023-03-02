@@ -1,4 +1,4 @@
-package com.maoatao.cas.security.generator;
+package com.maoatao.cas.security;
 
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
 

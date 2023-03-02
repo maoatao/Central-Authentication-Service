@@ -3,7 +3,7 @@ package com.maoatao.cas.util;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeAccessTokenProvider;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
 import com.maoatao.cas.security.oauth2.auth.CustomRefreshTokenProvider;
-import com.maoatao.cas.security.generator.UUIDStringKeyGenerator;
+import com.maoatao.cas.security.UUIDStringKeyGenerator;
 import com.maoatao.cas.security.oauth2.odic.CustomClientRegistrationProvider;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.NoUniqueBeanDefinitionException;

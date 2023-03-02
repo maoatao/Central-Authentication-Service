@@ -1,4 +1,4 @@
-package com.maoatao.cas.web.param;
+package com.maoatao.cas.core.param;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -8,18 +8,18 @@ import lombok.EqualsAndHashCode;
 import java.io.Serial;
 
 /**
- * 权限
+ * 角色
  *
  * @author MaoAtao
  * @date 2022-12-12 14:18:23
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Schema(description = "权限")
-public class PermissionParam extends PageParam {
+@Schema(description = "角色")
+public class RoleParam extends PageParam {
 
     @Serial
-    private static final long serialVersionUID = -4876422828478855700L;
+    private static final long serialVersionUID = 1233219274545424503L;
     /**
      * 主键id(自增)
      */
@@ -32,10 +32,10 @@ public class PermissionParam extends PageParam {
     @Schema(description = "OAuth2 客户端id")
     private String clientId;
     /**
-     * 权限名
+     * 角色名
      */
-    @NotNull(message = "权限名不能为空")
-    @Schema(description = "权限名")
+    @NotNull(message = "角色名不能为空")
+    @Schema(description = "角色名")
     private String name;
     /**
      * 描述
@@ -47,5 +47,4 @@ public class PermissionParam extends PageParam {
      */
     @Schema(description = "0:不可用,1:可用")
     private Boolean enabled;
-
 }

@@ -1,9 +1,9 @@
-package com.maoatao.cas.web.controller;
+package com.maoatao.cas.core.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.core.entity.PermissionEntity;
 import com.maoatao.cas.core.service.PermissionService;
-import com.maoatao.cas.web.param.PermissionParam;
+import com.maoatao.cas.core.param.PermissionParam;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -66,7 +66,7 @@ public class PermissionController {
      */
     @PostMapping
     @Operation(summary = "save", description = "新增权限")
-    public Boolean save(PermissionParam param) {
+    public boolean save(PermissionParam param) {
         return permissionService.save(param);
     }
 
@@ -78,7 +78,7 @@ public class PermissionController {
      */
     @PutMapping
     @Operation(summary = "update", description = "修改权限")
-    public Boolean update(PermissionParam param) {
+    public boolean update(PermissionParam param) {
         return permissionService.update(param);
     }
 
@@ -90,7 +90,7 @@ public class PermissionController {
      */
     @DeleteMapping("/{id}")
     @Operation(summary = "remove", description = "通过id删除权限")
-    public Boolean remove(@PathVariable
+    public boolean remove(@PathVariable
                           @Parameter(name = "id", description = "权限id")
                           @NotNull(message = "权限id不能为空")
                           Long id) {

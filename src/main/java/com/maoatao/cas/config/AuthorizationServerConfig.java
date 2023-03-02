@@ -1,13 +1,13 @@
 package com.maoatao.cas.config;
 
-import com.maoatao.cas.security.ClientUserAuthenticationProvider;
+import com.maoatao.cas.core.service.UserService;
+import com.maoatao.cas.security.CustomUserAuthenticationProvider;
 import com.maoatao.cas.security.oauth2.auth.CustomAccessTokenGenerator;
 import com.maoatao.cas.security.oauth2.auth.RedisAuthorizationService;
 import com.maoatao.cas.security.filter.BearerTokenFilterConfigurer;
-import com.maoatao.cas.security.service.SecurityUserService;
 import com.maoatao.cas.util.AuthorizationServerUtils;
 import com.maoatao.cas.security.oauth2.auth.CustomRefreshTokenGenerator;
-import com.maoatao.cas.security.generator.UUIDStringKeyGenerator;
+import com.maoatao.cas.security.UUIDStringKeyGenerator;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -100,10 +100,10 @@ public class AuthorizationServerConfig {
      * 自定义查询用户,通过用户名称和客户端 id 查询一个用户.提供多客户端同名用户身份验证
      */
     @Bean
-    public AbstractUserDetailsAuthenticationProvider abstractUserDetailsAuthenticationProvider(SecurityUserService userDetailsService) {
-        ClientUserAuthenticationProvider clientUserAuthenticationProvider = new ClientUserAuthenticationProvider();
-        clientUserAuthenticationProvider.setClientUserService(userDetailsService);
-        return clientUserAuthenticationProvider;
+    public AbstractUserDetailsAuthenticationProvider abstractUserDetailsAuthenticationProvider(UserService userService) {
+        CustomUserAuthenticationProvider customUserAuthenticationProvider = new CustomUserAuthenticationProvider();
+        customUserAuthenticationProvider.setUserService(userService);
+        return customUserAuthenticationProvider;
     }
 
     /**

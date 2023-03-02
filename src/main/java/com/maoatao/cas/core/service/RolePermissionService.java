@@ -3,7 +3,7 @@ package com.maoatao.cas.core.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.maoatao.cas.core.entity.RolePermissionEntity;
-import com.maoatao.cas.web.param.RolePermissionParam;
+import com.maoatao.cas.core.param.RolePermissionParam;
 
 /**
  * 角色权限关系

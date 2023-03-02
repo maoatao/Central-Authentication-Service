@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.maoatao.cas.core.entity.RolePermissionEntity;
 import com.maoatao.cas.core.mapper.RolePermissionMapper;
 import com.maoatao.cas.core.service.RolePermissionService;
-import com.maoatao.cas.web.param.RolePermissionParam;
+import com.maoatao.cas.core.param.RolePermissionParam;
 import com.maoatao.synapse.core.util.SynaAssert;
 import org.springframework.stereotype.Service;
 

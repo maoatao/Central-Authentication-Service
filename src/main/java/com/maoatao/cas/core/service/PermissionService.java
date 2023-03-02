@@ -3,7 +3,7 @@ package com.maoatao.cas.core.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.maoatao.cas.core.entity.PermissionEntity;
-import com.maoatao.cas.web.param.PermissionParam;
+import com.maoatao.cas.core.param.PermissionParam;
 
 import java.util.List;
 

@@ -1,6 +1,7 @@
 package com.maoatao.cas.security;
 
-import com.maoatao.cas.security.service.SecurityUserService;
+import com.maoatao.cas.core.service.UserService;
+import com.maoatao.synapse.core.util.SynaStrings;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,6 +15,8 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.Assert;
 
+import java.util.Optional;
+
 /**
  * 自定义用户详细信息身份验证提供程序
  * <p>
@@ -22,7 +25,7 @@ import org.springframework.util.Assert;
  * @author MaoAtao
  * @date 2023-02-28 21:35:51
  */
-public class ClientUserAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
+public class CustomUserAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 
     /**
      * The plaintext password used to perform
@@ -41,11 +44,11 @@ public class ClientUserAuthenticationProvider extends AbstractUserDetailsAuthent
      */
     private volatile String userNotFoundEncodedPassword;
 
-    private SecurityUserService securityUserService;
+    private UserService userService;
 
     private UserDetailsPasswordService userDetailsPasswordService;
 
-    public ClientUserAuthenticationProvider() {
+    public CustomUserAuthenticationProvider() {
         setPasswordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder());
     }
 
@@ -68,7 +71,7 @@ public class ClientUserAuthenticationProvider extends AbstractUserDetailsAuthent
 
     @Override
     protected void doAfterPropertiesSet() {
-        Assert.notNull(this.securityUserService, "A UserDetailsService must be set");
+        Assert.notNull(this.userService, "A UserDetailsService must be set");
     }
 
     /**
@@ -81,7 +84,8 @@ public class ClientUserAuthenticationProvider extends AbstractUserDetailsAuthent
         try {
             // 上游构建 AuthorizationService buildPrincipal 时, details 设定为 clientId
             // 通过用户名和客户端 id 查询一个用户
-            UserDetails loadedUser = this.getClientUserService().getUser(username, authentication.getDetails());
+            String clientId = Optional.ofNullable(authentication.getDetails()).orElse(SynaStrings.EMPTY).toString();
+            UserDetails loadedUser = this.getUserService().getUserDetails(username, clientId);
             if (loadedUser == null) {
                 throw new InternalAuthenticationServiceException(
                         "UserDetailsService returned null, which is an interface contract violation");
@@ -141,12 +145,12 @@ public class ClientUserAuthenticationProvider extends AbstractUserDetailsAuthent
         return this.passwordEncoder;
     }
 
-    public void setClientUserService(SecurityUserService securityUserService) {
-        this.securityUserService = securityUserService;
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 
-    protected SecurityUserService getClientUserService() {
-        return this.securityUserService;
+    protected UserService getUserService() {
+        return this.userService;
     }
 
     public void setUserDetailsPasswordService(UserDetailsPasswordService userDetailsPasswordService) {

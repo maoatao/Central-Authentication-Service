@@ -1,9 +1,9 @@
-package com.maoatao.cas.web.controller;
+package com.maoatao.cas.core.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.core.entity.RolePermissionEntity;
 import com.maoatao.cas.core.service.RolePermissionService;
-import com.maoatao.cas.web.param.RolePermissionParam;
+import com.maoatao.cas.core.param.RolePermissionParam;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -66,7 +66,7 @@ public class RolePermissionController {
      */
     @PostMapping
     @Operation(summary = "save", description = "新增角色权限关系")
-    public Boolean save(RolePermissionParam param) {
+    public boolean save(RolePermissionParam param) {
         return rolePermissionService.save(param);
     }
 
@@ -78,7 +78,7 @@ public class RolePermissionController {
      */
     @PutMapping
     @Operation(summary = "update", description = "修改角色权限关系")
-    public Boolean update(RolePermissionParam param) {
+    public boolean update(RolePermissionParam param) {
         return rolePermissionService.update(param);
     }
 
@@ -90,7 +90,7 @@ public class RolePermissionController {
      */
     @DeleteMapping("/{id}")
     @Operation(summary = "remove", description = "通过id删除角色权限关系")
-    public Boolean remove(@PathVariable
+    public boolean remove(@PathVariable
                           @Parameter(name = "id", description = "角色权限关系id")
                           @NotNull(message = "角色权限关系id不能为空")
                           Long id) {

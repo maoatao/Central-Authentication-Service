@@ -1,10 +1,10 @@
-package com.maoatao.cas.security.service.impl;
+package com.maoatao.cas.core.service.impl;
 
-import com.maoatao.cas.security.ClientUserAuthenticationProvider;
-import com.maoatao.cas.security.service.AuthorizationService;
+import com.maoatao.cas.security.CustomUserAuthenticationProvider;
+import com.maoatao.cas.core.service.AuthorizationService;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
-import com.maoatao.cas.security.generator.UUIDStringKeyGenerator;
-import com.maoatao.cas.web.param.GenerateAuthorizationCodeParams;
+import com.maoatao.cas.security.UUIDStringKeyGenerator;
+import com.maoatao.cas.core.param.GenerateAuthorizationCodeParams;
 import com.maoatao.cas.security.bean.AuthorizationInfo;
 import com.maoatao.cas.util.ServletUtils;
 import com.maoatao.synapse.core.lang.SynaException;
@@ -68,7 +68,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     }
 
     @Override
-    public Boolean revokeAccessToken(String accessToken) {
+    public boolean revokeAccessToken(String accessToken) {
         try {
             OAuth2Authorization authorization = findByAccessToken(accessToken);
             if (authorization == null) {
@@ -105,7 +105,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     /**
      * 构建身份验证
      * <p>
-     * {@link ClientUserAuthenticationProvider}
+     * {@link CustomUserAuthenticationProvider}
      *
      * @param clientId 客户端 Id
      * @param username 用户名

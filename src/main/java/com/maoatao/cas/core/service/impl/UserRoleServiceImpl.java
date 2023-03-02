@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.maoatao.cas.core.entity.UserRoleEntity;
 import com.maoatao.cas.core.mapper.UserRoleMapper;
 import com.maoatao.cas.core.service.UserRoleService;
-import com.maoatao.cas.web.param.UserRoleParam;
+import com.maoatao.cas.core.param.UserRoleParam;
 import com.maoatao.synapse.core.util.SynaAssert;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

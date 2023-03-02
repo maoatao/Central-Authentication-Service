@@ -1,7 +1,7 @@
-package com.maoatao.cas.web.controller;
+package com.maoatao.cas.core.controller;
 
-import com.maoatao.cas.security.service.AuthorizationService;
-import com.maoatao.cas.web.param.GenerateAuthorizationCodeParams;
+import com.maoatao.cas.core.service.AuthorizationService;
+import com.maoatao.cas.core.param.GenerateAuthorizationCodeParams;
 import com.maoatao.cas.security.bean.AuthorizationInfo;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,7 +48,7 @@ public class AuthorizationController {
      */
     @DeleteMapping
     @Operation(summary = "revokeAccessToken", description = "吊销令牌")
-    public Boolean revokeAccessToken(@RequestHeader(value = "Authorization") String accessToken) {
+    public boolean revokeAccessToken(@RequestHeader(value = "Authorization") String accessToken) {
         return authorizationService.revokeAccessToken(accessToken);
     }
 
