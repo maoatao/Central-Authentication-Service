@@ -38,6 +38,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
 
     @Override
     public boolean save(PermissionParam param) {
+        param.setId(null);
         return save(BeanUtil.copyProperties(param, PermissionEntity.class));
     }
 

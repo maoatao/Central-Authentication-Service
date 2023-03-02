@@ -1,7 +1,5 @@
 package com.maoatao.cas.core.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
@@ -33,7 +31,6 @@ public class PermissionEntity extends Model<PermissionEntity> {
      * 主键id(自增)
      */
     @TableId
-    @TableField(fill = FieldFill.UPDATE)
     @Schema(description = "主键id(自增)")
     private Long id;
     /**

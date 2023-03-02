@@ -33,7 +33,6 @@ public class UserEntity extends Model<UserEntity> {
      * 主键id(自增)
      */
     @TableId
-    @TableField(fill = FieldFill.UPDATE)
     @Schema(description = "主键id(自增)")
     private Long id;
     /**

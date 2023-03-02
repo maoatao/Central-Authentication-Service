@@ -53,6 +53,7 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRoleEnt
 
     @Override
     public boolean save(UserRoleParam param) {
+        param.setId(null);
         return save(BeanUtil.copyProperties(param, UserRoleEntity.class));
     }
 

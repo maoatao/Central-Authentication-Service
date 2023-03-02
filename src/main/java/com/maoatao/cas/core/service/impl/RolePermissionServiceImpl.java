@@ -27,6 +27,7 @@ public class RolePermissionServiceImpl extends ServiceImpl<RolePermissionMapper,
 
     @Override
     public boolean save(RolePermissionParam param) {
+        param.setId(null);
         return save(BeanUtil.copyProperties(param, RolePermissionEntity.class));
     }
 

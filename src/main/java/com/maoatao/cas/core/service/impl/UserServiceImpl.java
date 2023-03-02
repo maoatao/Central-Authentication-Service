@@ -35,6 +35,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @Override
     public boolean save(UserParam param) {
+        param.setId(null);
         // TODO: 2023-03-01 22:35:47 设置openId
         return save(BeanUtil.copyProperties(param, UserEntity.class));
     }

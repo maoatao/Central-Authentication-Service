@@ -40,6 +40,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> impleme
 
     @Override
     public boolean save(RoleParam param) {
+        param.setId(null);
         return save(BeanUtil.copyProperties(param, RoleEntity.class));
     }
 
