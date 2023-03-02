@@ -1,15 +1,25 @@
 package com.maoatao.cas;
 
-import com.maoatao.cas.security.bean.SecurityUser;
+import com.maoatao.cas.core.entity.PermissionEntity;
+import com.maoatao.cas.core.entity.RoleEntity;
+import com.maoatao.cas.core.entity.RolePermissionEntity;
+import com.maoatao.cas.core.service.PermissionService;
+import com.maoatao.cas.core.service.RolePermissionService;
+import com.maoatao.cas.core.service.RoleService;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
 import com.maoatao.cas.security.generator.UUIDStringKeyGenerator;
 import com.maoatao.cas.security.service.SecurityUserService;
+import com.maoatao.cas.util.Ids;
+import com.maoatao.cas.web.param.UserParam;
 import com.maoatao.synapse.core.lang.SynaException;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authorization.AuthorityAuthorizationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -29,14 +39,18 @@ import org.springframework.security.oauth2.server.authorization.settings.OAuth2T
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.security.oauth2.server.authorization.token.DefaultOAuth2TokenContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenContext;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 
+@RunWith(SpringRunner.class)
 @SpringBootTest
 class CasApplicationTests {
 
@@ -61,69 +75,126 @@ class CasApplicationTests {
     @Autowired
     private OAuth2AuthorizationService authorizationService;
 
-    /**
-     * 创建用户信息
-     */
-    @Test
-    void save_user_test() {
-        long userId = securityUserService.createUser(SecurityUser.builder()
-                .clientId("messaging-client")
-                .username("user")
-                .password("password")
-                .roles("USER")
-                .build());
-        System.out.println(userId);
-    }
+    @Autowired
+    private RoleService roleService;
+
+    @Autowired
+    private PermissionService permissionService;
+
+    @Autowired
+    private RolePermissionService rolePermissionService;
+
+
+    //------------------------------------------------ 初始化测试数据 开始 ------------------------------------------------
+    // 请按步骤执行以下单元测试
 
     /**
+     * 客户端 id
+     */
+    private static final String TEST_CLIENT_ID = "test-client";
+    /**
+     * 客户端密码
+     */
+    private static final String TEST_CLIENT_SECRET = "123456";
+    /**
+     * 角色名称
+     */
+    private static final String TEST_ROLE_NAME = "TEST";
+    /**
+     * 权限名称
+     */
+    private static final String TEST_PERMISSION_NAME = "PERMISSION_TEST";
+    /**
+     * 用户名称
+     */
+    private static final String TEST_USER_NAME = "user";
+    /**
+     * 用户密码
+     */
+    private static final String TEST_USER_PASSWORD = "password";
+
+    @Test
+    @Transactional(rollbackFor = Exception.class)
+    void initialize_test_data() {
+        // 1.先创建客户端 save_client_test
+        save_client_test();
+        // 2.通过客户端 id 新增角色和权限 save_role_permission_test
+        save_role_permission_test();
+        // 3.通过客户端 id 新增用户 save_user_test
+        save_user_test();
+    }
+
+
+    /**
+     * 步骤 1
+     * <p>
      * 创建测试客户端
      */
-    @Test
     void save_client_test() {
         RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("messaging-client")
-                .clientSecret(passwordEncoder.encode("123456"))
+                .clientId(TEST_CLIENT_ID)
+                .clientSecret(passwordEncoder.encode(TEST_CLIENT_SECRET))
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
                 .redirectUri("http://127.0.0.1:8080/authorized")
-                // 便于调试授权码流程
                 .redirectUri("https://cn.bing.com")
-                .scope("message.read")
-                .scope("message.write")
+                .scope("test.read")
+                .scope("test.write")
+                // requireProofKey 需要额外参数验证,requireAuthorizationConsent 授权需要同意
                 .clientSettings(ClientSettings.builder().requireProofKey(true).build())
                 .tokenSettings(TokenSettings.builder().accessTokenFormat(OAuth2TokenFormat.REFERENCE).build())
                 .build();
         registeredClientRepository.save(registeredClient);
+        Assert.assertEquals(registeredClientRepository.findByClientId("messaging-client").getClientId(), "messaging-client");
     }
 
     /**
-     * The access token in a Client Registration request REQUIRES the OAuth2 scope client.create.
-     * The access token in a Client Read request REQUIRES the OAuth2 scope client.read.
-     * 创建oidc测试客户端
+     * 步骤 2
+     * <p>
+     * 新增角色权限并绑定关系
+     * <p>
+     * {@link AuthorityAuthorizationManager#hasRole(String)}方法可以看到角色前缀 ROLE_PREFIX 是 ROLE_
+     * 所以库中的角色名一定要有前缀 ROLE_
      */
-    @Test
-    void save_oidc_client_test() {
-        RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("oidc-client")
-                .clientSecret(passwordEncoder.encode("123456"))
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-                .redirectUri("http://127.0.0.1:8080/login/oauth2/code/oidc-client-oidc")
-                .redirectUri("http://127.0.0.1:8080/authorized")
-                // 便于调试授权码流程
-                .redirectUri("https://cn.bing.com")
-                .scope(OidcScopes.OPENID)
-                .scope("client.create")
-                .scope("client.read")
-                .clientSettings(ClientSettings.builder().requireProofKey(true).requireAuthorizationConsent(true).build())
-                .tokenSettings(TokenSettings.builder().accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED).build())
+    void save_role_permission_test() {
+        RoleEntity roleEntity = RoleEntity.builder().clientId(TEST_CLIENT_ID)
+                .name("ROLE_".concat(TEST_ROLE_NAME))
+                .enabled(true)
                 .build();
-        registeredClientRepository.save(registeredClient);
+        Assert.assertTrue(roleService.save(roleEntity));
+        PermissionEntity permissionEntity = PermissionEntity.builder()
+                .clientId(TEST_CLIENT_ID)
+                .name(TEST_PERMISSION_NAME)
+                .enabled(true)
+                .build();
+        Assert.assertTrue(permissionService.save(permissionEntity));
+        Assert.assertTrue(rolePermissionService.save(RolePermissionEntity.builder()
+                .roleId(roleEntity.getId())
+                .permissionId(permissionEntity.getId())
+                .build()));
     }
+
+    /**
+     * 步骤 3
+     * <p>
+     * 创建用户信息
+     */
+    void save_user_test() {
+        UserParam param = new UserParam();
+        param.setUniqueId(Ids.user());
+        param.setClientId(TEST_CLIENT_ID);
+        param.setName(TEST_USER_NAME);
+        param.setPassword(TEST_USER_PASSWORD);
+        // 角色前缀同步骤 2 说明
+        param.setRoles(Collections.singletonList("ROLE_".concat(TEST_ROLE_NAME)));
+        long userId = securityUserService.createUser(param);
+        // id 为数据库自增,添加成功一定大于 0
+        Assert.assertTrue(userId > 0);
+    }
+
+    //------------------------------------------------ 初始化测试数据 结束 ------------------------------------------------
 
     @Test
     void generate_authorization_code_test() {
@@ -181,5 +252,34 @@ class CasApplicationTests {
                     .build();
             this.authorizationService.save(authorization);
         }
+    }
+
+
+    /**
+     * 创建oidc测试客户端
+     * <p>
+     * 客户端注册请求中的访问令牌需要 scope 有 client.create.
+     * <p>
+     * 客户端读取请求中的访问令牌需要 scope 有 client.read.
+     */
+    @Test
+    void save_oidc_client_test() {
+        RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
+                .clientId("oidc-client")
+                .clientSecret(passwordEncoder.encode("123456"))
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+                .redirectUri("http://127.0.0.1:8080/login/oauth2/code/oidc-client-oidc")
+                .redirectUri("http://127.0.0.1:8080/authorized")
+                .redirectUri("https://cn.bing.com")
+                .scope(OidcScopes.OPENID)
+                .scope("client.create")
+                .scope("client.read")
+                .clientSettings(ClientSettings.builder().requireProofKey(true).requireAuthorizationConsent(true).build())
+                .tokenSettings(TokenSettings.builder().accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED).build())
+                .build();
+        registeredClientRepository.save(registeredClient);
     }
 }

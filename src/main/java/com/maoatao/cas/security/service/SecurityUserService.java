@@ -1,6 +1,7 @@
 package com.maoatao.cas.security.service;
 
-import com.maoatao.cas.security.bean.CustomUserDetails;
+import com.maoatao.cas.web.param.UserParam;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
@@ -21,27 +22,27 @@ public interface SecurityUserService {
      * @return 返回用户信息
      * @throws UsernameNotFoundException 如果找不到用户或用户没有授权权限
      */
-    CustomUserDetails getUser(String username, Object details) throws UsernameNotFoundException;
+    UserDetails getUser(String username, Object details) throws UsernameNotFoundException;
 
     /**
      * 创建用户
      * <p>
      * 请传入未加密的密码,该方法将自动加密
      *
-     * @param userDetails 用户详情
+     * @param param 参数
      * @return 创建成功返回true
      */
-    long createUser(CustomUserDetails userDetails);
+    long createUser(UserParam param);
 
     /**
      * 更新用户
      * <p>
      * 此方法不允许修改密码,传入无效
      *
-     * @param userDetails 用户详情
+     * @param param 参数
      * @return 更新成功返回true
      */
-    boolean updateUser(CustomUserDetails userDetails);
+    boolean updateUser(UserParam param);
 
     /**
      * 删除用户

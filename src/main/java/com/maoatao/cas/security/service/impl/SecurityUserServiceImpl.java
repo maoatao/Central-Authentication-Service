@@ -1,6 +1,8 @@
 package com.maoatao.cas.security.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.IterUtil;
+import com.maoatao.cas.core.entity.RoleEntity;
 import com.maoatao.cas.core.entity.UserEntity;
 import com.maoatao.cas.core.service.PermissionService;
 import com.maoatao.cas.core.service.RoleService;
@@ -10,11 +12,13 @@ import com.maoatao.cas.security.bean.CustomUserDetails;
 import com.maoatao.cas.security.bean.CustomAuthority;
 import com.maoatao.cas.security.bean.SecurityUser;
 import com.maoatao.cas.security.service.SecurityUserService;
+import com.maoatao.cas.web.param.UserParam;
 import com.maoatao.synapse.core.util.SynaAssert;
 import com.maoatao.synapse.core.util.SynaSafes;
 import com.maoatao.synapse.core.util.SynaStrings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
@@ -24,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * OAuth2 认证授权要用到的查询用户 逻辑
@@ -53,7 +59,7 @@ public class SecurityUserServiceImpl implements SecurityUserService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public CustomUserDetails getUser(String username, Object details) throws UsernameNotFoundException {
+    public UserDetails getUser(String username, Object details) throws UsernameNotFoundException {
         UserEntity userEntity = userService.getByNameAndClient(username, details.toString());
         if (userEntity == null) {
             throw new UsernameNotFoundException(SynaStrings.format("用户 {} 不存在!", username));
@@ -73,19 +79,15 @@ public class SecurityUserServiceImpl implements SecurityUserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public long createUser(CustomUserDetails userDetails) {
-        checkClient(userDetails.getClientId());
-        checkUserName(userDetails.getUsername(), userDetails.getClientId());
-        UserEntity userEntity = UserEntity.builder()
-                .clientId(userDetails.getClientId())
-                .name(userDetails.getUsername())
-                .password(passwordEncoder.encode(userDetails.getPassword()))
-                .enabled(userDetails.isEnabled())
-                .build();
+    public long createUser(UserParam param) {
+        checkClient(param.getClientId());
+        checkUserName(param.getName(), param.getClientId());
+        UserEntity userEntity = BeanUtil.copyProperties(param, UserEntity.class);
+        userEntity.setPassword(passwordEncoder.encode(param.getPassword()));
         SynaAssert.isTrue(userService.save(userEntity), "新增用户失败!");
         SynaAssert.notNull(userEntity.getId(), "新增用户失败:用户 ID 为空!");
         SynaAssert.isTrue(
-                userRoleService.updateUserRole(getAndCheckRoleIds(userDetails.getAuthorities(), userDetails.getClientId()), userEntity.getId()),
+                userRoleService.updateUserRole(getAndCheckRoleIds(param.getRoles(), param.getClientId()), userEntity.getId()),
                 "新用户绑定角色失败!"
         );
         return userEntity.getId();
@@ -93,18 +95,17 @@ public class SecurityUserServiceImpl implements SecurityUserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean updateUser(CustomUserDetails userDetails) {
-        checkClient(userDetails.getClientId());
-        UserEntity existed = getAndCheckUser(userDetails.getUsername(), userDetails.getClientId());
-        if (!existed.getClientId().equals(userDetails.getClientId())) {
-            checkUserName(userDetails.getUsername(), userDetails.getClientId());
-            existed.setClientId(userDetails.getClientId());
+    public boolean updateUser(UserParam param) {
+        checkClient(param.getClientId());
+        UserEntity existed = getAndCheckUser(param.getName(), param.getClientId());
+        UserEntity userEntity = BeanUtil.copyProperties(param, UserEntity.class);
+        userEntity.setId(existed.getId());
+        if (!existed.getClientId().equals(param.getClientId())) {
+            checkUserName(param.getName(), param.getClientId());
         }
-        existed.setName(userDetails.getUsername());
-        existed.setEnabled(userDetails.isEnabled());
-        SynaAssert.isTrue(userService.updateById(existed), "更新用户失败!");
+        SynaAssert.isTrue(userService.updateById(userEntity), "更新用户失败!");
         SynaAssert.isTrue(
-                userRoleService.updateUserRole(getAndCheckRoleIds(userDetails.getAuthorities(), userDetails.getClientId()), existed.getId()),
+                userRoleService.updateUserRole(getAndCheckRoleIds(param.getRoles(), param.getClientId()), existed.getId()),
                 "更新用户绑定角色失败!"
         );
         return true;
@@ -182,23 +183,20 @@ public class SecurityUserServiceImpl implements SecurityUserService {
      * <p>
      * 给用户新增角色时,这些角色必须已存在
      *
-     * @param authorities 角色集合
-     * @param clientId    客户端 id
+     * @param roleNames 角色名称集合
+     * @param clientId  客户端 id
      * @return 如果角色都存在, 返回这些角色的 id
      */
-    private List<Long> getAndCheckRoleIds(Collection<? extends GrantedAuthority> authorities, String clientId) {
-        if (IterUtil.isEmpty(authorities)) {
+    private List<Long> getAndCheckRoleIds(List<String> roleNames, String clientId) {
+        if (IterUtil.isEmpty(roleNames)) {
             return Collections.emptyList();
         }
-        List<String> roleNames = authorities.stream()
-                .map(GrantedAuthority::getAuthority)
-                .distinct()
-                .toList();
-        return roleService.listByRolesAndClient(roleNames, clientId).stream()
-                .map(o -> {
-                    SynaAssert.isTrue(roleNames.contains(o.getName()), "角色 {} 不存在", o.getName());
-                    return o.getId();
-                })
-                .toList();
+        Map<String, Long> roleEntityMap = roleService.listByRolesAndClient(roleNames, clientId).stream()
+                .collect(Collectors.toMap(RoleEntity::getName, RoleEntity::getId));
+        return roleNames.stream().map(o -> {
+            Long roleId = roleEntityMap.get(o);
+            SynaAssert.notNull(roleId, "角色 {} 不存在", o);
+            return roleId;
+        }).toList();
     }
 }

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serial;
+import java.util.List;
 
 /**
  * 用户表
@@ -52,4 +53,15 @@ public class UserParam extends PageParam {
      */
     @Schema(description = "false:禁用,true:启用")
     private Boolean enabled;
+
+    /**
+     * 角色名称集合
+     */
+    @Schema(description = "角色名称集合")
+    List<String> roles;
+
+    public List<String> getRoles() {
+        // 去重
+        return roles.stream().distinct().toList();
+    }
 }

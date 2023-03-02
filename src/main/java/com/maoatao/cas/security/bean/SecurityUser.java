@@ -34,7 +34,7 @@ import java.util.TreeSet;
 @Slf4j
 @Getter
 @ToString
-public class SecurityUser implements CustomUserDetails, CredentialsContainer {
+public class SecurityUser implements UserDetails, CredentialsContainer {
 
     @Serial
     private static final long serialVersionUID = -1660229161744567202L;
@@ -390,7 +390,7 @@ public class SecurityUser implements CustomUserDetails, CredentialsContainer {
             return this;
         }
 
-        public CustomUserDetails build() {
+        public UserDetails build() {
             return new SecurityUser(this.clientId, this.username, this.password, !this.disabled, !this.accountExpired,
                     !this.credentialsExpired, !this.accountLocked, this.authorities);
         }
