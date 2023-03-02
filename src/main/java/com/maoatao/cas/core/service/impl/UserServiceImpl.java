@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.maoatao.cas.core.entity.UserEntity;
 import com.maoatao.cas.core.mapper.UserMapper;
 import com.maoatao.cas.core.service.UserService;
+import com.maoatao.cas.util.Ids;
 import com.maoatao.cas.web.param.UserParam;
 import com.maoatao.synapse.core.util.SynaAssert;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Override
     public boolean save(UserParam param) {
         param.setId(null);
-        // TODO: 2023-03-01 22:35:47 设置openId
+        param.setUniqueId(Ids.user());
         return save(BeanUtil.copyProperties(param, UserEntity.class));
     }
 

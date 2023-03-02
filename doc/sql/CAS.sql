@@ -65,7 +65,7 @@ DROP TABLE IF EXISTS `t_cas_user`;
 CREATE TABLE `t_cas_user`
 (
     `id`        int                                                     NOT NULL AUTO_INCREMENT COMMENT '主键id(自增)',
-    `open_id`   varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT 'CAS 开放id(唯一)',
+    `unique_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT 'CAS 全局唯一id',
     `client_id` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT 'OAuth2 客户端id',
     `name`      varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '用户名',
     `password`  varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '密码',
