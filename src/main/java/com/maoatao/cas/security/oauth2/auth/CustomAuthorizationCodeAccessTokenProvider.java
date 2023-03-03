@@ -56,7 +56,9 @@ public class CustomAuthorizationCodeAccessTokenProvider implements Authenticatio
             new OAuth2TokenType(OAuth2ParameterNames.CODE);
     private static final OAuth2TokenType ID_TOKEN_TOKEN_TYPE =
             new OAuth2TokenType(OidcParameterNames.ID_TOKEN);
-    // 使用自定义接口，如果只使用官方接口建议使用官方的提供者
+    /**
+     * 使用自定义接口，如果只使用官方接口建议使用官方的提供者
+     */
     private final CustomAuthorizationService authorizationService;
     private final OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator;
 
