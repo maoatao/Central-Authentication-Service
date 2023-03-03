@@ -97,6 +97,12 @@
         </dependency>
 
         <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-json</artifactId>
+            <version>${hutool.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.maoatao.synapse</groupId>
             <artifactId>synapse-all</artifactId>
             <version>${synapse.version}</version>
