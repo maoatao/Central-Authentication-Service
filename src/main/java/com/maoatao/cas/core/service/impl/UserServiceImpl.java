@@ -90,6 +90,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         param.setUniqueId(Ids.user());
         UserEntity user = BeanUtil.copyProperties(param, UserEntity.class);
         user.setPassword(passwordEncoder.encode(param.getPassword()));
+        user.setEnabled(true);
         SynaAssert.isTrue(save(user), "新增用户失败!");
         SynaAssert.notNull(user.getId(), "新增用户失败:用户 ID 为空!");
         SynaAssert.isTrue(
