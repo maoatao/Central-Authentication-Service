@@ -52,7 +52,7 @@ VALUES (1, 1, 1);
 -- ----------------------------
 INSERT INTO `cas`.`t_cas_user` (`id`, `unique_id`, `client_id`, `name`, `password`, `enabled`)
 VALUES (1, 'U6401e2942a0cb26023ba055c', 'test-client', 'user',
-        '{bcrypt}$2a$10$stcBm3H1qfgEOqeIhJHDbeiEfas/XXE5trPJPncUcRGozT.hejzzO', 0);
+        '{bcrypt}$2a$10$stcBm3H1qfgEOqeIhJHDbeiEfas/XXE5trPJPncUcRGozT.hejzzO', 1);
 
 -- ----------------------------
 -- 步骤 6 绑定用户和角色
