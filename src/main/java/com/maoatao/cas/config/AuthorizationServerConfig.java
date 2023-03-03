@@ -124,6 +124,8 @@ public class AuthorizationServerConfig {
 
     /**
      * 生成令牌服务
+     * <p>
+     * 官方提供了内存和数据库储存授权信息,根据需要自己实现了redis储存令牌信息
      */
     @Bean
     public OAuth2AuthorizationService oAuth2AuthorizationService() {
@@ -162,8 +164,8 @@ public class AuthorizationServerConfig {
     @Bean
     public JWKSource<SecurityContext> jwkSource() {
         KeyPair keyPair = AuthorizationServerUtils.generateRsaKey();
-        RSAPublicKey publicKey = (RSAPublicKey)keyPair.getPublic();
-        RSAPrivateKey privateKey = (RSAPrivateKey)keyPair.getPrivate();
+        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
         RSAKey rsaKey = new RSAKey.Builder(publicKey)
                 .privateKey(privateKey)
                 .keyID(UUID.randomUUID().toString())
