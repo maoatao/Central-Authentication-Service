@@ -27,9 +27,9 @@ public class UserParam extends PageParam {
     @Schema(description = "主键id(自增)")
     private Long id;
     /**
-     * CAS 开放id(唯一)
+     * CAS 全局唯一id(唯一)
      */
-    @Schema(description = "CAS 开放id")
+    @Schema(description = "CAS 全局唯一id")
     private String uniqueId;
     /**
      * OAuth2 客户端id
