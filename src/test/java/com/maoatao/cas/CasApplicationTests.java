@@ -3,6 +3,7 @@ package com.maoatao.cas;
 import com.maoatao.cas.core.entity.PermissionEntity;
 import com.maoatao.cas.core.entity.RoleEntity;
 import com.maoatao.cas.core.entity.RolePermissionEntity;
+import com.maoatao.cas.core.entity.UserEntity;
 import com.maoatao.cas.core.service.PermissionService;
 import com.maoatao.cas.core.service.RolePermissionService;
 import com.maoatao.cas.core.service.RoleService;
@@ -12,6 +13,8 @@ import com.maoatao.cas.security.UUIDStringKeyGenerator;
 import com.maoatao.cas.util.Ids;
 import com.maoatao.cas.core.param.UserParam;
 import com.maoatao.synapse.core.lang.SynaException;
+import com.maoatao.synapse.core.util.SynaStrings;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -40,7 +43,6 @@ import org.springframework.security.oauth2.server.authorization.settings.TokenSe
 import org.springframework.security.oauth2.server.authorization.token.DefaultOAuth2TokenContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenContext;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.util.Collections;
@@ -50,6 +52,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 
+@Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest
 class CasApplicationTests {
@@ -78,10 +81,6 @@ class CasApplicationTests {
     @Autowired
     private RolePermissionService rolePermissionService;
 
-
-    //------------------------------------------------ 初始化测试数据 开始 ------------------------------------------------
-    // 请按步骤执行以下单元测试
-
     /**
      * 客户端 id
      */
@@ -92,8 +91,11 @@ class CasApplicationTests {
     private static final String TEST_CLIENT_SECRET = "123456";
     /**
      * 角色名称
+     * <p>
+     * {@link AuthorityAuthorizationManager#hasRole(String)}方法可以看到角色前缀 ROLE_PREFIX 是 ROLE_
+     * 所以库中的角色名一定要有前缀 ROLE_
      */
-    private static final String TEST_ROLE_NAME = "TEST";
+    private static final String TEST_ROLE_NAME = "ROLE_TEST";
     /**
      * 权限名称
      */
@@ -107,8 +109,10 @@ class CasApplicationTests {
      */
     private static final String TEST_USER_PASSWORD = "password";
 
+    /**
+     * 创建一个客户端,并为其添加一个拥有角色权限的用户
+     */
     @Test
-    @Transactional(rollbackFor = Exception.class)
     void initialize_test_data() {
         // 1.先创建客户端 save_client_test
         save_client_test();
@@ -116,16 +120,24 @@ class CasApplicationTests {
         save_role_permission_test();
         // 3.通过客户端 id 新增用户 save_user_test
         save_user_test();
+        log.debug("----------------------------------------------------");
+        log.info("已成功创建客户端: {}", TEST_CLIENT_ID);
+        log.info("已成功创建角　色: {}", TEST_ROLE_NAME);
+        log.info("已成功创建权　限: {}", TEST_PERMISSION_NAME);
+        log.info("已成功创建用　户: {} 密码 {}", TEST_USER_NAME, TEST_USER_PASSWORD);
+        log.debug("----------------------------------------------------");
     }
 
+    //------------------------------------------------ 初始化测试数据 开始 ------------------------------------------------
 
     /**
      * 步骤 1
      * <p>
      * 创建测试客户端
      */
+    @Test
     void save_client_test() {
-        RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
+        registeredClientRepository.save(RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId(TEST_CLIENT_ID)
                 .clientSecret(passwordEncoder.encode(TEST_CLIENT_SECRET))
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
@@ -139,32 +151,31 @@ class CasApplicationTests {
                 // requireProofKey 需要额外参数验证,requireAuthorizationConsent 授权需要同意
                 .clientSettings(ClientSettings.builder().requireProofKey(true).build())
                 .tokenSettings(TokenSettings.builder().accessTokenFormat(OAuth2TokenFormat.REFERENCE).build())
-                .build();
-        registeredClientRepository.save(registeredClient);
-        Assert.assertEquals(registeredClientRepository.findByClientId("messaging-client").getClientId(), "messaging-client");
+                .build());
+        RegisteredClient registeredClient = registeredClientRepository.findByClientId(TEST_CLIENT_ID);
+        Assert.assertNotNull(registeredClient);
+        Assert.assertEquals("客户端创建失败", registeredClient.getClientId(), TEST_CLIENT_ID);
     }
 
     /**
      * 步骤 2
      * <p>
      * 新增角色权限并绑定关系
-     * <p>
-     * {@link AuthorityAuthorizationManager#hasRole(String)}方法可以看到角色前缀 ROLE_PREFIX 是 ROLE_
-     * 所以库中的角色名一定要有前缀 ROLE_
      */
+    @Test
     void save_role_permission_test() {
         RoleEntity roleEntity = RoleEntity.builder().clientId(TEST_CLIENT_ID)
-                .name("ROLE_".concat(TEST_ROLE_NAME))
+                .name(TEST_ROLE_NAME)
                 .enabled(true)
                 .build();
-        Assert.assertTrue(roleService.save(roleEntity));
+        Assert.assertTrue("角色创建失败", roleService.save(roleEntity));
         PermissionEntity permissionEntity = PermissionEntity.builder()
                 .clientId(TEST_CLIENT_ID)
                 .name(TEST_PERMISSION_NAME)
                 .enabled(true)
                 .build();
-        Assert.assertTrue(permissionService.save(permissionEntity));
-        Assert.assertTrue(rolePermissionService.save(RolePermissionEntity.builder()
+        Assert.assertTrue("权限创建失败", permissionService.save(permissionEntity));
+        Assert.assertTrue("角色权限关系绑定失败", rolePermissionService.save(RolePermissionEntity.builder()
                 .roleId(roleEntity.getId())
                 .permissionId(permissionEntity.getId())
                 .build()));
@@ -175,6 +186,7 @@ class CasApplicationTests {
      * <p>
      * 创建用户信息
      */
+    @Test
     void save_user_test() {
         UserParam param = new UserParam();
         param.setUniqueId(Ids.user());
@@ -182,10 +194,9 @@ class CasApplicationTests {
         param.setName(TEST_USER_NAME);
         param.setPassword(TEST_USER_PASSWORD);
         // 角色前缀同步骤 2 说明
-        param.setRoles(Collections.singletonList("ROLE_".concat(TEST_ROLE_NAME)));
-        long userId = userService.save(param);
-        // id 为数据库自增,添加成功一定大于 0
-        Assert.assertTrue(userId > 0);
+        param.setRoles(Collections.singletonList(TEST_ROLE_NAME));
+        UserEntity userEntity = userService.getById(userService.save(param));
+        Assert.assertNotNull("用户创建失败", userEntity);
     }
 
     //------------------------------------------------ 初始化测试数据 结束 ------------------------------------------------
@@ -194,7 +205,7 @@ class CasApplicationTests {
     void generate_authorization_code_test() {
         String username = "user";
         String password = "password";
-        String clientId = "messaging-client";
+        String clientId = TEST_CLIENT_ID;
         Set<String> scopes = new TreeSet<>();
         scopes.add("message.read");
         scopes.add("message.write");
@@ -234,7 +245,7 @@ class CasApplicationTests {
         if (authorizationCode != null) {
 
             // 控制台输出授权码
-            System.out.println(authorizationCode.getTokenValue());
+            log.info(authorizationCode.getTokenValue());
 
             OAuth2Authorization authorization = OAuth2Authorization.withRegisteredClient(registeredClient)
                     .principalName(principal.getName())
