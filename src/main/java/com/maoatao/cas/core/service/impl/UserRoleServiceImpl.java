@@ -39,9 +39,9 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRoleEnt
         List<Long> existed = list(Wrappers.<UserRoleEntity>lambdaQuery().eq(UserRoleEntity::getUserId, userId))
                 .stream()
                 .map(UserRoleEntity::getRoleId).toList();
-        // 已有不在入参为删除
+        // 已有不在入参为删除(已有-交集)
         List<Long> preDelete = existed.stream().filter(o -> !roleIds.contains(o)).toList();
-        // 入参不在已有为新增
+        // 入参不在已有为新增(入参-交集)
         List<Long> preAdd = roleIds.stream().filter(o -> !existed.contains(o)).toList();
         SynaAssert.isTrue(removeBatchByIds(preDelete), "删除用户角色关系失败!");
         List<UserRoleEntity> newUserRoles = preAdd.stream()
