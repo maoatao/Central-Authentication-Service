@@ -1,60 +1,59 @@
 package com.maoatao.cas;
 
+import cn.hutool.core.codec.Base64;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
 import com.maoatao.cas.core.entity.PermissionEntity;
 import com.maoatao.cas.core.entity.RoleEntity;
 import com.maoatao.cas.core.entity.RolePermissionEntity;
 import com.maoatao.cas.core.entity.UserEntity;
+import com.maoatao.cas.core.param.GenerateAuthorizationCodeParams;
+import com.maoatao.cas.core.service.AuthorizationService;
 import com.maoatao.cas.core.service.PermissionService;
 import com.maoatao.cas.core.service.RolePermissionService;
 import com.maoatao.cas.core.service.RoleService;
 import com.maoatao.cas.core.service.UserService;
-import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
-import com.maoatao.cas.security.UUIDStringKeyGenerator;
 import com.maoatao.cas.util.Ids;
 import com.maoatao.cas.core.param.UserParam;
-import com.maoatao.synapse.core.lang.SynaException;
 import com.maoatao.synapse.core.util.SynaStrings;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authorization.AuthorityAuthorizationManager;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
-import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
+import org.springframework.security.oauth2.core.endpoint.PkceParameterNames;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
-import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
-import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationCode;
-import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
-import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
-import org.springframework.security.oauth2.server.authorization.token.DefaultOAuth2TokenContext;
-import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenContext;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
-import java.security.Principal;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.UUID;
 
 @Slf4j
-@RunWith(SpringRunner.class)
 @SpringBootTest
+@AutoConfigureMockMvc
+@RunWith(SpringRunner.class)
 class CasApplicationTests {
 
     @Autowired
@@ -67,10 +66,7 @@ class CasApplicationTests {
     private RegisteredClientRepository registeredClientRepository;
 
     @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private OAuth2AuthorizationService authorizationService;
+    private AuthorizationService authorizationService;
 
     @Autowired
     private RoleService roleService;
@@ -81,6 +77,9 @@ class CasApplicationTests {
     @Autowired
     private RolePermissionService rolePermissionService;
 
+    @Autowired
+    private MockMvc mockMvc;
+
     /**
      * 客户端 id
      */
@@ -89,6 +88,14 @@ class CasApplicationTests {
      * 客户端密码
      */
     private static final String TEST_CLIENT_SECRET = "123456";
+    /**
+     * 客户端密码
+     */
+    private static final String TEST_CLIENT_REDIRECT_URI = "https://cn.bing.com";
+    /**
+     * 客户端授权范围
+     */
+    private static final Set<String> TEST_CLIENT_SCOPES = Set.of("test.read", "test.write");
     /**
      * 角色名称
      * <p>
@@ -110,28 +117,88 @@ class CasApplicationTests {
     private static final String TEST_USER_PASSWORD = "password";
 
     /**
+     * 测试步骤 1
+     * <p>
+     * 条件:服务配置正确的数据库连接,并手动新建数据库后使用 doc/sql/CAS 表结构.sql 建表
+     * <p>
+     * 初始化测试数据 (推荐使用本单元测试进行初始化测试数据,可以确认服务配置是否正常,如果使用 doc/sql/CAS 测试数据.sql 初始化测试数据,请跳过此单元测试直接执行测试步骤 2)
+     * <p>
      * 创建一个客户端,并为其添加一个拥有角色权限的用户
      */
     @Test
     void initialize_test_data() {
+        // 请按步骤初始化测试数据
         // 1.先创建客户端 save_client_test
         save_client_test();
         // 2.通过客户端 id 新增角色和权限 save_role_permission_test
         save_role_permission_test();
         // 3.通过客户端 id 新增用户 save_user_test
         save_user_test();
-        log.debug("----------------------------------------------------");
-        log.info("已成功创建客户端: {}", TEST_CLIENT_ID);
-        log.info("已成功创建角　色: {}", TEST_ROLE_NAME);
-        log.info("已成功创建权　限: {}", TEST_PERMISSION_NAME);
-        log.info("已成功创建用　户: {} 密码 {}", TEST_USER_NAME, TEST_USER_PASSWORD);
-        log.debug("----------------------------------------------------");
+        System.out.println("----------------------------------------------------");
+        System.out.println(SynaStrings.format("已成功创建客户端: {}", TEST_CLIENT_ID));
+        System.out.println(SynaStrings.format("已成功创建角　色: {}", TEST_ROLE_NAME));
+        System.out.println(SynaStrings.format("已成功创建权　限: {}", TEST_PERMISSION_NAME));
+        System.out.println(SynaStrings.format("已成功创建用　户: {} 密码 {}", TEST_USER_NAME, TEST_USER_PASSWORD));
+        System.out.println("----------------------------------------------------");
+    }
+
+    /**
+     * 测试步骤 2
+     * <p>
+     * 条件:服务配置正确的redis连接(默认使用redis来储存授权信息,详情{@link com.maoatao.cas.config.AuthorizationServerConfig#oAuth2AuthorizationService })
+     * <p>
+     * 创建一个授权码,并使用该授权码请求令牌
+     * <p>
+     * 客户端设置如果 requireProofKey 为 true,就需要添加额外参数,三个参数为一组,相互对应.详情{@link com.maoatao.cas.test.CodeVerifierTest}
+     * <p>
+     * CodeChallenge 验证源码位置 {@link org.springframework.security.oauth2.server.authorization.authentication.CodeVerifierAuthenticator#codeVerifierValid}
+     */
+    @Test
+    @SneakyThrows
+    void generate_authorization_code_and_token_test() {
+        GenerateAuthorizationCodeParams generateAuthorizationCodeParams = new GenerateAuthorizationCodeParams();
+        generateAuthorizationCodeParams.setClientId(TEST_CLIENT_ID);
+        generateAuthorizationCodeParams.setUsername(TEST_USER_NAME);
+        generateAuthorizationCodeParams.setPassword(TEST_USER_PASSWORD);
+        // scopes需要在客户端的范围内
+        generateAuthorizationCodeParams.setScopes(TEST_CLIENT_SCOPES);
+        generateAuthorizationCodeParams.setCodeChallengeMethod("S256");
+        generateAuthorizationCodeParams.setCodeChallenge("3vrxycun-VbyenvO5GiFOaOBazUBX_xcFElnqbl-TXA");
+        // 非OAuth2原获取授权码接口,原版请求成功后跳转页面 get http://localhost:8080/oauth2/authorize
+        // 根据需要自己新增了一个不需要鉴权,不跳转页面,post的请求授权码接口
+        String authorizationCode = authorizationService.generateAuthorizationCode(generateAuthorizationCodeParams);
+
+        System.out.println("----------------------------------------------------");
+        System.out.println(SynaStrings.format("已成功生成授权码: {}", authorizationCode));
+        System.out.println("----------------------------------------------------");
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.set(OAuth2ParameterNames.GRANT_TYPE, AuthorizationGrantType.AUTHORIZATION_CODE.getValue());
+        params.set(OAuth2ParameterNames.REDIRECT_URI, TEST_CLIENT_REDIRECT_URI);
+        params.set(OAuth2ParameterNames.CODE, authorizationCode);
+        params.set(PkceParameterNames.CODE_VERIFIER, "eT3Zhtr7Tmz20-qpTk9zs8EWhN63qdZd8GWiq5-h67TrujxzIg0p_tPUfWH1dXQg278ZEiMcq9ehYPvbBehNe8f4VP4o8EOnFoQY7wVwjUyG_l0ksZUUuPWg5dWKAEth");
+        // mock模拟了请求令牌,此接口为OAuth2原版接口 post http://localhost:8080/oauth2/token
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/oauth2/token")
+                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                .params(params)
+                .header(HttpHeaders.AUTHORIZATION, "Basic ".concat(Base64.encode(TEST_CLIENT_ID.concat(":").concat(TEST_CLIENT_SECRET))))
+        ).andReturn();
+        MockHttpServletResponse mockResponse = mvcResult.getResponse();
+
+        Assert.assertEquals("获取令牌请求失败!", mockResponse.getStatus(), 200);
+        Assert.assertTrue("获取令牌请求失败!", StrUtil.isNotBlank(mockResponse.getContentAsString()));
+
+        System.out.println("\n----------------------------------------------------");
+        System.out.println(SynaStrings.format("已成功获取令牌:"));
+        System.out.println(new JSONObject(mockResponse.getContentAsString()).toStringPretty());
+        System.out.println("----------------------------------------------------");
+
     }
 
     //------------------------------------------------ 初始化测试数据 开始 ------------------------------------------------
 
     /**
-     * 步骤 1
+     * 初始化测试数据 步骤 1
      * <p>
      * 创建测试客户端
      */
@@ -145,9 +212,8 @@ class CasApplicationTests {
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
                 .redirectUri("http://127.0.0.1:8080/authorized")
-                .redirectUri("https://cn.bing.com")
-                .scope("test.read")
-                .scope("test.write")
+                .redirectUri(TEST_CLIENT_REDIRECT_URI)
+                .scopes(scope -> scope.addAll(TEST_CLIENT_SCOPES))
                 // requireProofKey 需要额外参数验证,requireAuthorizationConsent 授权需要同意
                 .clientSettings(ClientSettings.builder().requireProofKey(true).build())
                 .tokenSettings(TokenSettings.builder().accessTokenFormat(OAuth2TokenFormat.REFERENCE).build())
@@ -158,7 +224,7 @@ class CasApplicationTests {
     }
 
     /**
-     * 步骤 2
+     * 初始化测试数据 步骤 2
      * <p>
      * 新增角色权限并绑定关系
      */
@@ -182,7 +248,7 @@ class CasApplicationTests {
     }
 
     /**
-     * 步骤 3
+     * 初始化测试数据 步骤 3
      * <p>
      * 创建用户信息
      */
@@ -201,66 +267,9 @@ class CasApplicationTests {
 
     //------------------------------------------------ 初始化测试数据 结束 ------------------------------------------------
 
-    @Test
-    void generate_authorization_code_test() {
-        String username = "user";
-        String password = "password";
-        String clientId = TEST_CLIENT_ID;
-        Set<String> scopes = new TreeSet<>();
-        scopes.add("message.read");
-        scopes.add("message.write");
-        Map<String, Object> additionalParameters = new HashMap<>();
-        additionalParameters.put("code_challenge_method", "S256");
-        additionalParameters.put("code_challenge", "3vrxycun-VbyenvO5GiFOaOBazUBX_xcFElnqbl-TXA");
-        // code_challenge对应code_verifier的值: eT3Zhtr7Tmz20-qpTk9zs8EWhN63qdZd8GWiq5-h67TrujxzIg0p_tPUfWH1dXQg278ZEiMcq9ehYPvbBehNe8f4VP4o8EOnFoQY7wVwjUyG_l0ksZUUuPWg5dWKAEth
-
-        // 通过 username 和 password 构建一个 Authentication 对象
-        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username, password);
-        Authentication principal = authenticationManager.authenticate(authRequest);
-
-        RegisteredClient registeredClient = this.registeredClientRepository.findByClientId(clientId);
-        if (registeredClient == null) {
-            throw new SynaException(OAuth2ErrorCodes.INVALID_REQUEST + ":" + OAuth2ParameterNames.CLIENT_ID);
-        }
-
-        if (!registeredClient.getAuthorizationGrantTypes().contains(AuthorizationGrantType.AUTHORIZATION_CODE)) {
-            throw new SynaException(OAuth2ErrorCodes.UNAUTHORIZED_CLIENT + ":" + OAuth2ParameterNames.CLIENT_ID);
-        }
-
-        OAuth2AuthorizationRequest authorizationRequest = OAuth2AuthorizationRequest.authorizationCode()
-                .authorizationUri("http://localhost:8080/oauth2/authorize")
-                .clientId(registeredClient.getClientId())
-                .scopes(scopes)
-                .additionalParameters(additionalParameters)
-                .build();
-
-        OAuth2TokenContext tokenContext = DefaultOAuth2TokenContext.builder()
-                .registeredClient(registeredClient)
-                .principal(principal)
-                .tokenType(new OAuth2TokenType(OAuth2ParameterNames.CODE))
-                .authorizedScopes(scopes)
-                .build();
-
-        OAuth2AuthorizationCode authorizationCode = new CustomAuthorizationCodeGenerator(new UUIDStringKeyGenerator()).generate(tokenContext);
-        if (authorizationCode != null) {
-
-            // 控制台输出授权码
-            log.info(authorizationCode.getTokenValue());
-
-            OAuth2Authorization authorization = OAuth2Authorization.withRegisteredClient(registeredClient)
-                    .principalName(principal.getName())
-                    .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                    .attribute(Principal.class.getName(), principal)
-                    .attribute(OAuth2AuthorizationRequest.class.getName(), authorizationRequest)
-                    .authorizedScopes(scopes)
-                    .token(authorizationCode)
-                    .build();
-            this.authorizationService.save(authorization);
-        }
-    }
-
-
     /**
+     * 非必要
+     * <p>
      * 创建oidc测试客户端
      * <p>
      * 客户端注册请求中的访问令牌需要 scope 有 client.create.
