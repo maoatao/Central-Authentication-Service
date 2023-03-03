@@ -66,6 +66,8 @@ public class RedisAuthorizationService implements CustomAuthorizationService {
 
     /**
      * 过期时间5分钟
+     * <p>
+     * 并非客户端详情中令牌配置的令牌时间,而是储存到redis中计算储存时间使用的默认时间
      */
     private static final long DEFAULT_EXPIRATION_SECONDS = 300;
 
