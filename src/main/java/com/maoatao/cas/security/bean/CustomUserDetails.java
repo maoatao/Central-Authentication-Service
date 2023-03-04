@@ -24,7 +24,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
- * 自定义客户端用户
+ * 自定义用户信息
  * <p>
  * Customized by {@link org.springframework.security.core.userdetails.User}
  *
@@ -390,7 +390,7 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
             return this;
         }
 
-        public UserDetails build() {
+        public CustomUserDetails build() {
             return new CustomUserDetails(this.clientId, this.username, this.password, !this.disabled, !this.accountExpired,
                     !this.credentialsExpired, !this.accountLocked, this.authorities);
         }

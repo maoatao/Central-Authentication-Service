@@ -1,5 +1,6 @@
 package com.maoatao.cas.security.filter;
 
+import com.maoatao.cas.core.service.AuthorizationService;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
@@ -16,13 +17,16 @@ public class CustomFilterConfigurer extends SecurityConfigurerAdapter<DefaultSec
 
     private final OAuth2AuthorizationService oAuth2AuthorizationService;
 
-    public CustomFilterConfigurer(OAuth2AuthorizationService oAuth2AuthorizationService) {
+    private final AuthorizationService authorizationService;
+
+    public CustomFilterConfigurer(OAuth2AuthorizationService oAuth2AuthorizationService, AuthorizationService authorizationService) {
         this.oAuth2AuthorizationService = oAuth2AuthorizationService;
+        this.authorizationService = authorizationService;
     }
 
     @Override
     public void configure(HttpSecurity http) {
-        AuthorizationFilter authorizationFilter = new AuthorizationFilter(oAuth2AuthorizationService);
+        AuthorizationFilter authorizationFilter = new AuthorizationFilter(oAuth2AuthorizationService, authorizationService);
         http.addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class);
         ResourcesFilter resourcesFilter = new ResourcesFilter();
         http.addFilterBefore(resourcesFilter, AuthorizationFilter.class);

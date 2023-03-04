@@ -1,11 +1,12 @@
 package com.maoatao.cas.config;
 
+import com.maoatao.cas.core.service.AuthorizationService;
 import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.security.CustomUserAuthenticationProvider;
 import com.maoatao.cas.security.HttpConstants;
+import com.maoatao.cas.security.filter.CustomFilterConfigurer;
 import com.maoatao.cas.security.oauth2.auth.CustomAccessTokenGenerator;
 import com.maoatao.cas.security.oauth2.auth.RedisAuthorizationService;
-import com.maoatao.cas.security.filter.CustomFilterConfigurer;
 import com.maoatao.cas.util.AuthorizationServerUtils;
 import com.maoatao.cas.security.oauth2.auth.CustomRefreshTokenGenerator;
 import com.maoatao.cas.security.UUIDStringKeyGenerator;
@@ -84,9 +85,10 @@ public class AuthorizationServerConfig {
     @Bean
     @Order(2)
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http,
-                                                          OAuth2AuthorizationService oAuth2AuthorizationService) throws Exception {
+                                                          OAuth2AuthorizationService oAuth2AuthorizationService,
+                                                          AuthorizationService authorizationService) throws Exception {
         permitSwagger(http);
-        applyFilterConfigurer(http, oAuth2AuthorizationService);
+        applyFilterConfigurer(http, oAuth2AuthorizationService, authorizationService);
         http.formLogin(Customizer.withDefaults())
                 .httpBasic()
                 .and()
@@ -211,11 +213,13 @@ public class AuthorizationServerConfig {
     /**
      * 配置令牌过滤器并放行部分请求
      */
-    private void applyFilterConfigurer(HttpSecurity http, OAuth2AuthorizationService oAuth2AuthorizationService) throws Exception {
+    private void applyFilterConfigurer(HttpSecurity http,
+                                       OAuth2AuthorizationService oAuth2AuthorizationService,
+                                       AuthorizationService authorizationService) throws Exception {
         http.authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/authorization").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/authorization").permitAll())
-                .apply(new CustomFilterConfigurer(oAuth2AuthorizationService))
+                .apply(new CustomFilterConfigurer(oAuth2AuthorizationService, authorizationService))
                 .and()
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated());
     }

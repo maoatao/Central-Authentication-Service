@@ -1,10 +1,14 @@
 package com.maoatao.cas.core.service.impl;
 
+import com.maoatao.cas.core.param.GenerateAccessTokenParam;
 import com.maoatao.cas.security.CustomUserAuthenticationProvider;
 import com.maoatao.cas.core.service.AuthorizationService;
+import com.maoatao.cas.security.GrantTypeConstants;
+import com.maoatao.cas.security.bean.ClientUser;
+import com.maoatao.cas.security.bean.CustomUserDetails;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
 import com.maoatao.cas.security.UUIDStringKeyGenerator;
-import com.maoatao.cas.core.param.GenerateAuthorizationCodeParams;
+import com.maoatao.cas.core.param.GenerateAuthorizationCodeParam;
 import com.maoatao.cas.security.bean.AuthorizationInfo;
 import com.maoatao.cas.util.ServletUtils;
 import com.maoatao.synapse.core.lang.SynaException;
@@ -16,7 +20,9 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
@@ -24,11 +30,16 @@ import org.springframework.security.oauth2.server.authorization.OAuth2Authorizat
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationCode;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AccessTokenAuthenticationToken;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeAuthenticationToken;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2ClientAuthenticationToken;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.token.DefaultOAuth2TokenContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
+import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2AuthorizationCodeAuthenticationConverter;
+import org.springframework.security.oauth2.server.authorization.web.authentication.ClientSecretBasicAuthenticationConverter;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -57,14 +68,27 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     private static final OAuth2TokenGenerator<OAuth2AuthorizationCode> TOKEN_GENERATOR = new CustomAuthorizationCodeGenerator(new UUIDStringKeyGenerator());
 
     @Override
-    public String generateAuthorizationCode(GenerateAuthorizationCodeParams params) {
-        RegisteredClient registeredClient = getRegisteredClient(params.getClientId());
-        checkParams(params, registeredClient);
-        Authentication principal = buildPrincipal(params.getClientId(), params.getUsername(), params.getPassword());
-        OAuth2TokenContext tokenContext = buildTokenContext(params, registeredClient, principal);
+    public String generateAuthorizationCode(GenerateAuthorizationCodeParam param) {
+        Authentication principal = getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) principal.getPrincipal();
+        RegisteredClient registeredClient = getRegisteredClient(userDetails.getClientId());
+        checkParams(param, registeredClient);
+        OAuth2TokenContext tokenContext = buildTokenContext(param.getScopes(), registeredClient, principal);
         OAuth2AuthorizationCode authorizationCode = buildAuthorizationCode(tokenContext);
-        saveAuthorization(params, registeredClient, principal, authorizationCode);
+        saveAuthorization(param, registeredClient, principal, authorizationCode);
         return authorizationCode.getTokenValue();
+    }
+
+    @Override
+    public OAuth2AccessToken generateAccessToken(GenerateAccessTokenParam param) {
+        OAuth2AccessToken oAuth2AccessToken;
+        switch (param.getType()) {
+            case GrantTypeConstants.AUTHORIZATION_CODE -> oAuth2AccessToken = buildAccessTokenByCode(param);
+            case GrantTypeConstants.REFRESH_TOKEN -> oAuth2AccessToken = buildAccessTokenByRefresh(param);
+            case GrantTypeConstants.CLIENT_CREDENTIALS -> oAuth2AccessToken = buildAccessTokenByClient(param);
+            default -> throw new UnsupportedOperationException("不支持的授权类型!");
+        }
+        return oAuth2AccessToken;
     }
 
     @Override
@@ -92,14 +116,24 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         return AuthorizationInfo.of(principal, isActive);
     }
 
+    @Override
+    public Authentication buildPrincipal(ClientUser clientUser) {
+        return buildPrincipal(clientUser.clientId(), clientUser.username(), clientUser.password());
+    }
+
     /**
-     * 获取令牌
+     * 获取用户详情
+     * <p>
+     * 这个值需要在拦截器中生成(正常情况下这个值生成失败拦截器不会放行)
+     * <p>
+     * {@link this#buildPrincipal(ClientUser)}该方法反过来,从上下文中获取
      *
-     * @param accessToken 令牌的值
-     * @return 令牌
+     * @return 用户详情
      */
-    private OAuth2Authorization findByAccessToken(String accessToken) {
-        return oAuth2AuthorizationService.findByToken(removeBearerPrefix(accessToken), OAuth2TokenType.ACCESS_TOKEN);
+    private CustomUserDetails getUserDetails() {
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        SynaAssert.notNull(usernamePasswordAuthenticationToken, "从用户主体获取失败!");
+        return (CustomUserDetails) usernamePasswordAuthenticationToken.getPrincipal();
     }
 
     /**
@@ -114,10 +148,10 @@ public class AuthorizationServiceImpl implements AuthorizationService {
      */
     private Authentication buildPrincipal(String clientId, String username, String password) {
         Authentication authentication;
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
-        authenticationToken.setDetails(clientId);
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+        usernamePasswordAuthenticationToken.setDetails(clientId);
         try {
-            authentication = authenticationManager.authenticate(authenticationToken);
+            authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
         } catch (Exception e) {
             throw new SynaException("用户身份验证失败!", e);
         }
@@ -125,6 +159,16 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             throw new SynaException("生成用户身份验证失败!");
         }
         return authentication;
+    }
+
+    /**
+     * 获取令牌
+     *
+     * @param accessToken 令牌的值
+     * @return 令牌
+     */
+    private OAuth2Authorization findByAccessToken(String accessToken) {
+        return oAuth2AuthorizationService.findByToken(removeBearerPrefix(accessToken), OAuth2TokenType.ACCESS_TOKEN);
     }
 
     /**
@@ -147,19 +191,19 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     /**
      * 构建授权请求
      *
-     * @param params           请求参数
+     * @param param            请求参数
      * @param registeredClient 客户端
      * @return 授权请求
      */
-    private OAuth2AuthorizationRequest buildAuthorizationRequest(GenerateAuthorizationCodeParams params,
+    private OAuth2AuthorizationRequest buildAuthorizationRequest(GenerateAuthorizationCodeParam param,
                                                                  RegisteredClient registeredClient) {
         OAuth2AuthorizationRequest authorizationRequest;
         try {
             authorizationRequest = OAuth2AuthorizationRequest.authorizationCode()
                     .authorizationUri(ServletUtils.getRequest().getRequestURL().toString())
                     .clientId(registeredClient.getClientId())
-                    .scopes(params.getScopes())
-                    .additionalParameters(params.getAdditionalParameters())
+                    .scopes(param.getScopes())
+                    .additionalParameters(param.getAdditionalParameters())
                     .build();
         } catch (Exception e) {
             throw new SynaException("生成用户身份验证失败!", e);
@@ -168,12 +212,14 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     }
 
     /**
-     * @param params           请求参数
+     * 生成令牌上下文
+     *
+     * @param scopes           授权范围
      * @param registeredClient 客户端
      * @param principal        用户身份验证
-     * @return 生成令牌上下文
+     * @return 令牌上下文
      */
-    private OAuth2TokenContext buildTokenContext(GenerateAuthorizationCodeParams params,
+    private OAuth2TokenContext buildTokenContext(Set<String> scopes,
                                                  RegisteredClient registeredClient,
                                                  Authentication principal) {
         OAuth2TokenContext tokenContext;
@@ -182,7 +228,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
                     .registeredClient(registeredClient)
                     .principal(principal)
                     .tokenType(new OAuth2TokenType(OAuth2ParameterNames.CODE))
-                    .authorizedScopes(params.getScopes())
+                    .authorizedScopes(scopes)
                     .build();
         } catch (Exception e) {
             throw new SynaException("生成令牌上下文失败!", e);
@@ -212,24 +258,24 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     /**
      * 保存授权信息
      *
-     * @param params            请求参数
+     * @param param             请求参数
      * @param registeredClient  客户端
      * @param principal         用户身份验证
      * @param authorizationCode 授权码
      */
-    private void saveAuthorization(GenerateAuthorizationCodeParams params,
+    private void saveAuthorization(GenerateAuthorizationCodeParam param,
                                    RegisteredClient registeredClient,
                                    Authentication principal,
                                    OAuth2AuthorizationCode authorizationCode) {
         OAuth2Authorization authorization;
-        OAuth2AuthorizationRequest authorizationRequest = buildAuthorizationRequest(params, registeredClient);
+        OAuth2AuthorizationRequest authorizationRequest = buildAuthorizationRequest(param, registeredClient);
         try {
             authorization = OAuth2Authorization.withRegisteredClient(registeredClient)
                     .principalName(principal.getName())
                     .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                     .attribute(Principal.class.getName(), principal)
                     .attribute(OAuth2AuthorizationRequest.class.getName(), authorizationRequest)
-                    .authorizedScopes(params.getScopes())
+                    .authorizedScopes(param.getScopes())
                     .token(authorizationCode)
                     .build();
         } catch (Exception e) {
@@ -254,16 +300,49 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         return accessToken.replaceAll(OAuth2AccessToken.TokenType.BEARER.getValue(), "").trim();
     }
 
-    private void checkParams(GenerateAuthorizationCodeParams params, RegisteredClient registeredClient) {
+    private void checkParams(GenerateAuthorizationCodeParam param, RegisteredClient registeredClient) {
         String errorMsg = "无效的请求参数[scopes]";
-        Set<String> scopes = params.getScopes();
+        Set<String> scopes = param.getScopes();
         SynaAssert.notEmpty(scopes, errorMsg);
         for (String s : scopes) {
             SynaAssert.isTrue(registeredClient.getScopes().contains(s), errorMsg);
         }
         if (registeredClient.getClientSettings().isRequireProofKey()) {
-            SynaAssert.isTrue(StrUtil.isNotBlank(params.getCodeChallengeMethod()), "无效的请求参数[codeChallengeMethod]");
-            SynaAssert.isTrue(StrUtil.isNotBlank(params.getCodeChallenge()), "无效的请求参数[codeChallenge]");
+            SynaAssert.isTrue(StrUtil.isNotBlank(param.getCodeChallengeMethod()), "无效的请求参数[codeChallengeMethod]");
+            SynaAssert.isTrue(StrUtil.isNotBlank(param.getCodeChallenge()), "无效的请求参数[codeChallenge]");
         }
+    }
+
+    /**
+     * {@link OAuth2AuthorizationCodeAuthenticationConverter#convert}
+     * {@link ClientSecretBasicAuthenticationConverter#convert}
+     *
+     * @param param
+     * @return
+     */
+    private OAuth2AccessToken buildAccessTokenByCode(GenerateAccessTokenParam param) {
+        CustomUserDetails userDetails = getUserDetails();
+        // Authentication oAuth2ClientAuthenticationToken = new OAuth2ClientAuthenticationToken(clientID, ClientAuthenticationMethod.CLIENT_SECRET_BASIC, clientSecret, null);
+        Authentication oAuth2ClientAuthenticationToken = new OAuth2ClientAuthenticationToken(userDetails.getClientId(), ClientAuthenticationMethod.CLIENT_SECRET_BASIC, param.getSecret(), null);
+        // Authentication authorizationGrantAuthentication = new OAuth2AuthorizationCodeAuthenticationToken(code, clientPrincipal, redirectUri, additionalParameters);
+        Authentication authorizationGrantAuthentication = new OAuth2AuthorizationCodeAuthenticationToken(param.getCode(), oAuth2ClientAuthenticationToken, null, null);
+
+        OAuth2AccessTokenAuthenticationToken accessTokenAuthentication =
+                (OAuth2AccessTokenAuthenticationToken) this.authenticationManager.authenticate(authorizationGrantAuthentication);
+        return accessTokenAuthentication.getAccessToken();
+    }
+
+    private OAuth2AccessToken buildAccessTokenByClient(GenerateAccessTokenParam param) {
+        return null;
+    }
+
+    private OAuth2AccessToken buildAccessTokenByRefresh(GenerateAccessTokenParam param) {
+        return null;
+    }
+
+    private Authentication getAuthentication() {
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        SynaAssert.notNull(usernamePasswordAuthenticationToken, "从用户主体获取失败!");
+        return usernamePasswordAuthenticationToken;
     }
 }

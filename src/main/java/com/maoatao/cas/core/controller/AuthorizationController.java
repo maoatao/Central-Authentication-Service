@@ -1,7 +1,7 @@
 package com.maoatao.cas.core.controller;
 
 import com.maoatao.cas.core.service.AuthorizationService;
-import com.maoatao.cas.core.param.GenerateAuthorizationCodeParams;
+import com.maoatao.cas.core.param.GenerateAuthorizationCodeParam;
 import com.maoatao.cas.security.HttpConstants;
 import com.maoatao.cas.security.bean.AuthorizationInfo;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,13 +32,13 @@ public class AuthorizationController {
     /**
      * 生成授权码
      *
-     * @param params 参数
+     * @param param 参数
      * @return 授权码
      */
     @PostMapping
     @Operation(summary = "generateAuthorizationCode", description = "生成授权码")
-    public String generateAuthorizationCode(@RequestBody GenerateAuthorizationCodeParams params) {
-        return authorizationService.generateAuthorizationCode(params);
+    public String generateAuthorizationCode(@RequestBody GenerateAuthorizationCodeParam param) {
+        return authorizationService.generateAuthorizationCode(param);
     }
 
     /**

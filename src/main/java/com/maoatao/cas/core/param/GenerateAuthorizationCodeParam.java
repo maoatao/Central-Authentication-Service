@@ -20,28 +20,10 @@ import java.util.Set;
  */
 @Data
 @Schema(description = "生成授权码请求参数")
-public class GenerateAuthorizationCodeParams implements Serializable {
+public class GenerateAuthorizationCodeParam implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -7286826147280035652L;
-    /**
-     * 注册客户端id
-     */
-    @NotNull(message = "注册客户端id不能为空")
-    @Schema(description = "注册客户端id")
-    private String clientId;
-    /**
-     * 用户名
-     */
-    @NotNull(message = "用户名不能为空")
-    @Schema(description = "用户名")
-    private String username;
-    /**
-     * 密码
-     */
-    @NotNull(message = "密码不能为空")
-    @Schema(description = "密码")
-    private String password;
     /**
      * 授权范围
      */

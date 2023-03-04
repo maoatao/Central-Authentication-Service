@@ -7,12 +7,13 @@ import com.maoatao.cas.core.entity.PermissionEntity;
 import com.maoatao.cas.core.entity.RoleEntity;
 import com.maoatao.cas.core.entity.RolePermissionEntity;
 import com.maoatao.cas.core.entity.UserEntity;
-import com.maoatao.cas.core.param.GenerateAuthorizationCodeParams;
+import com.maoatao.cas.core.param.GenerateAuthorizationCodeParam;
 import com.maoatao.cas.core.service.AuthorizationService;
 import com.maoatao.cas.core.service.PermissionService;
 import com.maoatao.cas.core.service.RolePermissionService;
 import com.maoatao.cas.core.service.RoleService;
 import com.maoatao.cas.core.service.UserService;
+import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.util.Ids;
 import com.maoatao.cas.core.param.UserParam;
 import com.maoatao.synapse.core.util.SynaStrings;
@@ -28,6 +29,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authorization.AuthorityAuthorizationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -156,31 +159,35 @@ class CasApplicationTests {
     @Test
     @SneakyThrows
     void generate_authorization_code_and_token_test() {
-        GenerateAuthorizationCodeParams generateAuthorizationCodeParams = new GenerateAuthorizationCodeParams();
-        generateAuthorizationCodeParams.setClientId(TEST_CLIENT_ID);
-        generateAuthorizationCodeParams.setUsername(TEST_USER_NAME);
-        generateAuthorizationCodeParams.setPassword(TEST_USER_PASSWORD);
+        Authentication principal = authorizationService.buildPrincipal(ClientUser.builder()
+                .clientId(TEST_CLIENT_ID)
+                .username(TEST_USER_NAME)
+                .password(TEST_USER_PASSWORD)
+                .build()
+        );
+        SecurityContextHolder.getContext().setAuthentication(principal);
+        GenerateAuthorizationCodeParam generateAuthorizationCodeParam = new GenerateAuthorizationCodeParam();
         // scopes需要在客户端的范围内
-        generateAuthorizationCodeParams.setScopes(TEST_CLIENT_SCOPES);
-        generateAuthorizationCodeParams.setCodeChallengeMethod("S256");
-        generateAuthorizationCodeParams.setCodeChallenge("3vrxycun-VbyenvO5GiFOaOBazUBX_xcFElnqbl-TXA");
+        generateAuthorizationCodeParam.setScopes(TEST_CLIENT_SCOPES);
+        generateAuthorizationCodeParam.setCodeChallengeMethod("S256");
+        generateAuthorizationCodeParam.setCodeChallenge("3vrxycun-VbyenvO5GiFOaOBazUBX_xcFElnqbl-TXA");
         // 非OAuth2原获取授权码接口,原版请求成功后跳转页面 get http://localhost:8080/oauth2/authorize
         // 根据需要自己新增了一个不需要鉴权,不跳转页面,post的请求授权码接口
-        String authorizationCode = authorizationService.generateAuthorizationCode(generateAuthorizationCodeParams);
+        String authorizationCode = authorizationService.generateAuthorizationCode(generateAuthorizationCodeParam);
 
         System.out.println("----------------------------------------------------");
         System.out.println(SynaStrings.format("已成功生成授权码: {}", authorizationCode));
         System.out.println("----------------------------------------------------");
 
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.set(OAuth2ParameterNames.GRANT_TYPE, AuthorizationGrantType.AUTHORIZATION_CODE.getValue());
-        params.set(OAuth2ParameterNames.REDIRECT_URI, TEST_CLIENT_REDIRECT_URI);
-        params.set(OAuth2ParameterNames.CODE, authorizationCode);
-        params.set(PkceParameterNames.CODE_VERIFIER, "eT3Zhtr7Tmz20-qpTk9zs8EWhN63qdZd8GWiq5-h67TrujxzIg0p_tPUfWH1dXQg278ZEiMcq9ehYPvbBehNe8f4VP4o8EOnFoQY7wVwjUyG_l0ksZUUuPWg5dWKAEth");
+        MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
+        param.set(OAuth2ParameterNames.GRANT_TYPE, AuthorizationGrantType.AUTHORIZATION_CODE.getValue());
+        param.set(OAuth2ParameterNames.REDIRECT_URI, TEST_CLIENT_REDIRECT_URI);
+        param.set(OAuth2ParameterNames.CODE, authorizationCode);
+        param.set(PkceParameterNames.CODE_VERIFIER, "eT3Zhtr7Tmz20-qpTk9zs8EWhN63qdZd8GWiq5-h67TrujxzIg0p_tPUfWH1dXQg278ZEiMcq9ehYPvbBehNe8f4VP4o8EOnFoQY7wVwjUyG_l0ksZUUuPWg5dWKAEth");
         // mock模拟了请求令牌,此接口为OAuth2原版接口 post http://localhost:8080/oauth2/token
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/oauth2/token")
                 .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-                .params(params)
+                .params(param)
                 .header(HttpHeaders.AUTHORIZATION, "Basic ".concat(Base64.encode(TEST_CLIENT_ID.concat(":").concat(TEST_CLIENT_SECRET))))
         ).andReturn();
         MockHttpServletResponse mockResponse = mvcResult.getResponse();

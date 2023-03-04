@@ -1,7 +1,12 @@
 package com.maoatao.cas.core.service;
 
-import com.maoatao.cas.core.param.GenerateAuthorizationCodeParams;
+import com.maoatao.cas.core.param.GenerateAccessTokenParam;
+import com.maoatao.cas.core.param.GenerateAuthorizationCodeParam;
+import com.maoatao.cas.security.CustomUserAuthenticationProvider;
 import com.maoatao.cas.security.bean.AuthorizationInfo;
+import com.maoatao.cas.security.bean.ClientUser;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 
 /**
  * 自定义授权接口
@@ -14,10 +19,18 @@ public interface AuthorizationService {
     /**
      * 生成授权码
      *
-     * @param params 参数
+     * @param param 参数
      * @return 授权码
      */
-    String generateAuthorizationCode(GenerateAuthorizationCodeParams params);
+    String generateAuthorizationCode(GenerateAuthorizationCodeParam param);
+
+    /**
+     * 生成访问令牌
+     *
+     * @param param 参数
+     * @return 访问令牌
+     */
+    OAuth2AccessToken generateAccessToken(GenerateAccessTokenParam param);
 
     /**
      * 吊销令牌
@@ -34,4 +47,14 @@ public interface AuthorizationService {
      * @return 授权信息
      */
     AuthorizationInfo getAuthorizationInfo(String accessToken);
+
+    /**
+     * 构建身份验证
+     * <p>
+     * {@link CustomUserAuthenticationProvider}
+     *
+     * @param clientUser 客户端用户信息
+     * @return 用户身份验证
+     */
+    Authentication buildPrincipal(ClientUser clientUser);
 }
