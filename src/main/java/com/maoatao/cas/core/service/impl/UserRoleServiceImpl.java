@@ -32,13 +32,13 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRoleEnt
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean updateUserRole(List<Long> roleIds, long userId) {
-        if (IterUtil.isEmpty(roleIds)) {
-            return remove(Wrappers.<UserRoleEntity>lambdaQuery().eq(UserRoleEntity::getUserId, userId));
-        }
         // 查询已有,排除已有,列出新增和删除
         List<Long> existed = list(Wrappers.<UserRoleEntity>lambdaQuery().eq(UserRoleEntity::getUserId, userId))
                 .stream()
                 .map(UserRoleEntity::getRoleId).toList();
+        if (IterUtil.isEmpty(roleIds) && IterUtil.isNotEmpty(existed)) {
+            return remove(Wrappers.<UserRoleEntity>lambdaQuery().eq(UserRoleEntity::getUserId, userId));
+        }
         // 已有不在入参为删除(已有-交集)
         List<Long> preDelete = existed.stream().filter(o -> !roleIds.contains(o)).toList();
         // 入参不在已有为新增(入参-交集)

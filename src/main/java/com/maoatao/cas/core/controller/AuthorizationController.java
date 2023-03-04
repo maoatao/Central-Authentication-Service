@@ -2,6 +2,7 @@ package com.maoatao.cas.core.controller;
 
 import com.maoatao.cas.core.service.AuthorizationService;
 import com.maoatao.cas.core.param.GenerateAuthorizationCodeParams;
+import com.maoatao.cas.security.HttpConstants;
 import com.maoatao.cas.security.bean.AuthorizationInfo;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2022-10-23 17:17:17
  */
 @RestController
-@RequestMapping("/authorization")
+@RequestMapping(HttpConstants.BASE_URL + "/authorization")
 @Tag(name = "AuthorizationController", description = "授权管理")
 public class AuthorizationController {
 

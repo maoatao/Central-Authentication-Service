@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.core.entity.UserRoleEntity;
 import com.maoatao.cas.core.service.UserRoleService;
 import com.maoatao.cas.core.param.UserRoleParam;
+import com.maoatao.cas.security.HttpConstants;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2022-12-12 14:18:22
  */
 @RestController
-@RequestMapping("/userrole")
+@RequestMapping(HttpConstants.BASE_URL + "/userrole")
 @Tag(name = "UserRoleController", description = "用户角色关系管理")
 public class UserRoleController {
 
@@ -91,9 +92,9 @@ public class UserRoleController {
     @DeleteMapping("/{id}")
     @Operation(summary = "remove", description = "通过id删除用户角色关系")
     public boolean remove(@PathVariable
-                              @Parameter(name = "id", description = "用户角色关系id")
-                              @NotNull(message = "用户角色关系id不能为空")
-                              Long id) {
+                          @Parameter(name = "id", description = "用户角色关系id")
+                          @NotNull(message = "用户角色关系id不能为空")
+                          Long id) {
         return userRoleService.remove(id);
     }
 }

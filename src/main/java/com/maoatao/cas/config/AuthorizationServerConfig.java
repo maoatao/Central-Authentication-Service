@@ -2,9 +2,10 @@ package com.maoatao.cas.config;
 
 import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.security.CustomUserAuthenticationProvider;
+import com.maoatao.cas.security.HttpConstants;
 import com.maoatao.cas.security.oauth2.auth.CustomAccessTokenGenerator;
 import com.maoatao.cas.security.oauth2.auth.RedisAuthorizationService;
-import com.maoatao.cas.security.filter.BearerTokenFilterConfigurer;
+import com.maoatao.cas.security.filter.CustomFilterConfigurer;
 import com.maoatao.cas.util.AuthorizationServerUtils;
 import com.maoatao.cas.security.oauth2.auth.CustomRefreshTokenGenerator;
 import com.maoatao.cas.security.UUIDStringKeyGenerator;
@@ -214,7 +215,7 @@ public class AuthorizationServerConfig {
         http.authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/authorization").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/authorization").permitAll())
-                .apply(new BearerTokenFilterConfigurer(oAuth2AuthorizationService))
+                .apply(new CustomFilterConfigurer(oAuth2AuthorizationService))
                 .and()
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated());
     }
@@ -224,7 +225,7 @@ public class AuthorizationServerConfig {
      */
     private void permitSwagger(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests()
-                .requestMatchers("/swagger-ui/**", "/swagger-resources/**", "/webjars/**", "/v3/**", "/api/**", "/doc.html")
+                .requestMatchers(HttpConstants.WHITE_LIST)
                 .permitAll();
     }
 }

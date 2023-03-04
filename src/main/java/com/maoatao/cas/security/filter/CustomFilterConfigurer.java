@@ -12,17 +12,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * @author MaoAtao
  * @date 2022-10-24 11:16:14
  */
-public class BearerTokenFilterConfigurer extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
+public class CustomFilterConfigurer extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
 
     private final OAuth2AuthorizationService oAuth2AuthorizationService;
 
-    public BearerTokenFilterConfigurer(OAuth2AuthorizationService oAuth2AuthorizationService) {
+    public CustomFilterConfigurer(OAuth2AuthorizationService oAuth2AuthorizationService) {
         this.oAuth2AuthorizationService = oAuth2AuthorizationService;
     }
 
     @Override
     public void configure(HttpSecurity http) {
-        BearerTokenFilter customFilter = new BearerTokenFilter(oAuth2AuthorizationService);
-        http.addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
+        AuthorizationFilter authorizationFilter = new AuthorizationFilter(oAuth2AuthorizationService);
+        http.addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class);
+        ResourcesFilter resourcesFilter = new ResourcesFilter();
+        http.addFilterBefore(resourcesFilter, AuthorizationFilter.class);
     }
 }
