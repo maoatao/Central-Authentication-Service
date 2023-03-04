@@ -29,7 +29,7 @@ public class CodeVerifierTest {
      * code_verifier: 字符串B
      */
     @Test
-    void contextLoads() {
+    void generate_verifier_by_S256_test() {
         String codeVerifier = generateCodeVerifier();
         String codeChallange = generateCodeChallange(codeVerifier);
         System.out.println(codeVerifier);
