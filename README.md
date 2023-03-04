@@ -19,7 +19,7 @@ Central Authentication Service (CAS 中央认证服务 OAuth2.1协议)
 
 基于[Spring Authorization Server](https://spring.io/projects/spring-authorization-server)
 开发,在源码基础上新增了额外功能,比如修改令牌的展示值为UUID,踢人下线（只签发一个可用的令牌）等.
-目前1.0.1版本官方没有Redis储存授权信息的功能，根据业务需要自定义了Redis储存授权信息功能。
+目前1.0.1版本官方没有Redis储存授权信息的功能，根据业务需要自定义了Redis储存授权信息功能.
 
 ## 使用说明
 
