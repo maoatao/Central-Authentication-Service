@@ -1,8 +1,4 @@
-<center>
-    <strong>
-        <font size=7>Central Authentication Service</font>
-    </strong>
-</center>
+# Central Authentication Service
 <p align="center">
   <a href="https://www.oracle.com/java">
     <img src="https://img.shields.io/badge/Java-17-blue" alt="java">
