@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
+import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -21,9 +22,12 @@ public class CustomFilterConfigurer extends SecurityConfigurerAdapter<DefaultSec
 
     private final AuthorizationService authorizationService;
 
-    public CustomFilterConfigurer(OAuth2AuthorizationService oAuth2AuthorizationService, AuthorizationService authorizationService) {
+    private final AuthorizationServerSettings authorizationServerSettings;
+
+    public CustomFilterConfigurer(OAuth2AuthorizationService oAuth2AuthorizationService, AuthorizationService authorizationService, AuthorizationServerSettings authorizationServerSettings) {
         this.oAuth2AuthorizationService = oAuth2AuthorizationService;
         this.authorizationService = authorizationService;
+        this.authorizationServerSettings = authorizationServerSettings;
     }
 
     @Override
@@ -32,5 +36,7 @@ public class CustomFilterConfigurer extends SecurityConfigurerAdapter<DefaultSec
         http.addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class);
         ResourcesFilter resourcesFilter = new ResourcesFilter();
         http.addFilterBefore(resourcesFilter, AuthorizationFilter.class);
+        AuthorizationServerContextFilter authorizationServerContextFilter = new AuthorizationServerContextFilter(authorizationServerSettings);
+        http.addFilterBefore(authorizationServerContextFilter, ResourcesFilter.class);
     }
 }

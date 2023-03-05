@@ -1,5 +1,6 @@
 package com.maoatao.cas.core.service.impl;
 
+import cn.hutool.json.JSONObject;
 import com.maoatao.cas.core.param.GenerateAccessTokenParam;
 import com.maoatao.cas.security.CustomUserAuthenticationProvider;
 import com.maoatao.cas.core.service.AuthorizationService;
@@ -13,9 +14,6 @@ import com.maoatao.cas.security.bean.AuthorizationInfo;
 import com.maoatao.cas.util.ServletUtils;
 import com.maoatao.synapse.core.lang.SynaException;
 import com.maoatao.synapse.core.util.SynaAssert;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -330,13 +328,18 @@ public class AuthorizationServiceImpl implements AuthorizationService {
      */
     private OAuth2AccessToken buildAccessTokenByCode(GenerateAccessTokenParam param) {
         CustomUserDetails userDetails = getUserDetails();
-        // Authentication oAuth2ClientAuthenticationToken = new OAuth2ClientAuthenticationToken(clientID, ClientAuthenticationMethod.CLIENT_SECRET_BASIC, clientSecret, null);
-        Authentication oAuth2ClientAuthenticationToken = new OAuth2ClientAuthenticationToken(userDetails.getClientId(), ClientAuthenticationMethod.CLIENT_SECRET_BASIC, param.getSecret(), null);
-        // Authentication authorizationGrantAuthentication = new OAuth2AuthorizationCodeAuthenticationToken(code, clientPrincipal, redirectUri, additionalParameters);
-        Authentication authorizationGrantAuthentication = new OAuth2AuthorizationCodeAuthenticationToken(param.getCode(), oAuth2ClientAuthenticationToken, null, null);
+        RegisteredClient registeredClient = registeredClientRepository.findByClientId(userDetails.getClientId());
+        // 构建客户端身份验证令牌
+        Authentication clientAuthentication = new OAuth2ClientAuthenticationToken(registeredClient, ClientAuthenticationMethod.CLIENT_SECRET_BASIC, param.getSecret());
+        // 认证客户端令牌
+        OAuth2ClientAuthenticationToken clientAuthenticationToken = (OAuth2ClientAuthenticationToken) this.authenticationManager.authenticate(clientAuthentication);
+        // 构建授权码认证令牌
+        Authentication codeAuthentication = new OAuth2AuthorizationCodeAuthenticationToken(param.getCode(), clientAuthenticationToken, null, null);
+        // 生成访问令牌
+        OAuth2AccessTokenAuthenticationToken accessTokenAuthentication = (OAuth2AccessTokenAuthenticationToken) this.authenticationManager.authenticate(codeAuthentication);
 
-        OAuth2AccessTokenAuthenticationToken accessTokenAuthentication =
-                (OAuth2AccessTokenAuthenticationToken) this.authenticationManager.authenticate(authorizationGrantAuthentication);
+        System.out.println(new JSONObject(accessTokenAuthentication).toStringPretty());
+
         return accessTokenAuthentication.getAccessToken();
     }
 

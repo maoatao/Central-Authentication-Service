@@ -2,10 +2,16 @@ package com.maoatao.cas.util;
 
 import cn.hutool.json.JSONUtil;
 import com.maoatao.cas.security.bean.ClientUser;
+import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationServerContext;
 import com.maoatao.synapse.core.web.HttpResponseStatus;
 import com.maoatao.synapse.core.web.RestResponse;
 import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.server.authorization.context.AuthorizationServerContext;
+import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
+import org.springframework.security.web.util.UrlUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -42,6 +48,16 @@ public abstract class FilterUtils {
     }
 
     /**
+     * 构建授权服务器上下文
+     *
+     * @param settings 授权服务器配置
+     * @return 授权服务器上下文
+     */
+    public static AuthorizationServerContext buildAuthorizationServerContext(AuthorizationServerSettings settings, HttpServletRequest request) {
+        return new CustomAuthorizationServerContext(() -> resolveIssuer(settings, request), settings);
+    }
+
+    /**
      * 未找到资源
      */
     public static void notFound(ServletResponse response) throws IOException {
@@ -60,5 +76,22 @@ public abstract class FilterUtils {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter().println(JSONUtil.parseObj(obj));
         response.getWriter().flush();
+    }
+
+    private static String resolveIssuer(AuthorizationServerSettings authorizationServerSettings, HttpServletRequest request) {
+        return authorizationServerSettings.getIssuer() != null ?
+                authorizationServerSettings.getIssuer() :
+                getContextPath(request);
+    }
+
+    private static String getContextPath(HttpServletRequest request) {
+        // @formatter:off
+        return UriComponentsBuilder.fromHttpUrl(UrlUtils.buildFullRequestUrl(request))
+                .replacePath(request.getContextPath())
+                .replaceQuery(null)
+                .fragment(null)
+                .build()
+                .toUriString();
+        // @formatter:on
     }
 }

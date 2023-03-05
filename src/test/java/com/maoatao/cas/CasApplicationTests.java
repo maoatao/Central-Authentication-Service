@@ -15,6 +15,8 @@ import com.maoatao.cas.core.service.RolePermissionService;
 import com.maoatao.cas.core.service.RoleService;
 import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.security.bean.ClientUser;
+import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationServerContext;
+import com.maoatao.cas.util.FilterUtils;
 import com.maoatao.cas.util.Ids;
 import com.maoatao.cas.core.param.UserParam;
 import com.maoatao.synapse.core.util.SynaStrings;
@@ -28,6 +30,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authorization.AuthorityAuthorizationManager;
 import org.springframework.security.core.Authentication;
@@ -39,11 +42,17 @@ import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.core.endpoint.PkceParameterNames;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
+import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.context.AuthorizationServerContext;
+import org.springframework.security.oauth2.server.authorization.context.AuthorizationServerContextHolder;
+import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
+import org.springframework.security.oauth2.server.authorization.token.DefaultOAuth2TokenContext;
+import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -81,6 +90,9 @@ class CasApplicationTests {
 
     @Autowired
     private RolePermissionService rolePermissionService;
+
+    @Autowired
+    private AuthorizationServerSettings authorizationServerSettings;
 
     @Autowired
     private MockMvc mockMvc;
@@ -318,6 +330,9 @@ class CasApplicationTests {
         //
         // Assert.assertEquals("获取令牌请求失败!", mockResponse.getStatus(), 200);
         // Assert.assertTrue("获取令牌请求失败!", StrUtil.isNotBlank(mockResponse.getContentAsString()));
+
+        AuthorizationServerContext authorizationServerContext = FilterUtils.buildAuthorizationServerContext(authorizationServerSettings, new MockHttpServletRequest());
+        AuthorizationServerContextHolder.setContext(authorizationServerContext);
 
         GenerateAccessTokenParam param = new GenerateAccessTokenParam();
         param.setType(AuthorizationGrantType.AUTHORIZATION_CODE.getValue());

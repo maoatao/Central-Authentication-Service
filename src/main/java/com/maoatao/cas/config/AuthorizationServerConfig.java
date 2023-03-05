@@ -38,6 +38,7 @@ import org.springframework.security.oauth2.server.authorization.JdbcOAuth2Author
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
+import org.springframework.security.oauth2.server.authorization.authentication.ClientSecretAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
@@ -101,6 +102,15 @@ public class AuthorizationServerConfig {
     @Bean
     public CustomUserAuthenticationProvider customUserAuthenticationProvider(UserService userService) {
         return new CustomUserAuthenticationProvider(userService);
+    }
+
+    /**
+     * 客户端身份验证提供程序
+     */
+    @Bean
+    public ClientSecretAuthenticationProvider clientSecretAuthenticationProvider(RegisteredClientRepository registeredClientRepository,
+                                                                                 OAuth2AuthorizationService oAuth2AuthorizationService) {
+        return new ClientSecretAuthenticationProvider(registeredClientRepository, oAuth2AuthorizationService);
     }
 
     /**
@@ -168,8 +178,9 @@ public class AuthorizationServerConfig {
      */
     @Bean
     public AuthenticationManager authenticationManager(CustomUserAuthenticationProvider userAuthenticationProvider,
-                                                       CustomAuthorizationCodeAccessTokenProvider accessTokenProvider) {
-        return new ProviderManager(userAuthenticationProvider, accessTokenProvider);
+                                                       CustomAuthorizationCodeAccessTokenProvider accessTokenProvider,
+                                                       ClientSecretAuthenticationProvider clientAuthenticationProvider) {
+        return new ProviderManager(userAuthenticationProvider, accessTokenProvider, clientAuthenticationProvider);
     }
 
     /**
