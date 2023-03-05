@@ -7,7 +7,10 @@ import com.maoatao.cas.security.HttpConstants;
 import com.maoatao.cas.security.filter.CustomFilterConfigurer;
 import com.maoatao.cas.security.oauth2.auth.CustomAccessTokenGenerator;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeAccessTokenProvider;
+import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
+import com.maoatao.cas.security.oauth2.auth.CustomRefreshTokenProvider;
 import com.maoatao.cas.security.oauth2.auth.RedisAuthorizationService;
+import com.maoatao.cas.security.oauth2.odic.CustomClientRegistrationProvider;
 import com.maoatao.cas.util.AuthorizationServerUtils;
 import com.maoatao.cas.security.oauth2.auth.CustomRefreshTokenGenerator;
 import com.maoatao.cas.security.UUIDStringKeyGenerator;
@@ -41,6 +44,7 @@ import org.springframework.security.oauth2.server.authorization.JdbcOAuth2Author
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
@@ -73,10 +77,8 @@ public class AuthorizationServerConfig {
      */
     @Bean
     @Order(1)
-    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http,
-                                                                      AbstractUserDetailsAuthenticationProvider abstractUserDetailsAuthenticationProvider) throws Exception {
+    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
         AuthorizationServerUtils.applyConfigurer(http);
-        http.authenticationProvider(abstractUserDetailsAuthenticationProvider);
         http.exceptionHandling(exceptions ->
                 exceptions.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
         );
@@ -107,23 +109,59 @@ public class AuthorizationServerConfig {
      * 自定义查询用户,通过用户名称和客户端 id 查询一个用户.提供多客户端同名用户身份验证
      */
     @Bean
-    public AbstractUserDetailsAuthenticationProvider abstractUserDetailsAuthenticationProvider(UserService userService) {
+    public CustomUserAuthenticationProvider customUserAuthenticationProvider(UserService userService) {
         return new CustomUserAuthenticationProvider(userService);
+    }
+
+    /**
+     * 自定义授权码生成访问令牌提供者
+     */
+    @Bean
+    public static CustomAuthorizationCodeAccessTokenProvider customAuthorizationCodeAccessTokenProvider(OAuth2AuthorizationService oAuth2AuthorizationService,
+                                                                                                        OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator) {
+        return new CustomAuthorizationCodeAccessTokenProvider(oAuth2AuthorizationService, oAuth2TokenGenerator);
+    }
+
+
+    /**
+     * 授权码提供者(自定义授权码生成器)
+     */
+    @Bean
+    public static OAuth2AuthorizationCodeRequestAuthenticationProvider oAuth2AuthorizationCodeRequestAuthenticationProvider(RegisteredClientRepository registeredClientRepository,
+                                                                                                                            OAuth2AuthorizationService oAuth2AuthorizationService,
+                                                                                                                            OAuth2AuthorizationConsentService oAuth2AuthorizationConsentService) {
+        OAuth2AuthorizationCodeRequestAuthenticationProvider oAuth2AuthorizationCodeRequestAuthenticationProvider = new OAuth2AuthorizationCodeRequestAuthenticationProvider(registeredClientRepository, oAuth2AuthorizationService, oAuth2AuthorizationConsentService);
+        // 配置自定义授权码生成器
+        oAuth2AuthorizationCodeRequestAuthenticationProvider.setAuthorizationCodeGenerator(new CustomAuthorizationCodeGenerator(new UUIDStringKeyGenerator()));
+        return oAuth2AuthorizationCodeRequestAuthenticationProvider;
+    }
+
+    /**
+     * 自定义客户端注册提供者
+     */
+    @Bean
+    public static CustomClientRegistrationProvider customClientRegistrationProvider(RegisteredClientRepository registeredClientRepository,
+                                                                                    OAuth2AuthorizationService oAuth2AuthorizationService,
+                                                                                    OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator) {
+        return new CustomClientRegistrationProvider(registeredClientRepository, oAuth2AuthorizationService, oAuth2TokenGenerator);
+    }
+
+    /**
+     * 自定义刷新令牌提供者
+     */
+    @Bean
+    public static CustomRefreshTokenProvider customRefreshTokenProvider(OAuth2AuthorizationService oAuth2AuthorizationService,
+                                                                        OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator) {
+        return new CustomRefreshTokenProvider(oAuth2AuthorizationService, oAuth2TokenGenerator);
     }
 
     /**
      * 认证管理(password模式需要配置AuthenticationManager)
      */
     @Bean
-    public AuthenticationManager authenticationManager(AbstractUserDetailsAuthenticationProvider abstractUserDetailsAuthenticationProvider,
-                                                       OAuth2AuthorizationService oAuth2AuthorizationService,
-                                                       OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator) {
-        // AuthenticationManager authenticationManager = authenticationConfiguration.getAuthenticationManager();
-        // ProviderManager providerManager = new ProviderManager();
-        return new ProviderManager(abstractUserDetailsAuthenticationProvider, new CustomAuthorizationCodeAccessTokenProvider(
-                oAuth2AuthorizationService,
-                oAuth2TokenGenerator
-        ));
+    public AuthenticationManager authenticationManager(CustomUserAuthenticationProvider customUserAuthenticationProvider,
+                                                       CustomAuthorizationCodeAccessTokenProvider customAuthorizationCodeAccessTokenProvider) {
+        return new ProviderManager(customUserAuthenticationProvider, customAuthorizationCodeAccessTokenProvider);
     }
 
     /**

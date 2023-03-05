@@ -48,16 +48,16 @@ import java.util.Map;
  */
 public abstract class AuthorizationServerUtils {
 
-    private static RegisteredClientRepository registeredClientRepository;
-    private static OAuth2AuthorizationService authorizationService;
-    private static OAuth2AuthorizationConsentService authorizationConsentService;
-    private static OAuth2TokenGenerator<OAuth2Token> tokenGenerator;
+    private static OAuth2AuthorizationCodeRequestAuthenticationProvider oAuth2AuthorizationCodeRequestAuthenticationProvider;
+    private static CustomClientRegistrationProvider customClientRegistrationProvider;
+    private static CustomRefreshTokenProvider customRefreshTokenProvider;
+    private static CustomAuthorizationCodeAccessTokenProvider customAuthorizationCodeAccessTokenProvider;
 
     public static void applyConfigurer(HttpSecurity http) throws Exception {
-        registeredClientRepository = getRegisteredClientRepository(http);
-        authorizationService = getAuthorizationService(http);
-        authorizationConsentService = getAuthorizationConsentService(http);
-        tokenGenerator = SpringContextUtils.getBean(OAuth2TokenGenerator.class);
+        oAuth2AuthorizationCodeRequestAuthenticationProvider = SpringContextUtils.getBean(OAuth2AuthorizationCodeRequestAuthenticationProvider.class);
+        customClientRegistrationProvider = SpringContextUtils.getBean(CustomClientRegistrationProvider.class);
+        customRefreshTokenProvider = SpringContextUtils.getBean(CustomRefreshTokenProvider.class);
+        customAuthorizationCodeAccessTokenProvider = SpringContextUtils.getBean(CustomAuthorizationCodeAccessTokenProvider.class);
         OAuth2AuthorizationServerConfigurer configurer = new OAuth2AuthorizationServerConfigurer();
         applyAuthenticationProviders(configurer);
         applyOidcConfigurer(configurer);
@@ -70,10 +70,6 @@ public abstract class AuthorizationServerUtils {
                 .csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .apply(configurer);
-    }
-
-    public static ProviderManager buildProviderManager(AuthenticationProvider... providers) {
-        return new ProviderManager();
     }
 
     public static KeyPair generateRsaKey() {
@@ -177,59 +173,14 @@ public abstract class AuthorizationServerUtils {
     }
 
     /**
-     * 授权码提供者(自定义授权码生成器)
-     */
-    private static OAuth2AuthorizationCodeRequestAuthenticationProvider buildAuthorizationCodeProvider() {
-        OAuth2AuthorizationCodeRequestAuthenticationProvider codeRequestAuthenticationProvider =
-                new OAuth2AuthorizationCodeRequestAuthenticationProvider(
-                        registeredClientRepository,
-                        authorizationService,
-                        authorizationConsentService
-                );
-        // 配置自定义授权码生成器
-        codeRequestAuthenticationProvider.setAuthorizationCodeGenerator(new CustomAuthorizationCodeGenerator(new UUIDStringKeyGenerator()));
-        return codeRequestAuthenticationProvider;
-    }
-
-    /**
-     * 自定义客户端注册提供者
-     */
-    private static CustomClientRegistrationProvider buildCustomClientRegistrationProvider() {
-        return new CustomClientRegistrationProvider(
-                registeredClientRepository,
-                authorizationService,
-                tokenGenerator);
-    }
-
-    /**
-     * 自定义刷新令牌提供者
-     */
-    private static CustomRefreshTokenProvider buildCustomRefreshTokenProvider() {
-        return new CustomRefreshTokenProvider(
-                authorizationService,
-                tokenGenerator
-        );
-    }
-
-    /**
-     * 自定义授权码生成访问令牌提供者
-     */
-    private static CustomAuthorizationCodeAccessTokenProvider buildCustomAuthorizationCodeAccessTokenProvider() {
-        return new CustomAuthorizationCodeAccessTokenProvider(
-                authorizationService,
-                tokenGenerator
-        );
-    }
-
-    /**
      * 配置身份验证提供程序
      */
     private static void applyAuthenticationProviders(OAuth2AuthorizationServerConfigurer configurer) {
         configurer.authorizationEndpoint(endpoint -> endpoint
-                .authenticationProvider(buildAuthorizationCodeProvider())
-                .authenticationProvider(buildCustomClientRegistrationProvider())
-                .authenticationProvider(buildCustomRefreshTokenProvider())
-                .authenticationProvider(buildCustomAuthorizationCodeAccessTokenProvider()));
+                .authenticationProvider(oAuth2AuthorizationCodeRequestAuthenticationProvider)
+                .authenticationProvider(customClientRegistrationProvider)
+                .authenticationProvider(customRefreshTokenProvider)
+                .authenticationProvider(customAuthorizationCodeAccessTokenProvider));
     }
 
     /**
