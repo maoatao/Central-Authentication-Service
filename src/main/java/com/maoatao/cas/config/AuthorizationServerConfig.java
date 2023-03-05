@@ -29,8 +29,11 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.OAuth2Token;
@@ -48,6 +51,7 @@ import org.springframework.security.oauth2.server.authorization.authentication.O
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.token.DelegatingOAuth2TokenGenerator;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
@@ -56,6 +60,7 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Toke
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import java.security.KeyPair;
 import java.security.interfaces.RSAPrivateKey;
@@ -77,11 +82,9 @@ public class AuthorizationServerConfig {
      */
     @Bean
     @Order(1)
-    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
-        AuthorizationServerUtils.applyConfigurer(http);
-        http.exceptionHandling(exceptions ->
-                exceptions.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
-        );
+    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http,
+                                                                      OAuth2AuthorizationServerConfigurer configurer) throws Exception {
+        http.securityMatcher(configurer.getEndpointsMatcher()).apply(configurer);
         return http.build();
     }
 
@@ -91,15 +94,13 @@ public class AuthorizationServerConfig {
     @Bean
     @Order(2)
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http,
-                                                          OAuth2AuthorizationService oAuth2AuthorizationService,
-                                                          AuthorizationService authorizationService) throws Exception {
-        permitSwagger(http);
-        applyFilterConfigurer(http, oAuth2AuthorizationService, authorizationService);
-        http.formLogin(Customizer.withDefaults())
-                .httpBasic()
-                .and()
-                .csrf()
-                .disable();
+                                                          CustomFilterConfigurer configurer) throws Exception {
+        http.csrf().disable()
+                .authorizeHttpRequests(authorize -> {
+                    authorize.requestMatchers(HttpConstants.WHITE_LIST).permitAll();
+                    authorize.anyRequest().authenticated();
+                })
+                .apply(configurer);
         return http.build();
     }
 
@@ -117,8 +118,9 @@ public class AuthorizationServerConfig {
      * 自定义授权码生成访问令牌提供者
      */
     @Bean
-    public static CustomAuthorizationCodeAccessTokenProvider customAuthorizationCodeAccessTokenProvider(OAuth2AuthorizationService oAuth2AuthorizationService,
-                                                                                                        OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator) {
+    public CustomAuthorizationCodeAccessTokenProvider customAuthorizationCodeAccessTokenProvider
+    (OAuth2AuthorizationService oAuth2AuthorizationService,
+     OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator) {
         return new CustomAuthorizationCodeAccessTokenProvider(oAuth2AuthorizationService, oAuth2TokenGenerator);
     }
 
@@ -127,9 +129,10 @@ public class AuthorizationServerConfig {
      * 授权码提供者(自定义授权码生成器)
      */
     @Bean
-    public static OAuth2AuthorizationCodeRequestAuthenticationProvider oAuth2AuthorizationCodeRequestAuthenticationProvider(RegisteredClientRepository registeredClientRepository,
-                                                                                                                            OAuth2AuthorizationService oAuth2AuthorizationService,
-                                                                                                                            OAuth2AuthorizationConsentService oAuth2AuthorizationConsentService) {
+    public OAuth2AuthorizationCodeRequestAuthenticationProvider oAuth2AuthorizationCodeRequestAuthenticationProvider
+    (RegisteredClientRepository registeredClientRepository,
+     OAuth2AuthorizationService oAuth2AuthorizationService,
+     OAuth2AuthorizationConsentService oAuth2AuthorizationConsentService) {
         OAuth2AuthorizationCodeRequestAuthenticationProvider oAuth2AuthorizationCodeRequestAuthenticationProvider = new OAuth2AuthorizationCodeRequestAuthenticationProvider(registeredClientRepository, oAuth2AuthorizationService, oAuth2AuthorizationConsentService);
         // 配置自定义授权码生成器
         oAuth2AuthorizationCodeRequestAuthenticationProvider.setAuthorizationCodeGenerator(new CustomAuthorizationCodeGenerator(new UUIDStringKeyGenerator()));
@@ -140,9 +143,10 @@ public class AuthorizationServerConfig {
      * 自定义客户端注册提供者
      */
     @Bean
-    public static CustomClientRegistrationProvider customClientRegistrationProvider(RegisteredClientRepository registeredClientRepository,
-                                                                                    OAuth2AuthorizationService oAuth2AuthorizationService,
-                                                                                    OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator) {
+    public CustomClientRegistrationProvider customClientRegistrationProvider(RegisteredClientRepository
+                                                                                     registeredClientRepository,
+                                                                             OAuth2AuthorizationService oAuth2AuthorizationService,
+                                                                             OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator) {
         return new CustomClientRegistrationProvider(registeredClientRepository, oAuth2AuthorizationService, oAuth2TokenGenerator);
     }
 
@@ -150,16 +154,37 @@ public class AuthorizationServerConfig {
      * 自定义刷新令牌提供者
      */
     @Bean
-    public static CustomRefreshTokenProvider customRefreshTokenProvider(OAuth2AuthorizationService oAuth2AuthorizationService,
-                                                                        OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator) {
+    public CustomRefreshTokenProvider customRefreshTokenProvider(OAuth2AuthorizationService
+                                                                         oAuth2AuthorizationService,
+                                                                 OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator) {
         return new CustomRefreshTokenProvider(oAuth2AuthorizationService, oAuth2TokenGenerator);
     }
 
     /**
-     * 认证管理(password模式需要配置AuthenticationManager)
+     * OAuth2 授权服务器配置程序(自定义令牌提供者)
      */
     @Bean
-    public AuthenticationManager authenticationManager(CustomUserAuthenticationProvider customUserAuthenticationProvider,
+    public OAuth2AuthorizationServerConfigurer oAuth2AuthorizationServerConfigurer
+    (CustomAuthorizationCodeAccessTokenProvider customAuthorizationCodeAccessTokenProvider,
+     OAuth2AuthorizationCodeRequestAuthenticationProvider
+             oAuth2AuthorizationCodeRequestAuthenticationProvider,
+     CustomClientRegistrationProvider customClientRegistrationProvider,
+     CustomRefreshTokenProvider customRefreshTokenProvider) {
+        OAuth2AuthorizationServerConfigurer oAuth2AuthorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
+        oAuth2AuthorizationServerConfigurer.authorizationEndpoint(endpoint -> endpoint
+                .authenticationProvider(oAuth2AuthorizationCodeRequestAuthenticationProvider)
+                .authenticationProvider(customClientRegistrationProvider)
+                .authenticationProvider(customRefreshTokenProvider)
+                .authenticationProvider(customAuthorizationCodeAccessTokenProvider));
+        return oAuth2AuthorizationServerConfigurer;
+    }
+
+    /**
+     * 认证管理
+     */
+    @Bean
+    public AuthenticationManager authenticationManager(CustomUserAuthenticationProvider
+                                                               customUserAuthenticationProvider,
                                                        CustomAuthorizationCodeAccessTokenProvider customAuthorizationCodeAccessTokenProvider) {
         return new ProviderManager(customUserAuthenticationProvider, customAuthorizationCodeAccessTokenProvider);
     }
@@ -186,7 +211,8 @@ public class AuthorizationServerConfig {
      * 记录授权服务
      */
     @Bean
-    public OAuth2AuthorizationConsentService authorizationConsentService(JdbcTemplate jdbcTemplate, RegisteredClientRepository registeredClientRepository) {
+    public OAuth2AuthorizationConsentService authorizationConsentService(JdbcTemplate
+                                                                                 jdbcTemplate, RegisteredClientRepository registeredClientRepository) {
         return new JdbcOAuth2AuthorizationConsentService(jdbcTemplate, registeredClientRepository);
     }
 

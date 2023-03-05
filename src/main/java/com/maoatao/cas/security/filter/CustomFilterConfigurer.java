@@ -1,6 +1,7 @@
 package com.maoatao.cas.security.filter;
 
 import com.maoatao.cas.core.service.AuthorizationService;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
@@ -13,6 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * @author MaoAtao
  * @date 2022-10-24 11:16:14
  */
+@Configuration
 public class CustomFilterConfigurer extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
 
     private final OAuth2AuthorizationService oAuth2AuthorizationService;

@@ -61,14 +61,10 @@ public abstract class AuthorizationServerUtils {
         OAuth2AuthorizationServerConfigurer configurer = new OAuth2AuthorizationServerConfigurer();
         applyAuthenticationProviders(configurer);
         applyOidcConfigurer(configurer);
-        RequestMatcher endpointsMatcher = configurer.getEndpointsMatcher();
         http
-                .securityMatcher(endpointsMatcher)
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests.anyRequest().authenticated()
                 )
-                .csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
-                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .apply(configurer);
     }
 
@@ -122,54 +118,6 @@ public abstract class AuthorizationServerUtils {
             return clientPrincipal;
         }
         throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_CLIENT);
-    }
-
-    private static <B extends HttpSecurityBuilder<B>> RegisteredClientRepository getRegisteredClientRepository(B builder) {
-        RegisteredClientRepository registeredClientRepository = builder.getSharedObject(RegisteredClientRepository.class);
-        if (registeredClientRepository == null) {
-            registeredClientRepository = getBean(builder, RegisteredClientRepository.class);
-            builder.setSharedObject(RegisteredClientRepository.class, registeredClientRepository);
-        }
-        return registeredClientRepository;
-    }
-
-    private static <B extends HttpSecurityBuilder<B>> OAuth2AuthorizationService getAuthorizationService(B builder) {
-        OAuth2AuthorizationService authorizationService = builder.getSharedObject(OAuth2AuthorizationService.class);
-        if (authorizationService == null) {
-            authorizationService = getOptionalBean(builder, OAuth2AuthorizationService.class);
-            if (authorizationService == null) {
-                authorizationService = new InMemoryOAuth2AuthorizationService();
-            }
-            builder.setSharedObject(OAuth2AuthorizationService.class, authorizationService);
-        }
-        return authorizationService;
-    }
-
-    private static <B extends HttpSecurityBuilder<B>> OAuth2AuthorizationConsentService getAuthorizationConsentService(B builder) {
-        OAuth2AuthorizationConsentService authorizationConsentService = builder.getSharedObject(OAuth2AuthorizationConsentService.class);
-        if (authorizationConsentService == null) {
-            authorizationConsentService = getOptionalBean(builder, OAuth2AuthorizationConsentService.class);
-            if (authorizationConsentService == null) {
-                authorizationConsentService = new InMemoryOAuth2AuthorizationConsentService();
-            }
-            builder.setSharedObject(OAuth2AuthorizationConsentService.class, authorizationConsentService);
-        }
-        return authorizationConsentService;
-    }
-
-    private static <B extends HttpSecurityBuilder<B>, T> T getBean(B builder, Class<T> type) {
-        return builder.getSharedObject(ApplicationContext.class).getBean(type);
-    }
-
-    private static <B extends HttpSecurityBuilder<B>, T> T getOptionalBean(B builder, Class<T> type) {
-        Map<String, T> beansMap = BeanFactoryUtils.beansOfTypeIncludingAncestors(
-                builder.getSharedObject(ApplicationContext.class), type);
-        if (beansMap.size() > 1) {
-            throw new NoUniqueBeanDefinitionException(type, beansMap.size(),
-                    "Expected single matching bean of type '" + type.getName() + "' but found " +
-                            beansMap.size() + ": " + StringUtils.collectionToCommaDelimitedString(beansMap.keySet()));
-        }
-        return (!beansMap.isEmpty() ? beansMap.values().iterator().next() : null);
     }
 
     /**
