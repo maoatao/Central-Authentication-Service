@@ -20,7 +20,6 @@ import com.maoatao.cas.util.FilterUtils;
 import com.maoatao.cas.util.Ids;
 import com.maoatao.cas.core.param.UserParam;
 import com.maoatao.synapse.core.util.SynaStrings;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -167,10 +166,29 @@ class CasApplicationTests {
      * CodeChallenge 验证源码位置 org.springframework.security.oauth2.server.authorization.authentication.CodeVerifierAuthenticator#codeVerifierValid
      */
     @Test
-    @SneakyThrows
-    void generate_authorization_code_and_token_test() {
+    void generate_token_test() {
+        // 构建上下文
+        Authentication principal = authorizationService.generatePrincipal(ClientUser.builder()
+                .clientId(TEST_CLIENT_ID)
+                .username(TEST_USER_NAME)
+                .password(TEST_USER_PASSWORD)
+                .build()
+        );
+        SecurityContextHolder.getContext().setAuthentication(principal);
+        AuthorizationServerContext authorizationServerContext = FilterUtils.buildAuthorizationServerContext(authorizationServerSettings, new MockHttpServletRequest());
+        AuthorizationServerContextHolder.setContext(authorizationServerContext);
+
+        System.out.println("\n========================== 授权码模式 开始 ==========================");
         String authorizationCode = generate_authorization_code_test();
-        generate_token_test2(authorizationCode);
+        CustomAccessToken customAccessToken = generate_token_by_code_test(authorizationCode);
+        System.out.println("\n========================== 授权码模式 结束 ==========================");
+        System.out.println("\n========================== 刷新令牌模式 开始 ==========================");
+        String refreshToken = customAccessToken.getRefreshToken();
+        generate_token_by_refresh_test(refreshToken);
+        System.out.println("\n========================== 刷新令牌模式 结束 ==========================");
+        System.out.println("\n========================== 客户端模式 开始 ==========================");
+        generate_token_by_client_test();
+        System.out.println("\n========================== 客户端模式 结束 ==========================");
     }
 
     //------------------------------------------------ 初始化测试数据 开始 ------------------------------------------------
@@ -245,21 +263,14 @@ class CasApplicationTests {
 
     //------------------------------------------------ 初始化测试数据 结束 ------------------------------------------------
 
-    //------------------------------------------------ 授权码模式生成令牌 开始 ------------------------------------------------
+    //------------------------------------------------ 生成令牌 开始 ------------------------------------------------
 
     /**
-     * 步骤 1 生成一个授权码
+     * 生成一个授权码
      *
      * @return 授权码
      */
     private String generate_authorization_code_test() {
-        Authentication principal = authorizationService.generatePrincipal(ClientUser.builder()
-                .clientId(TEST_CLIENT_ID)
-                .username(TEST_USER_NAME)
-                .password(TEST_USER_PASSWORD)
-                .build()
-        );
-        SecurityContextHolder.getContext().setAuthentication(principal);
         GenerateAuthorizationCodeParam generateAuthorizationCodeParam = new GenerateAuthorizationCodeParam();
         // scopes需要在客户端的范围内
         generateAuthorizationCodeParam.setScopes(TEST_CLIENT_SCOPES);
@@ -282,7 +293,7 @@ class CasApplicationTests {
      *
      * @param authorizationCode 授权码
      */
-    private void generate_token_test(String authorizationCode) throws Exception {
+    private void request_token_test(String authorizationCode) throws Exception {
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
         param.set(OAuth2ParameterNames.GRANT_TYPE, AuthorizationGrantType.AUTHORIZATION_CODE.getValue());
         param.set(OAuth2ParameterNames.REDIRECT_URI, TEST_CLIENT_REDIRECT_URI);
@@ -306,14 +317,11 @@ class CasApplicationTests {
     }
 
     /**
-     * 步骤 2 生成令牌
+     * 授权码模式 生成令牌
      *
      * @param authorizationCode 授权码
      */
-    private void generate_token_test2(String authorizationCode) {
-        AuthorizationServerContext authorizationServerContext = FilterUtils.buildAuthorizationServerContext(authorizationServerSettings, new MockHttpServletRequest());
-        AuthorizationServerContextHolder.setContext(authorizationServerContext);
-
+    private CustomAccessToken generate_token_by_code_test(String authorizationCode) {
         GenerateAccessTokenParam param = new GenerateAccessTokenParam();
         param.setType(AuthorizationGrantType.AUTHORIZATION_CODE.getValue());
         param.setCode(authorizationCode);
@@ -322,16 +330,57 @@ class CasApplicationTests {
 
         CustomAccessToken accessToken = authorizationService.generateAccessToken(param);
 
-        Assert.assertNotNull("获取令牌请求失败!", accessToken);
+        Assert.assertNotNull("授权码模式生成令牌请求失败!", accessToken);
 
         System.out.println("\n----------------------------------------------------");
-        System.out.println(SynaStrings.format("已成功获取令牌:"));
+        System.out.println(SynaStrings.format("[授权码模式]已成功获取令牌:"));
+        System.out.println(new JSONObject(accessToken).toStringPretty());
+        System.out.println("----------------------------------------------------");
+
+        return accessToken;
+    }
+
+    /**
+     * 刷新令牌模式 生成令牌
+     *
+     * @param refreshToken 刷新令牌
+     */
+    private void generate_token_by_refresh_test(String refreshToken) {
+        GenerateAccessTokenParam param = new GenerateAccessTokenParam();
+        param.setType(AuthorizationGrantType.REFRESH_TOKEN.getValue());
+        param.setCode(refreshToken);
+        param.setSecret(TEST_CLIENT_SECRET);
+
+        CustomAccessToken accessToken = authorizationService.generateAccessToken(param);
+
+        Assert.assertNotNull("刷新令牌模式生成令牌请求失败!", accessToken);
+
+        System.out.println("\n----------------------------------------------------");
+        System.out.println(SynaStrings.format("[刷新令牌模式]已成功获取令牌:"));
+        System.out.println(new JSONObject(accessToken).toStringPretty());
+        System.out.println("----------------------------------------------------");
+    }
+
+    /**
+     * 客户端模式 生成令牌
+     */
+    private void generate_token_by_client_test() {
+        GenerateAccessTokenParam param = new GenerateAccessTokenParam();
+        param.setType(AuthorizationGrantType.CLIENT_CREDENTIALS.getValue());
+        param.setSecret(TEST_CLIENT_SECRET);
+
+        CustomAccessToken accessToken = authorizationService.generateAccessToken(param);
+
+        Assert.assertNotNull("客户端模式生成令牌请求失败!", accessToken);
+
+        System.out.println("\n----------------------------------------------------");
+        System.out.println(SynaStrings.format("[客户端模式]已成功获取令牌:"));
         System.out.println(new JSONObject(accessToken).toStringPretty());
         System.out.println("----------------------------------------------------");
     }
 
 
-    //------------------------------------------------ 授权码模式生成令牌 结束 ------------------------------------------------
+    //------------------------------------------------ 生成令牌 结束 ------------------------------------------------
 
     /**
      * 非必要

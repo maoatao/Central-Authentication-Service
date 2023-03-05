@@ -200,7 +200,7 @@ public class CustomClientRegistrationProvider implements AuthenticationProvider 
                 registeredClient.getClientAuthenticationMethods().iterator().next(), registeredClient.getClientSecret());
 
         Set<String> authorizedScopes = new HashSet<>();
-        authorizedScopes.add(CustomClientAuthenticationProvider.DEFAULT_CLIENT_CONFIGURATION_AUTHORIZED_SCOPE);
+        authorizedScopes.add(CustomOdicClientAuthenticationProvider.DEFAULT_CLIENT_CONFIGURATION_AUTHORIZED_SCOPE);
         authorizedScopes = Collections.unmodifiableSet(authorizedScopes);
 
         // @formatter:off

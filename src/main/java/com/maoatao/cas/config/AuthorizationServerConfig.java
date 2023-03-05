@@ -40,6 +40,7 @@ import org.springframework.security.oauth2.server.authorization.OAuth2Authorizat
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.authentication.ClientSecretAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationProvider;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2ClientCredentialsAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
@@ -122,6 +123,15 @@ public class AuthorizationServerConfig {
         return new CustomAuthorizationCodeAccessTokenProvider(oAuth2AuthorizationService, oAuth2TokenGenerator);
     }
 
+    /**
+     * 客户端模式生成访问令牌提供者
+     */
+    @Bean
+    public OAuth2ClientCredentialsAuthenticationProvider oAuth2ClientCredentialsAuthenticationProvider(OAuth2AuthorizationService oAuth2AuthorizationService,
+                                                                                                       OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator) {
+        return new OAuth2ClientCredentialsAuthenticationProvider(oAuth2AuthorizationService, oAuth2TokenGenerator);
+    }
+
 
     /**
      * 授权码提供者(自定义授权码生成器)
@@ -175,12 +185,21 @@ public class AuthorizationServerConfig {
 
     /**
      * 认证管理
+     *
+     * @param userAuthenticationProvider   用户身份授权
+     * @param clientAuthenticationProvider 客户端授权
+     * @param accessTokenProvider          授权码模式 生成访问令牌
+     * @param refreshTokenProvider         刷新令牌模式 生成访问令牌
+     * @param clientTokenProvider          客户端模式 生成访问令牌
      */
     @Bean
     public AuthenticationManager authenticationManager(CustomUserAuthenticationProvider userAuthenticationProvider,
+                                                       ClientSecretAuthenticationProvider clientAuthenticationProvider,
                                                        CustomAuthorizationCodeAccessTokenProvider accessTokenProvider,
-                                                       ClientSecretAuthenticationProvider clientAuthenticationProvider) {
-        return new ProviderManager(userAuthenticationProvider, accessTokenProvider, clientAuthenticationProvider);
+                                                       CustomRefreshTokenProvider refreshTokenProvider,
+                                                       OAuth2ClientCredentialsAuthenticationProvider clientTokenProvider) {
+        return new ProviderManager(userAuthenticationProvider, clientAuthenticationProvider,
+                accessTokenProvider, refreshTokenProvider, clientTokenProvider);
     }
 
     /**

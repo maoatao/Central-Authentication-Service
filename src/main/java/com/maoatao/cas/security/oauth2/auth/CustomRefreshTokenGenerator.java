@@ -34,7 +34,7 @@ public class CustomRefreshTokenGenerator implements OAuth2TokenGenerator<OAuth2R
     @Nullable
     @Override
     public OAuth2RefreshToken generate(OAuth2TokenContext context) {
-        if (!OAuth2TokenType.REFRESH_TOKEN.equals(context.getTokenType())) {
+        if (context.getTokenType() == null || !OAuth2TokenType.REFRESH_TOKEN.equals(context.getTokenType())) {
             return null;
         }
         Instant issuedAt = Instant.now();

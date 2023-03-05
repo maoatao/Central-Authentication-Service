@@ -1,12 +1,15 @@
 package com.maoatao.cas.security.bean;
 
 import com.maoatao.synapse.core.bean.BaseVO;
+import com.maoatao.synapse.core.util.SynaAssert;
 import com.maoatao.synapse.core.util.SynaDates;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.OAuth2RefreshToken;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AccessTokenAuthenticationToken;
 
 import java.io.Serial;
@@ -54,6 +57,10 @@ public class CustomAccessToken extends BaseVO {
     private long expiresIn;
 
     public static CustomAccessToken of(OAuth2AccessTokenAuthenticationToken accessTokenAuthentication) {
+        OAuth2AccessToken accessToken = accessTokenAuthentication.getAccessToken();
+        SynaAssert.notNull(accessToken, "令牌生成失败!");
+        OAuth2RefreshToken refreshToken = accessTokenAuthentication.getRefreshToken();
+        CustomAccessToken.CustomAccessTokenBuilder customAccessTokenBuilder = CustomAccessToken.builder();
         long now = SynaDates.now(SynaDates.DateType.MILLI_SECOND);
         long expiresAt = accessTokenAuthentication.getAccessToken().getExpiresAt().toEpochMilli();
         // 求差值去毫秒
@@ -61,12 +68,13 @@ public class CustomAccessToken extends BaseVO {
         if (expiresIn <= 0) {
             log.warn("令牌生成成功,但已过期? issuedAt:{},expiresAt:{},now:{}", accessTokenAuthentication.getAccessToken().getIssuedAt().toEpochMilli(), expiresAt, now);
         }
-        return CustomAccessToken.builder()
-                .accessToken(accessTokenAuthentication.getAccessToken().getTokenValue())
-                .refreshToken(accessTokenAuthentication.getRefreshToken().getTokenValue())
-                .scope(accessTokenAuthentication.getAccessToken().getScopes())
-                .tokenType(accessTokenAuthentication.getAccessToken().getTokenType().getValue())
-                .expiresIn(expiresIn)
-                .build();
+        customAccessTokenBuilder.accessToken(accessToken.getTokenValue()).scope(accessToken.getScopes()).expiresIn(expiresIn);
+        if (accessToken.getTokenType() != null) {
+            customAccessTokenBuilder.tokenType(accessToken.getTokenType().getValue());
+        }
+        if (refreshToken != null) {
+            customAccessTokenBuilder.refreshToken(refreshToken.getTokenValue());
+        }
+        return customAccessTokenBuilder.build();
     }
 }

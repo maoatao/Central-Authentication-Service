@@ -48,7 +48,7 @@ import java.util.Set;
  * @author MaoAtao
  * @date 2023-01-22 13:31:37
  */
-public final class CustomClientAuthenticationProvider implements AuthenticationProvider {
+public final class CustomOdicClientAuthenticationProvider implements AuthenticationProvider {
     static final String DEFAULT_CLIENT_CONFIGURATION_AUTHORIZED_SCOPE = "client.read";
     private final Log logger = LogFactory.getLog(getClass());
     private final RegisteredClientRepository registeredClientRepository;
@@ -61,8 +61,8 @@ public final class CustomClientAuthenticationProvider implements AuthenticationP
      * @param registeredClientRepository the repository of registered clients
      * @param authorizationService       the authorization service
      */
-    public CustomClientAuthenticationProvider(RegisteredClientRepository registeredClientRepository,
-                                              OAuth2AuthorizationService authorizationService) {
+    public CustomOdicClientAuthenticationProvider(RegisteredClientRepository registeredClientRepository,
+                                                  OAuth2AuthorizationService authorizationService) {
         Assert.notNull(registeredClientRepository, "registeredClientRepository cannot be null");
         Assert.notNull(authorizationService, "authorizationService cannot be null");
         this.registeredClientRepository = registeredClientRepository;

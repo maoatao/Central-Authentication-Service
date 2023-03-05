@@ -7,7 +7,6 @@ import com.maoatao.cas.security.bean.AuthorizationInfo;
 import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.security.bean.CustomAccessToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
 
 /**
  * 自定义授权接口
