@@ -1,11 +1,11 @@
 package com.maoatao.cas.core.service.impl;
 
-import cn.hutool.json.JSONObject;
 import com.maoatao.cas.core.param.GenerateAccessTokenParam;
 import com.maoatao.cas.security.CustomUserAuthenticationProvider;
 import com.maoatao.cas.core.service.AuthorizationService;
 import com.maoatao.cas.security.GrantTypeConstants;
 import com.maoatao.cas.security.bean.ClientUser;
+import com.maoatao.cas.security.bean.CustomAccessToken;
 import com.maoatao.cas.security.bean.CustomUserDetails;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
 import com.maoatao.cas.security.UUIDStringKeyGenerator;
@@ -82,15 +82,15 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     }
 
     @Override
-    public OAuth2AccessToken generateAccessToken(GenerateAccessTokenParam param) {
-        OAuth2AccessToken oAuth2AccessToken;
+    public CustomAccessToken generateAccessToken(GenerateAccessTokenParam param) {
+        CustomAccessToken accessToken;
         switch (param.getType()) {
-            case GrantTypeConstants.AUTHORIZATION_CODE -> oAuth2AccessToken = buildAccessTokenByCode(param);
-            case GrantTypeConstants.REFRESH_TOKEN -> oAuth2AccessToken = buildAccessTokenByRefresh(param);
-            case GrantTypeConstants.CLIENT_CREDENTIALS -> oAuth2AccessToken = buildAccessTokenByClient(param);
+            case GrantTypeConstants.AUTHORIZATION_CODE -> accessToken = buildAccessTokenByCode(param);
+            case GrantTypeConstants.REFRESH_TOKEN -> accessToken = buildAccessTokenByRefresh(param);
+            case GrantTypeConstants.CLIENT_CREDENTIALS -> accessToken = buildAccessTokenByClient(param);
             default -> throw new UnsupportedOperationException("不支持的授权类型!");
         }
-        return oAuth2AccessToken;
+        return accessToken;
     }
 
     @Override
@@ -318,37 +318,47 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     }
 
     /**
-     * {@link OAuth2AuthorizationCodeAuthenticationConverter#convert}
+     * 通过授权码生成访问令牌
      * <p>
-     * {@link ClientSecretBasicAuthenticationConverter#convert}
+     * 构建客户端身份验证令牌源码{@link ClientSecretBasicAuthenticationConverter#convert}
      * <p>
-     * {@link OAuth2TokenEndpointFilter}.doFilterInternal
+     * 构建授权码认证令牌源码{@link OAuth2AuthorizationCodeAuthenticationConverter#convert}
+     * <p>
+     * 生成访问令牌源码{@link OAuth2TokenEndpointFilter}.doFilterInternal
      *
-     * @param param
-     * @return
+     * @param param 参数
+     * @return 访问令牌
      */
-    private OAuth2AccessToken buildAccessTokenByCode(GenerateAccessTokenParam param) {
+    private CustomAccessToken buildAccessTokenByCode(GenerateAccessTokenParam param) {
         CustomUserDetails userDetails = getUserDetails();
         RegisteredClient registeredClient = registeredClientRepository.findByClientId(userDetails.getClientId());
         // 构建客户端身份验证令牌
         Authentication clientAuthentication = new OAuth2ClientAuthenticationToken(registeredClient, ClientAuthenticationMethod.CLIENT_SECRET_BASIC, param.getSecret());
         // 认证客户端令牌
-        OAuth2ClientAuthenticationToken clientAuthenticationToken = (OAuth2ClientAuthenticationToken) this.authenticationManager.authenticate(clientAuthentication);
+        OAuth2ClientAuthenticationToken clientAuthenticationToken;
+        try {
+            clientAuthenticationToken = (OAuth2ClientAuthenticationToken) this.authenticationManager.authenticate(clientAuthentication);
+        } catch (Exception e) {
+            throw new SynaException("认证客户端失败!", e);
+        }
         // 构建授权码认证令牌
         Authentication codeAuthentication = new OAuth2AuthorizationCodeAuthenticationToken(param.getCode(), clientAuthenticationToken, null, null);
-        // 生成访问令牌
-        OAuth2AccessTokenAuthenticationToken accessTokenAuthentication = (OAuth2AccessTokenAuthenticationToken) this.authenticationManager.authenticate(codeAuthentication);
-
-        System.out.println(new JSONObject(accessTokenAuthentication).toStringPretty());
-
-        return accessTokenAuthentication.getAccessToken();
+        OAuth2AccessTokenAuthenticationToken accessTokenAuthentication;
+        try {
+            // 生成访问令牌
+            accessTokenAuthentication = (OAuth2AccessTokenAuthenticationToken) this.authenticationManager.authenticate(codeAuthentication);
+        } catch (Exception e) {
+            throw new SynaException("令牌生成失败!", e);
+        }
+        SynaAssert.notNull(accessTokenAuthentication, "令牌生成失败!");
+        return CustomAccessToken.of(accessTokenAuthentication);
     }
 
-    private OAuth2AccessToken buildAccessTokenByClient(GenerateAccessTokenParam param) {
+    private CustomAccessToken buildAccessTokenByClient(GenerateAccessTokenParam param) {
         return null;
     }
 
-    private OAuth2AccessToken buildAccessTokenByRefresh(GenerateAccessTokenParam param) {
+    private CustomAccessToken buildAccessTokenByRefresh(GenerateAccessTokenParam param) {
         return null;
     }
 

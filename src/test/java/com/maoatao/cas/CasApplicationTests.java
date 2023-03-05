@@ -15,7 +15,7 @@ import com.maoatao.cas.core.service.RolePermissionService;
 import com.maoatao.cas.core.service.RoleService;
 import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.security.bean.ClientUser;
-import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationServerContext;
+import com.maoatao.cas.security.bean.CustomAccessToken;
 import com.maoatao.cas.util.FilterUtils;
 import com.maoatao.cas.util.Ids;
 import com.maoatao.cas.core.param.UserParam;
@@ -38,11 +38,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.core.endpoint.PkceParameterNames;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
-import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.context.AuthorizationServerContext;
@@ -51,8 +49,6 @@ import org.springframework.security.oauth2.server.authorization.settings.Authori
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
-import org.springframework.security.oauth2.server.authorization.token.DefaultOAuth2TokenContext;
-import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -168,7 +164,7 @@ class CasApplicationTests {
      * <p>
      * 客户端设置如果 requireProofKey 为 true,就需要添加额外参数,三个参数为一组,相互对应.详情{@link com.maoatao.cas.test.CodeVerifierTest}
      * <p>
-     * CodeChallenge 验证源码位置 {@link org.springframework.security.oauth2.server.authorization.authentication.CodeVerifierAuthenticator#codeVerifierValid}
+     * CodeChallenge 验证源码位置 org.springframework.security.oauth2.server.authorization.authentication.CodeVerifierAuthenticator#codeVerifierValid
      */
     @Test
     @SneakyThrows
@@ -315,22 +311,6 @@ class CasApplicationTests {
      * @param authorizationCode 授权码
      */
     private void generate_token_test2(String authorizationCode) {
-        // MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
-        // param.set(OAuth2ParameterNames.GRANT_TYPE, AuthorizationGrantType.AUTHORIZATION_CODE.getValue());
-        // param.set(OAuth2ParameterNames.REDIRECT_URI, TEST_CLIENT_REDIRECT_URI);
-        // param.set(OAuth2ParameterNames.CODE, authorizationCode);
-        // param.set(PkceParameterNames.CODE_VERIFIER, "eT3Zhtr7Tmz20-qpTk9zs8EWhN63qdZd8GWiq5-h67TrujxzIg0p_tPUfWH1dXQg278ZEiMcq9ehYPvbBehNe8f4VP4o8EOnFoQY7wVwjUyG_l0ksZUUuPWg5dWKAEth");
-        // // mock模拟了请求令牌,此接口为OAuth2原版接口 post http://localhost:8080/oauth2/token
-        // MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/oauth2/token")
-        //         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-        //         .params(param)
-        //         .header(HttpHeaders.AUTHORIZATION, "Basic ".concat(Base64.encode(TEST_CLIENT_ID.concat(":").concat(TEST_CLIENT_SECRET))))
-        // ).andReturn();
-        // MockHttpServletResponse mockResponse = mvcResult.getResponse();
-        //
-        // Assert.assertEquals("获取令牌请求失败!", mockResponse.getStatus(), 200);
-        // Assert.assertTrue("获取令牌请求失败!", StrUtil.isNotBlank(mockResponse.getContentAsString()));
-
         AuthorizationServerContext authorizationServerContext = FilterUtils.buildAuthorizationServerContext(authorizationServerSettings, new MockHttpServletRequest());
         AuthorizationServerContextHolder.setContext(authorizationServerContext);
 
@@ -340,13 +320,13 @@ class CasApplicationTests {
         param.setSecret(TEST_CLIENT_SECRET);
         param.setVerifier("eT3Zhtr7Tmz20-qpTk9zs8EWhN63qdZd8GWiq5-h67TrujxzIg0p_tPUfWH1dXQg278ZEiMcq9ehYPvbBehNe8f4VP4o8EOnFoQY7wVwjUyG_l0ksZUUuPWg5dWKAEth");
 
-        OAuth2AccessToken oAuth2AccessToken = authorizationService.generateAccessToken(param);
+        CustomAccessToken accessToken = authorizationService.generateAccessToken(param);
 
-        Assert.assertNotNull("获取令牌请求失败!", oAuth2AccessToken);
+        Assert.assertNotNull("获取令牌请求失败!", accessToken);
 
         System.out.println("\n----------------------------------------------------");
         System.out.println(SynaStrings.format("已成功获取令牌:"));
-        System.out.println(new JSONObject(oAuth2AccessToken).toStringPretty());
+        System.out.println(new JSONObject(accessToken).toStringPretty());
         System.out.println("----------------------------------------------------");
     }
 

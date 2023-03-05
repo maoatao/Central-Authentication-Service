@@ -5,6 +5,7 @@ import com.maoatao.cas.core.param.GenerateAuthorizationCodeParam;
 import com.maoatao.cas.security.CustomUserAuthenticationProvider;
 import com.maoatao.cas.security.bean.AuthorizationInfo;
 import com.maoatao.cas.security.bean.ClientUser;
+import com.maoatao.cas.security.bean.CustomAccessToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 
@@ -30,7 +31,7 @@ public interface AuthorizationService {
      * @param param 参数
      * @return 访问令牌
      */
-    OAuth2AccessToken generateAccessToken(GenerateAccessTokenParam param);
+    CustomAccessToken generateAccessToken(GenerateAccessTokenParam param);
 
     /**
      * 吊销令牌
