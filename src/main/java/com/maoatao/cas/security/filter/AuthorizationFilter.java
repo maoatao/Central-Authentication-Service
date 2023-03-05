@@ -74,7 +74,7 @@ public class AuthorizationFilter extends GenericFilterBean {
         if (clientUser == null) {
             return false;
         }
-        Authentication principal = authorizationService.buildPrincipal(clientUser);
+        Authentication principal = authorizationService.generatePrincipal(clientUser);
         if (principal == null) {
             return false;
         }

@@ -44,11 +44,12 @@ public class CustomUserAuthenticationProvider extends AbstractUserDetailsAuthent
      */
     private volatile String userNotFoundEncodedPassword;
 
-    private UserService userService;
+    private final UserService userService;
 
     private UserDetailsPasswordService userDetailsPasswordService;
 
-    public CustomUserAuthenticationProvider() {
+    public CustomUserAuthenticationProvider(UserService userService) {
+        this.userService = userService;
         setPasswordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder());
     }
 
@@ -82,7 +83,7 @@ public class CustomUserAuthenticationProvider extends AbstractUserDetailsAuthent
             throws AuthenticationException {
         prepareTimingAttackProtection();
         try {
-            // 上游构建 AuthorizationService buildPrincipal 时, details 设定为 clientId
+            // 上游构建 AuthorizationService generatePrincipal 时, details 设定为 clientId
             // 通过用户名和客户端 id 查询一个用户
             String clientId = Optional.ofNullable(authentication.getDetails()).orElse(SynaStrings.EMPTY).toString();
             UserDetails loadedUser = this.getUserService().getUserDetails(username, clientId);
@@ -143,10 +144,6 @@ public class CustomUserAuthenticationProvider extends AbstractUserDetailsAuthent
 
     protected PasswordEncoder getPasswordEncoder() {
         return this.passwordEncoder;
-    }
-
-    public void setUserService(UserService userService) {
-        this.userService = userService;
     }
 
     protected UserService getUserService() {

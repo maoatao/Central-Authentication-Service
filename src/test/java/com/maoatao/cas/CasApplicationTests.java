@@ -7,6 +7,7 @@ import com.maoatao.cas.core.entity.PermissionEntity;
 import com.maoatao.cas.core.entity.RoleEntity;
 import com.maoatao.cas.core.entity.RolePermissionEntity;
 import com.maoatao.cas.core.entity.UserEntity;
+import com.maoatao.cas.core.param.GenerateAccessTokenParam;
 import com.maoatao.cas.core.param.GenerateAuthorizationCodeParam;
 import com.maoatao.cas.core.service.AuthorizationService;
 import com.maoatao.cas.core.service.PermissionService;
@@ -34,6 +35,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.core.endpoint.PkceParameterNames;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
@@ -159,47 +161,8 @@ class CasApplicationTests {
     @Test
     @SneakyThrows
     void generate_authorization_code_and_token_test() {
-        Authentication principal = authorizationService.buildPrincipal(ClientUser.builder()
-                .clientId(TEST_CLIENT_ID)
-                .username(TEST_USER_NAME)
-                .password(TEST_USER_PASSWORD)
-                .build()
-        );
-        SecurityContextHolder.getContext().setAuthentication(principal);
-        GenerateAuthorizationCodeParam generateAuthorizationCodeParam = new GenerateAuthorizationCodeParam();
-        // scopes需要在客户端的范围内
-        generateAuthorizationCodeParam.setScopes(TEST_CLIENT_SCOPES);
-        generateAuthorizationCodeParam.setCodeChallengeMethod("S256");
-        generateAuthorizationCodeParam.setCodeChallenge("3vrxycun-VbyenvO5GiFOaOBazUBX_xcFElnqbl-TXA");
-        // 非OAuth2原获取授权码接口,原版请求成功后跳转页面 get http://localhost:8080/oauth2/authorize
-        // 根据需要自己新增了一个不需要鉴权,不跳转页面,post的请求授权码接口
-        String authorizationCode = authorizationService.generateAuthorizationCode(generateAuthorizationCodeParam);
-
-        System.out.println("----------------------------------------------------");
-        System.out.println(SynaStrings.format("已成功生成授权码: {}", authorizationCode));
-        System.out.println("----------------------------------------------------");
-
-        MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
-        param.set(OAuth2ParameterNames.GRANT_TYPE, AuthorizationGrantType.AUTHORIZATION_CODE.getValue());
-        param.set(OAuth2ParameterNames.REDIRECT_URI, TEST_CLIENT_REDIRECT_URI);
-        param.set(OAuth2ParameterNames.CODE, authorizationCode);
-        param.set(PkceParameterNames.CODE_VERIFIER, "eT3Zhtr7Tmz20-qpTk9zs8EWhN63qdZd8GWiq5-h67TrujxzIg0p_tPUfWH1dXQg278ZEiMcq9ehYPvbBehNe8f4VP4o8EOnFoQY7wVwjUyG_l0ksZUUuPWg5dWKAEth");
-        // mock模拟了请求令牌,此接口为OAuth2原版接口 post http://localhost:8080/oauth2/token
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/oauth2/token")
-                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-                .params(param)
-                .header(HttpHeaders.AUTHORIZATION, "Basic ".concat(Base64.encode(TEST_CLIENT_ID.concat(":").concat(TEST_CLIENT_SECRET))))
-        ).andReturn();
-        MockHttpServletResponse mockResponse = mvcResult.getResponse();
-
-        Assert.assertEquals("获取令牌请求失败!", mockResponse.getStatus(), 200);
-        Assert.assertTrue("获取令牌请求失败!", StrUtil.isNotBlank(mockResponse.getContentAsString()));
-
-        System.out.println("\n----------------------------------------------------");
-        System.out.println(SynaStrings.format("已成功获取令牌:"));
-        System.out.println(new JSONObject(mockResponse.getContentAsString()).toStringPretty());
-        System.out.println("----------------------------------------------------");
-
+        String authorizationCode = generate_authorization_code_test();
+        generate_token_test2(authorizationCode);
     }
 
     //------------------------------------------------ 初始化测试数据 开始 ------------------------------------------------
@@ -273,6 +236,107 @@ class CasApplicationTests {
     }
 
     //------------------------------------------------ 初始化测试数据 结束 ------------------------------------------------
+
+    //------------------------------------------------ 授权码模式生成令牌 开始 ------------------------------------------------
+
+    /**
+     * 步骤 1 生成一个授权码
+     *
+     * @return 授权码
+     */
+    private String generate_authorization_code_test() {
+        Authentication principal = authorizationService.generatePrincipal(ClientUser.builder()
+                .clientId(TEST_CLIENT_ID)
+                .username(TEST_USER_NAME)
+                .password(TEST_USER_PASSWORD)
+                .build()
+        );
+        SecurityContextHolder.getContext().setAuthentication(principal);
+        GenerateAuthorizationCodeParam generateAuthorizationCodeParam = new GenerateAuthorizationCodeParam();
+        // scopes需要在客户端的范围内
+        generateAuthorizationCodeParam.setScopes(TEST_CLIENT_SCOPES);
+        generateAuthorizationCodeParam.setCodeChallengeMethod("S256");
+        generateAuthorizationCodeParam.setCodeChallenge("3vrxycun-VbyenvO5GiFOaOBazUBX_xcFElnqbl-TXA");
+        // 非OAuth2原获取授权码接口,原版请求成功后跳转页面 get http://localhost:8080/oauth2/authorize
+        // 根据需要自己新增了一个不需要鉴权,不跳转页面,post的请求授权码接口
+        String authorizationCode = authorizationService.generateAuthorizationCode(generateAuthorizationCodeParam);
+
+        Assert.assertTrue("授权码生成失败!", StrUtil.isNotBlank(authorizationCode));
+
+        System.out.println("----------------------------------------------------");
+        System.out.println(SynaStrings.format("已成功生成授权码: {}", authorizationCode));
+        System.out.println("----------------------------------------------------");
+        return authorizationCode;
+    }
+
+    /**
+     * 步骤 2 生成令牌
+     *
+     * @param authorizationCode 授权码
+     */
+    private void generate_token_test(String authorizationCode) throws Exception {
+        MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
+        param.set(OAuth2ParameterNames.GRANT_TYPE, AuthorizationGrantType.AUTHORIZATION_CODE.getValue());
+        param.set(OAuth2ParameterNames.REDIRECT_URI, TEST_CLIENT_REDIRECT_URI);
+        param.set(OAuth2ParameterNames.CODE, authorizationCode);
+        param.set(PkceParameterNames.CODE_VERIFIER, "eT3Zhtr7Tmz20-qpTk9zs8EWhN63qdZd8GWiq5-h67TrujxzIg0p_tPUfWH1dXQg278ZEiMcq9ehYPvbBehNe8f4VP4o8EOnFoQY7wVwjUyG_l0ksZUUuPWg5dWKAEth");
+        // mock模拟了请求令牌,此接口为OAuth2原版接口 post http://localhost:8080/oauth2/token
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/oauth2/token")
+                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                .params(param)
+                .header(HttpHeaders.AUTHORIZATION, "Basic ".concat(Base64.encode(TEST_CLIENT_ID.concat(":").concat(TEST_CLIENT_SECRET))))
+        ).andReturn();
+        MockHttpServletResponse mockResponse = mvcResult.getResponse();
+
+        Assert.assertEquals("获取令牌请求失败!", mockResponse.getStatus(), 200);
+        Assert.assertTrue("获取令牌请求失败!", StrUtil.isNotBlank(mockResponse.getContentAsString()));
+
+        System.out.println("\n----------------------------------------------------");
+        System.out.println(SynaStrings.format("已成功获取令牌:"));
+        System.out.println(new JSONObject(mockResponse.getContentAsString()).toStringPretty());
+        System.out.println("----------------------------------------------------");
+    }
+
+    /**
+     * 步骤 2 生成令牌
+     *
+     * @param authorizationCode 授权码
+     */
+    private void generate_token_test2(String authorizationCode) {
+        // MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
+        // param.set(OAuth2ParameterNames.GRANT_TYPE, AuthorizationGrantType.AUTHORIZATION_CODE.getValue());
+        // param.set(OAuth2ParameterNames.REDIRECT_URI, TEST_CLIENT_REDIRECT_URI);
+        // param.set(OAuth2ParameterNames.CODE, authorizationCode);
+        // param.set(PkceParameterNames.CODE_VERIFIER, "eT3Zhtr7Tmz20-qpTk9zs8EWhN63qdZd8GWiq5-h67TrujxzIg0p_tPUfWH1dXQg278ZEiMcq9ehYPvbBehNe8f4VP4o8EOnFoQY7wVwjUyG_l0ksZUUuPWg5dWKAEth");
+        // // mock模拟了请求令牌,此接口为OAuth2原版接口 post http://localhost:8080/oauth2/token
+        // MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/oauth2/token")
+        //         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+        //         .params(param)
+        //         .header(HttpHeaders.AUTHORIZATION, "Basic ".concat(Base64.encode(TEST_CLIENT_ID.concat(":").concat(TEST_CLIENT_SECRET))))
+        // ).andReturn();
+        // MockHttpServletResponse mockResponse = mvcResult.getResponse();
+        //
+        // Assert.assertEquals("获取令牌请求失败!", mockResponse.getStatus(), 200);
+        // Assert.assertTrue("获取令牌请求失败!", StrUtil.isNotBlank(mockResponse.getContentAsString()));
+
+        GenerateAccessTokenParam param = new GenerateAccessTokenParam();
+        param.setType(AuthorizationGrantType.AUTHORIZATION_CODE.getValue());
+        param.setCode(authorizationCode);
+        param.setSecret(TEST_CLIENT_SECRET);
+        param.setVerifier("eT3Zhtr7Tmz20-qpTk9zs8EWhN63qdZd8GWiq5-h67TrujxzIg0p_tPUfWH1dXQg278ZEiMcq9ehYPvbBehNe8f4VP4o8EOnFoQY7wVwjUyG_l0ksZUUuPWg5dWKAEth");
+
+        OAuth2AccessToken oAuth2AccessToken = authorizationService.generateAccessToken(param);
+
+        Assert.assertNotNull("获取令牌请求失败!", oAuth2AccessToken);
+
+        System.out.println("\n----------------------------------------------------");
+        System.out.println(SynaStrings.format("已成功获取令牌:"));
+        System.out.println(new JSONObject(oAuth2AccessToken).toStringPretty());
+        System.out.println("----------------------------------------------------");
+    }
+
+
+    //------------------------------------------------ 授权码模式生成令牌 结束 ------------------------------------------------
 
     /**
      * 非必要

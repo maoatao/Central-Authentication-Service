@@ -6,6 +6,7 @@ import com.maoatao.cas.security.CustomUserAuthenticationProvider;
 import com.maoatao.cas.security.HttpConstants;
 import com.maoatao.cas.security.filter.CustomFilterConfigurer;
 import com.maoatao.cas.security.oauth2.auth.CustomAccessTokenGenerator;
+import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeAccessTokenProvider;
 import com.maoatao.cas.security.oauth2.auth.RedisAuthorizationService;
 import com.maoatao.cas.util.AuthorizationServerUtils;
 import com.maoatao.cas.security.oauth2.auth.CustomRefreshTokenGenerator;
@@ -21,6 +22,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -71,8 +73,10 @@ public class AuthorizationServerConfig {
      */
     @Bean
     @Order(1)
-    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http,
+                                                                      AbstractUserDetailsAuthenticationProvider abstractUserDetailsAuthenticationProvider) throws Exception {
         AuthorizationServerUtils.applyConfigurer(http);
+        http.authenticationProvider(abstractUserDetailsAuthenticationProvider);
         http.exceptionHandling(exceptions ->
                 exceptions.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
         );
@@ -104,17 +108,22 @@ public class AuthorizationServerConfig {
      */
     @Bean
     public AbstractUserDetailsAuthenticationProvider abstractUserDetailsAuthenticationProvider(UserService userService) {
-        CustomUserAuthenticationProvider customUserAuthenticationProvider = new CustomUserAuthenticationProvider();
-        customUserAuthenticationProvider.setUserService(userService);
-        return customUserAuthenticationProvider;
+        return new CustomUserAuthenticationProvider(userService);
     }
 
     /**
      * 认证管理(password模式需要配置AuthenticationManager)
      */
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AbstractUserDetailsAuthenticationProvider abstractUserDetailsAuthenticationProvider,
+                                                       OAuth2AuthorizationService oAuth2AuthorizationService,
+                                                       OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator) {
+        // AuthenticationManager authenticationManager = authenticationConfiguration.getAuthenticationManager();
+        // ProviderManager providerManager = new ProviderManager();
+        return new ProviderManager(abstractUserDetailsAuthenticationProvider, new CustomAuthorizationCodeAccessTokenProvider(
+                oAuth2AuthorizationService,
+                oAuth2TokenGenerator
+        ));
     }
 
     /**

@@ -8,6 +8,8 @@ import com.maoatao.cas.security.oauth2.odic.CustomClientRegistrationProvider;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -51,7 +53,6 @@ public abstract class AuthorizationServerUtils {
     private static OAuth2AuthorizationConsentService authorizationConsentService;
     private static OAuth2TokenGenerator<OAuth2Token> tokenGenerator;
 
-
     public static void applyConfigurer(HttpSecurity http) throws Exception {
         registeredClientRepository = getRegisteredClientRepository(http);
         authorizationService = getAuthorizationService(http);
@@ -69,6 +70,10 @@ public abstract class AuthorizationServerUtils {
                 .csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .apply(configurer);
+    }
+
+    public static ProviderManager buildProviderManager(AuthenticationProvider... providers) {
+        return new ProviderManager();
     }
 
     public static KeyPair generateRsaKey() {
@@ -115,7 +120,7 @@ public abstract class AuthorizationServerUtils {
     public static OAuth2ClientAuthenticationToken getAuthenticatedClientElseThrowInvalidClient(Authentication authentication) {
         OAuth2ClientAuthenticationToken clientPrincipal = null;
         if (OAuth2ClientAuthenticationToken.class.isAssignableFrom(authentication.getPrincipal().getClass())) {
-            clientPrincipal = (OAuth2ClientAuthenticationToken)authentication.getPrincipal();
+            clientPrincipal = (OAuth2ClientAuthenticationToken) authentication.getPrincipal();
         }
         if (clientPrincipal != null && clientPrincipal.isAuthenticated()) {
             return clientPrincipal;
@@ -220,12 +225,11 @@ public abstract class AuthorizationServerUtils {
      * 配置身份验证提供程序
      */
     private static void applyAuthenticationProviders(OAuth2AuthorizationServerConfigurer configurer) {
-        configurer.authorizationEndpoint(authorizationEndpoint -> authorizationEndpoint
+        configurer.authorizationEndpoint(endpoint -> endpoint
                 .authenticationProvider(buildAuthorizationCodeProvider())
                 .authenticationProvider(buildCustomClientRegistrationProvider())
                 .authenticationProvider(buildCustomRefreshTokenProvider())
-                .authenticationProvider(buildCustomAuthorizationCodeAccessTokenProvider())
-        );
+                .authenticationProvider(buildCustomAuthorizationCodeAccessTokenProvider()));
     }
 
     /**

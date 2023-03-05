@@ -49,12 +49,12 @@ public interface AuthorizationService {
     AuthorizationInfo getAuthorizationInfo(String accessToken);
 
     /**
-     * 构建身份验证
+     * 通过客户端用户获取经过授权用户主体
      * <p>
      * {@link CustomUserAuthenticationProvider}
      *
      * @param clientUser 客户端用户信息
-     * @return 用户身份验证
+     * @return 用户主体
      */
-    Authentication buildPrincipal(ClientUser clientUser);
+    Authentication generatePrincipal(ClientUser clientUser);
 }

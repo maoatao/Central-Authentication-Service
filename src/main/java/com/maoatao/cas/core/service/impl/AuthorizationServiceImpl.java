@@ -13,6 +13,9 @@ import com.maoatao.cas.security.bean.AuthorizationInfo;
 import com.maoatao.cas.util.ServletUtils;
 import com.maoatao.synapse.core.lang.SynaException;
 import com.maoatao.synapse.core.util.SynaAssert;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +41,7 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.token.DefaultOAuth2TokenContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
+import org.springframework.security.oauth2.server.authorization.web.OAuth2TokenEndpointFilter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2AuthorizationCodeAuthenticationConverter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.ClientSecretBasicAuthenticationConverter;
 import org.springframework.stereotype.Service;
@@ -117,8 +121,8 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     }
 
     @Override
-    public Authentication buildPrincipal(ClientUser clientUser) {
-        return buildPrincipal(clientUser.clientId(), clientUser.username(), clientUser.password());
+    public Authentication generatePrincipal(ClientUser clientUser) {
+        return generatePrincipal(clientUser.clientId(), clientUser.username(), clientUser.password());
     }
 
     /**
@@ -126,7 +130,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
      * <p>
      * 这个值需要在拦截器中生成(正常情况下这个值生成失败拦截器不会放行)
      * <p>
-     * {@link this#buildPrincipal(ClientUser)}该方法反过来,从上下文中获取
+     * {@link this#generatePrincipal(ClientUser)}该方法反过来,从上下文中获取
      *
      * @return 用户详情
      */
@@ -146,9 +150,10 @@ public class AuthorizationServiceImpl implements AuthorizationService {
      * @param password 密码
      * @return 用户身份验证
      */
-    private Authentication buildPrincipal(String clientId, String username, String password) {
+    private Authentication generatePrincipal(String clientId, String username, String password) {
         Authentication authentication;
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+        // 设置客户端 id 供 CustomUserAuthenticationProvider#retrieveUser 方法使用
         usernamePasswordAuthenticationToken.setDetails(clientId);
         try {
             authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
@@ -315,7 +320,10 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
     /**
      * {@link OAuth2AuthorizationCodeAuthenticationConverter#convert}
+     * <p>
      * {@link ClientSecretBasicAuthenticationConverter#convert}
+     * <p>
+     * {@link OAuth2TokenEndpointFilter}.doFilterInternal
      *
      * @param param
      * @return
