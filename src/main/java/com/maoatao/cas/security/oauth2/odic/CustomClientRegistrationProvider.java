@@ -1,6 +1,6 @@
 package com.maoatao.cas.security.oauth2.odic;
 
-import com.maoatao.cas.util.AuthorizationServerUtils;
+import com.maoatao.cas.util.AuthorizationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.core.convert.converter.Converter;
@@ -172,9 +172,9 @@ public class CustomClientRegistrationProvider implements AuthenticationProvider 
         OAuth2Authorization registeredClientAuthorization = registerAccessToken(registeredClient);
 
         // Invalidate the "initial" access token as it can only be used once
-        authorization = AuthorizationServerUtils.invalidate(authorization, authorization.getAccessToken().getToken());
+        authorization = AuthorizationUtils.invalidate(authorization, authorization.getAccessToken().getToken());
         if (authorization.getRefreshToken() != null) {
-            authorization = AuthorizationServerUtils.invalidate(authorization, authorization.getRefreshToken().getToken());
+            authorization = AuthorizationUtils.invalidate(authorization, authorization.getRefreshToken().getToken());
         }
         this.authorizationService.save(authorization);
 

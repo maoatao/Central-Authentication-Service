@@ -1,6 +1,6 @@
 package com.maoatao.cas.security.oauth2.auth;
 
-import com.maoatao.cas.util.AuthorizationServerUtils;
+import com.maoatao.cas.util.AuthorizationUtils;
 import com.maoatao.cas.util.TokenSettingUtils;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
@@ -84,7 +84,7 @@ public class CustomAuthorizationCodeAccessTokenProvider implements Authenticatio
                 (OAuth2AuthorizationCodeAuthenticationToken) authentication;
 
         OAuth2ClientAuthenticationToken clientPrincipal =
-                AuthorizationServerUtils.getAuthenticatedClientElseThrowInvalidClient(authorizationCodeAuthentication);
+                AuthorizationUtils.getAuthenticatedClientElseThrowInvalidClient(authorizationCodeAuthentication);
         RegisteredClient registeredClient = clientPrincipal.getRegisteredClient();
 
         OAuth2Authorization authorization = this.authorizationService.findByToken(
@@ -101,7 +101,7 @@ public class CustomAuthorizationCodeAccessTokenProvider implements Authenticatio
         if (!registeredClient.getClientId().equals(authorizationRequest.getClientId())) {
             if (!authorizationCode.isInvalidated()) {
                 // Invalidate the authorization code given that a different client is attempting to use it
-                authorization = AuthorizationServerUtils.invalidate(authorization, authorizationCode.getToken());
+                authorization = AuthorizationUtils.invalidate(authorization, authorizationCode.getToken());
                 this.authorizationService.save(authorization);
             }
             throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_GRANT);
@@ -170,7 +170,8 @@ public class CustomAuthorizationCodeAccessTokenProvider implements Authenticatio
             // @formatter:off
             tokenContext = tokenContextBuilder
                     .tokenType(ID_TOKEN_TOKEN_TYPE)
-                    .authorization(authorizationBuilder.build())    // ID token customizer may need access to the access token and/or refresh token
+                    // ID token customizer may need access to the access token and/or refresh token
+                    .authorization(authorizationBuilder.build())
                     .build();
             // @formatter:on
             OAuth2Token generatedIdToken = this.tokenGenerator.generate(tokenContext);
@@ -190,7 +191,7 @@ public class CustomAuthorizationCodeAccessTokenProvider implements Authenticatio
         OAuth2Authorization newAuthorization = authorizationBuilder.build();
 
         // Invalidate the authorization code as it can only be used once
-        newAuthorization = AuthorizationServerUtils.invalidate(newAuthorization, authorizationCode.getToken());
+        newAuthorization = AuthorizationUtils.invalidate(newAuthorization, authorizationCode.getToken());
 
         this.authorizationService.save(newAuthorization);
 
@@ -226,5 +227,4 @@ public class CustomAuthorizationCodeAccessTokenProvider implements Authenticatio
     public boolean supports(Class<?> authentication) {
         return OAuth2AuthorizationCodeAuthenticationToken.class.isAssignableFrom(authentication);
     }
-
 }

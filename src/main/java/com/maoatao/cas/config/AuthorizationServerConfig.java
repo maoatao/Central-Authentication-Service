@@ -1,6 +1,5 @@
 package com.maoatao.cas.config;
 
-import com.maoatao.cas.core.service.AuthorizationService;
 import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.security.CustomUserAuthenticationProvider;
 import com.maoatao.cas.security.HttpConstants;
@@ -11,7 +10,7 @@ import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
 import com.maoatao.cas.security.oauth2.auth.CustomRefreshTokenProvider;
 import com.maoatao.cas.security.oauth2.auth.RedisAuthorizationService;
 import com.maoatao.cas.security.oauth2.odic.CustomClientRegistrationProvider;
-import com.maoatao.cas.util.AuthorizationServerUtils;
+import com.maoatao.cas.util.AuthorizationUtils;
 import com.maoatao.cas.security.oauth2.auth.CustomRefreshTokenGenerator;
 import com.maoatao.cas.security.UUIDStringKeyGenerator;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -22,22 +21,14 @@ import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.OAuth2Token;
-import org.springframework.security.oauth2.core.oidc.endpoint.OidcParameterNames;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -59,8 +50,6 @@ import org.springframework.security.oauth2.server.authorization.token.JwtGenerat
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import java.security.KeyPair;
 import java.security.interfaces.RSAPrivateKey;
@@ -118,9 +107,8 @@ public class AuthorizationServerConfig {
      * 自定义授权码生成访问令牌提供者
      */
     @Bean
-    public CustomAuthorizationCodeAccessTokenProvider customAuthorizationCodeAccessTokenProvider
-    (OAuth2AuthorizationService oAuth2AuthorizationService,
-     OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator) {
+    public CustomAuthorizationCodeAccessTokenProvider customAuthorizationCodeAccessTokenProvider(OAuth2AuthorizationService oAuth2AuthorizationService,
+                                                                                                 OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator) {
         return new CustomAuthorizationCodeAccessTokenProvider(oAuth2AuthorizationService, oAuth2TokenGenerator);
     }
 
@@ -129,11 +117,11 @@ public class AuthorizationServerConfig {
      * 授权码提供者(自定义授权码生成器)
      */
     @Bean
-    public OAuth2AuthorizationCodeRequestAuthenticationProvider oAuth2AuthorizationCodeRequestAuthenticationProvider
-    (RegisteredClientRepository registeredClientRepository,
-     OAuth2AuthorizationService oAuth2AuthorizationService,
-     OAuth2AuthorizationConsentService oAuth2AuthorizationConsentService) {
-        OAuth2AuthorizationCodeRequestAuthenticationProvider oAuth2AuthorizationCodeRequestAuthenticationProvider = new OAuth2AuthorizationCodeRequestAuthenticationProvider(registeredClientRepository, oAuth2AuthorizationService, oAuth2AuthorizationConsentService);
+    public OAuth2AuthorizationCodeRequestAuthenticationProvider oAuth2AuthorizationCodeRequestAuthenticationProvider(RegisteredClientRepository registeredClientRepository,
+                                                                                                                     OAuth2AuthorizationService oAuth2AuthorizationService,
+                                                                                                                     OAuth2AuthorizationConsentService oAuth2AuthorizationConsentService) {
+        OAuth2AuthorizationCodeRequestAuthenticationProvider oAuth2AuthorizationCodeRequestAuthenticationProvider =
+                new OAuth2AuthorizationCodeRequestAuthenticationProvider(registeredClientRepository, oAuth2AuthorizationService, oAuth2AuthorizationConsentService);
         // 配置自定义授权码生成器
         oAuth2AuthorizationCodeRequestAuthenticationProvider.setAuthorizationCodeGenerator(new CustomAuthorizationCodeGenerator(new UUIDStringKeyGenerator()));
         return oAuth2AuthorizationCodeRequestAuthenticationProvider;
@@ -143,8 +131,7 @@ public class AuthorizationServerConfig {
      * 自定义客户端注册提供者
      */
     @Bean
-    public CustomClientRegistrationProvider customClientRegistrationProvider(RegisteredClientRepository
-                                                                                     registeredClientRepository,
+    public CustomClientRegistrationProvider customClientRegistrationProvider(RegisteredClientRepository registeredClientRepository,
                                                                              OAuth2AuthorizationService oAuth2AuthorizationService,
                                                                              OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator) {
         return new CustomClientRegistrationProvider(registeredClientRepository, oAuth2AuthorizationService, oAuth2TokenGenerator);
@@ -154,8 +141,7 @@ public class AuthorizationServerConfig {
      * 自定义刷新令牌提供者
      */
     @Bean
-    public CustomRefreshTokenProvider customRefreshTokenProvider(OAuth2AuthorizationService
-                                                                         oAuth2AuthorizationService,
+    public CustomRefreshTokenProvider customRefreshTokenProvider(OAuth2AuthorizationService oAuth2AuthorizationService,
                                                                  OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator) {
         return new CustomRefreshTokenProvider(oAuth2AuthorizationService, oAuth2TokenGenerator);
     }
@@ -164,18 +150,16 @@ public class AuthorizationServerConfig {
      * OAuth2 授权服务器配置程序(自定义令牌提供者)
      */
     @Bean
-    public OAuth2AuthorizationServerConfigurer oAuth2AuthorizationServerConfigurer
-    (CustomAuthorizationCodeAccessTokenProvider customAuthorizationCodeAccessTokenProvider,
-     OAuth2AuthorizationCodeRequestAuthenticationProvider
-             oAuth2AuthorizationCodeRequestAuthenticationProvider,
-     CustomClientRegistrationProvider customClientRegistrationProvider,
-     CustomRefreshTokenProvider customRefreshTokenProvider) {
+    public OAuth2AuthorizationServerConfigurer oAuth2AuthorizationServerConfigurer(CustomAuthorizationCodeAccessTokenProvider accessTokenProvider,
+                                                                                   OAuth2AuthorizationCodeRequestAuthenticationProvider authorizationCodeProvider,
+                                                                                   CustomClientRegistrationProvider clientRegistrationProvider,
+                                                                                   CustomRefreshTokenProvider refreshTokenProvider) {
         OAuth2AuthorizationServerConfigurer oAuth2AuthorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
         oAuth2AuthorizationServerConfigurer.authorizationEndpoint(endpoint -> endpoint
-                .authenticationProvider(oAuth2AuthorizationCodeRequestAuthenticationProvider)
-                .authenticationProvider(customClientRegistrationProvider)
-                .authenticationProvider(customRefreshTokenProvider)
-                .authenticationProvider(customAuthorizationCodeAccessTokenProvider));
+                .authenticationProvider(authorizationCodeProvider)
+                .authenticationProvider(clientRegistrationProvider)
+                .authenticationProvider(refreshTokenProvider)
+                .authenticationProvider(accessTokenProvider));
         return oAuth2AuthorizationServerConfigurer;
     }
 
@@ -183,10 +167,9 @@ public class AuthorizationServerConfig {
      * 认证管理
      */
     @Bean
-    public AuthenticationManager authenticationManager(CustomUserAuthenticationProvider
-                                                               customUserAuthenticationProvider,
-                                                       CustomAuthorizationCodeAccessTokenProvider customAuthorizationCodeAccessTokenProvider) {
-        return new ProviderManager(customUserAuthenticationProvider, customAuthorizationCodeAccessTokenProvider);
+    public AuthenticationManager authenticationManager(CustomUserAuthenticationProvider userAuthenticationProvider,
+                                                       CustomAuthorizationCodeAccessTokenProvider accessTokenProvider) {
+        return new ProviderManager(userAuthenticationProvider, accessTokenProvider);
     }
 
     /**
@@ -211,8 +194,8 @@ public class AuthorizationServerConfig {
      * 记录授权服务
      */
     @Bean
-    public OAuth2AuthorizationConsentService authorizationConsentService(JdbcTemplate
-                                                                                 jdbcTemplate, RegisteredClientRepository registeredClientRepository) {
+    public OAuth2AuthorizationConsentService authorizationConsentService(JdbcTemplate jdbcTemplate,
+                                                                         RegisteredClientRepository registeredClientRepository) {
         return new JdbcOAuth2AuthorizationConsentService(jdbcTemplate, registeredClientRepository);
     }
 
@@ -239,7 +222,7 @@ public class AuthorizationServerConfig {
 
     @Bean
     public JWKSource<SecurityContext> jwkSource() {
-        KeyPair keyPair = AuthorizationServerUtils.generateRsaKey();
+        KeyPair keyPair = AuthorizationUtils.generateRsaKey();
         RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
         RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
         RSAKey rsaKey = new RSAKey.Builder(publicKey)
@@ -266,13 +249,8 @@ public class AuthorizationServerConfig {
             JwsHeader.Builder jwsHeader = context.getJwsHeader();
             JwtClaimsSet.Builder claims = context.getClaims();
             if (context.getTokenType().equals(OAuth2TokenType.ACCESS_TOKEN)) {
-                // Customize headers/claims for access_token
                 jwsHeader.header("customerHeader", "这是一个自定义access_token header");
                 claims.claim("customerClaim", "这是一个自定义access_token claim");
-            } else if (context.getTokenType().getValue().equals(OidcParameterNames.ID_TOKEN)) {
-                // Customize headers/claims for id_token
-                jwsHeader.header("customerHeader", "这是一个自定义id_token header");
-                claims.claim("customerClaim", "这是一个自定义id_token claim");
             }
         };
     }
@@ -280,30 +258,6 @@ public class AuthorizationServerConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
-
-
-    /**
-     * 配置令牌过滤器并放行部分请求
-     */
-    private void applyFilterConfigurer(HttpSecurity http,
-                                       OAuth2AuthorizationService oAuth2AuthorizationService,
-                                       AuthorizationService authorizationService) throws Exception {
-        http.authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST, "/authorization").permitAll()
-                        .requestMatchers(HttpMethod.DELETE, "/authorization").permitAll())
-                .apply(new CustomFilterConfigurer(oAuth2AuthorizationService, authorizationService))
-                .and()
-                .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated());
-    }
-
-    /**
-     * 放行swagger
-     */
-    private void permitSwagger(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests()
-                .requestMatchers(HttpConstants.WHITE_LIST)
-                .permitAll();
     }
 }
 
