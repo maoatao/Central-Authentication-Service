@@ -308,6 +308,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         Set<String> scopes = param.getScopes();
         SynaAssert.notEmpty(scopes, errorMsg);
         for (String s : scopes) {
+            // TODO: 2023-03-05 15:49:12 疑问:请求一个多客户端的令牌 scopes 不能使用如下校验
             SynaAssert.isTrue(registeredClient.getScopes().contains(s), errorMsg);
         }
         if (registeredClient.getClientSettings().isRequireProofKey()) {
