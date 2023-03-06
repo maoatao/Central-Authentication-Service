@@ -87,10 +87,10 @@ public class AuthorizationServerConfig {
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http,
                                                           CustomFilterConfigurer configurer) throws Exception {
         http.csrf().disable()
-                .authorizeHttpRequests(authorize -> {
-                    authorize.requestMatchers(HttpConstants.WHITE_LIST).permitAll();
-                    authorize.anyRequest().authenticated();
-                })
+                .authorizeHttpRequests()
+                .requestMatchers(HttpConstants.WHITE_LIST).permitAll()
+                .anyRequest().authenticated()
+                .and()
                 .apply(configurer);
         return http.build();
     }

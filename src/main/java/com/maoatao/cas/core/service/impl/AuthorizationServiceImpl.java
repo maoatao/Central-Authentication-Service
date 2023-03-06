@@ -7,6 +7,7 @@ import com.maoatao.cas.security.GrantTypeConstants;
 import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.security.bean.CustomAccessToken;
 import com.maoatao.cas.security.bean.CustomUserDetails;
+import com.maoatao.cas.security.filter.TokenFilter;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
 import com.maoatao.cas.security.UUIDStringKeyGenerator;
 import com.maoatao.cas.core.param.GenerateAuthorizationCodeParam;
@@ -416,7 +417,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     /**
      * 从上下文获取用户授权主体
      * <p>
-     * 设置主体位置 {@link com.maoatao.cas.security.filter.AuthorizationFilter}
+     * 设置主体位置 {@link TokenFilter}
      *
      * @return 用户授权主体
      */

@@ -28,7 +28,7 @@ import java.security.Principal;
  * @author MaoAtao
  * @date 2022-10-24 11:17:31
  */
-public class AuthorizationFilter extends GenericFilterBean {
+public class TokenFilter extends GenericFilterBean {
 
     private static final String TOKEM_TYPE_BASIC = "Basic";
 
@@ -38,62 +38,56 @@ public class AuthorizationFilter extends GenericFilterBean {
 
     private final AuthorizationService authorizationService;
 
-    public AuthorizationFilter(OAuth2AuthorizationService oAuth2AuthorizationService, AuthorizationService authorizationService) {
+    public TokenFilter(OAuth2AuthorizationService oAuth2AuthorizationService, AuthorizationService authorizationService) {
         this.oAuth2AuthorizationService = oAuth2AuthorizationService;
         this.authorizationService = authorizationService;
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-        if (doFilterInternal(httpServletRequest)) {
-            chain.doFilter(request, response);
-        } else {
-            FilterUtils.unauthorized(response);
-        }
+        doFilterInternal(request);
+        chain.doFilter(request, response);
     }
 
-    private boolean doFilterInternal(HttpServletRequest httpServletRequest) {
+    private void doFilterInternal(ServletRequest request) {
+        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         String token = httpServletRequest.getHeader("Authorization");
         if (StrUtil.isBlank(token)) {
-            return false;
+            return;
         }
         if (token.startsWith(TOKEM_TYPE_BASIC)) {
-            return doBasicTokenFilter(token);
+            doBasicTokenFilter(token);
         }
         if (token.startsWith(TOKEM_TYPE_BEARER)) {
-            return doBearerTokenFilter(token);
+            doBearerTokenFilter(token);
         }
-        return false;
     }
 
-    private boolean doBasicTokenFilter(String token) {
+    private void doBasicTokenFilter(String token) {
         // 去掉令牌前缀
         token = token.replace(TOKEM_TYPE_BASIC, "").trim();
         ClientUser clientUser = FilterUtils.buildClientUserByToken(token);
         if (clientUser == null) {
-            return false;
+            return;
         }
         Authentication principal = authorizationService.generatePrincipal(clientUser);
         if (principal == null) {
-            return false;
+            return;
         }
         SecurityContextHolder.getContext().setAuthentication(principal);
-        return true;
     }
 
-    private boolean doBearerTokenFilter(String token) {
+    private void doBearerTokenFilter(String token) {
         // 去掉令牌前缀
         token = token.replace(TOKEM_TYPE_BEARER, "").trim();
         OAuth2Authorization authorization = oAuth2AuthorizationService.findByToken(token, OAuth2TokenType.ACCESS_TOKEN);
         if (authorization == null || authorization.getAccessToken() == null || !authorization.getAccessToken().isActive()) {
-            return false;
+            return;
         }
         Authentication principal = authorization.getAttribute(Principal.class.getName());
         if (principal == null || !principal.isAuthenticated()) {
-            return false;
+            return;
         }
         SecurityContextHolder.getContext().setAuthentication(principal);
-        return true;
     }
 }
