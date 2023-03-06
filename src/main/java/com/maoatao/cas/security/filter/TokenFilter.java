@@ -6,6 +6,7 @@ import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.util.FilterUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
@@ -85,9 +86,15 @@ public class TokenFilter extends GenericFilterBean {
             return;
         }
         Authentication principal = authorization.getAttribute(Principal.class.getName());
-        if (principal == null || !principal.isAuthenticated()) {
+        boolean isClient = AuthorizationGrantType.CLIENT_CREDENTIALS.equals(authorization.getAuthorizationGrantType());
+        if (isClient){
+            // TODO: 2023-03-06 18:10:26 客户端授权主体咋搞?
+            SecurityContextHolder.getContext().setAuthentication(principal);
             return;
         }
-        SecurityContextHolder.getContext().setAuthentication(principal);
+        boolean isAuthenticated = principal != null && principal.isAuthenticated();
+        if (isAuthenticated) {
+            SecurityContextHolder.getContext().setAuthentication(principal);
+        }
     }
 }

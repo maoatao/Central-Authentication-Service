@@ -37,8 +37,8 @@ public class CustomFilterConfigurer extends SecurityConfigurerAdapter<DefaultSec
         // 令牌过滤放在原 login 登录过滤前(登录过滤在添加了 clientId 参数后不能用了,不想重新写,且原接口禁止访问了)
         http.addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class);
         // 资源过滤,放在令牌过滤前(禁止原有接口的请求)
-        ResourcesFilter resourcesFilter = new ResourcesFilter();
-        http.addFilterBefore(resourcesFilter, TokenFilter.class);
+        // ResourcesFilter resourcesFilter = new ResourcesFilter();
+        // http.addFilterBefore(resourcesFilter, TokenFilter.class);
         // 获取令牌和授权码时要用,放在令牌过滤后
         AuthorizationServerContextFilter authorizationServerContextFilter = new AuthorizationServerContextFilter(authorizationServerSettings);
         http.addFilterAfter(authorizationServerContextFilter, TokenFilter.class);
