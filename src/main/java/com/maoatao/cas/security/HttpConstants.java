@@ -6,7 +6,7 @@ package com.maoatao.cas.security;
  * @author MaoAtao
  * @date 2023-03-04 17:51:04
  */
-public class HttpConstants {
+public final class HttpConstants {
 
     /**
      * CAS 服务请求 URL

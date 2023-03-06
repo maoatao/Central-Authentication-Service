@@ -8,7 +8,7 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
  * @author MaoAtao
  * @date 2023-03-04 17:51:04
  */
-public class GrantTypeConstants {
+public final class GrantTypeConstants {
 
     /**
      * 授权码模式
