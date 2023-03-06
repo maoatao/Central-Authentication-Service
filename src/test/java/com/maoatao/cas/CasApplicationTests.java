@@ -3,6 +3,7 @@ package com.maoatao.cas;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
+import com.maoatao.cas.config.secutity.AuthorizationServerConfig;
 import com.maoatao.cas.core.entity.PermissionEntity;
 import com.maoatao.cas.core.entity.RoleEntity;
 import com.maoatao.cas.core.entity.RolePermissionEntity;
@@ -157,7 +158,7 @@ class CasApplicationTests {
     /**
      * 测试步骤 2
      * <p>
-     * 条件:服务配置正确的redis连接(默认使用redis来储存授权信息,详情{@link com.maoatao.cas.config.AuthorizationServerConfig#oAuth2AuthorizationService })
+     * 条件:服务配置正确的redis连接(默认使用redis来储存授权信息,详情{@link AuthorizationServerConfig#oAuth2AuthorizationService })
      * <p>
      * 创建一个授权码,并使用该授权码请求令牌
      * <p>
