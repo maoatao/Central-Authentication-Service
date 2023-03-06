@@ -36,6 +36,7 @@ public final class HttpConstants {
      * 白名单
      */
     public static final String[] WHITE_LIST = new String[]{
+            "/error",
             "/swagger-ui/**",
             "/swagger-resources/**",
             "/webjars/**",
