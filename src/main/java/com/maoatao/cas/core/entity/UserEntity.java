@@ -40,7 +40,7 @@ public class UserEntity extends Model<UserEntity> {
      */
     @TableField(fill = FieldFill.INSERT)
     @Schema(description = "CAS 全局唯一id")
-    private String uniqueId;
+    private String openId;
     /**
      * OAuth2 客户端id
      */

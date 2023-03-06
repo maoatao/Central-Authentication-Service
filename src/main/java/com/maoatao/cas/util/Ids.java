@@ -10,14 +10,14 @@ import cn.hutool.core.util.IdUtil;
  */
 public abstract class Ids {
 
-    private static final String USER_UNIQUE_ID_PREFIX = "U";
+    private static final String USER_OPEN_ID_PREFIX = "U";
 
     /**
-     * 前缀{@value USER_UNIQUE_ID_PREFIX}+24位编号
+     * 前缀{@value USER_OPEN_ID_PREFIX}+24位编号
      *
      * @return 用户 id
      */
     public static String user() {
-        return USER_UNIQUE_ID_PREFIX.concat(IdUtil.objectId());
+        return USER_OPEN_ID_PREFIX.concat(IdUtil.objectId());
     }
 }

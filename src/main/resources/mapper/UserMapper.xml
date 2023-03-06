@@ -4,7 +4,7 @@
 <mapper namespace="com.maoatao.cas.core.mapper.UserMapper">
     <resultMap id="userMap" type="com.maoatao.cas.core.entity.UserEntity">
         <id property="id" column="id"/>
-        <result property="uniqueId" column="unique_id"/>
+        <result property="openId" column="open_id"/>
         <result property="clientId" column="client_id"/>
         <result property="name" column="name"/>
         <result property="password" column="password"/>
