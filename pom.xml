@@ -22,7 +22,6 @@
         <java.version>17</java.version>
         <spring-boot.version>3.0.3</spring-boot.version>
         <spring-authorization-server.version>1.0.1</spring-authorization-server.version>
-        <hutool.version>5.8.11</hutool.version>
         <mysql-connector.version>8.0.32</mysql-connector.version>
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
         <synapse.version>1.0.3-SNAPSHOT</synapse.version>
