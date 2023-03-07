@@ -2,7 +2,7 @@ package com.maoatao.cas.security.oauth2.auth;
 
 import cn.hutool.core.collection.IterUtil;
 import cn.hutool.core.util.StrUtil;
-import com.maoatao.cas.util.RedisUtils;
+import com.maoatao.daedalus.data.util.RedisUtils;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
 import org.springframework.security.oauth2.core.OAuth2Token;

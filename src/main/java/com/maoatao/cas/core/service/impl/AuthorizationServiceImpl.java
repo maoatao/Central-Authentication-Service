@@ -12,7 +12,7 @@ import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
 import com.maoatao.cas.security.UUIDStringKeyGenerator;
 import com.maoatao.cas.core.param.GenerateAuthorizationCodeParam;
 import com.maoatao.cas.security.bean.AuthorizationInfo;
-import com.maoatao.cas.util.ServletUtils;
+import com.maoatao.daedalus.web.util.ServletUtils;
 import com.maoatao.synapse.core.lang.SynaException;
 import com.maoatao.synapse.core.util.SynaAssert;
 import lombok.extern.slf4j.Slf4j;

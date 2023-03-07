@@ -11,7 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author MaoAtao
  * @date 2022-10-23 23:31:22
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.maoatao.*"})
 public class CasApplication {
 
     public static void main(String[] args) {
