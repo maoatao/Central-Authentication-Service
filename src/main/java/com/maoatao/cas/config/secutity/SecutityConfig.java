@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
+import org.springframework.security.config.annotation.web.configurers.ExceptionHandlingConfigurer;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -32,6 +34,12 @@ public class SecutityConfig {
                 .anyRequest().authenticated()
                 .and()
                 .apply(configurer);
+        // FilterChainProxy
+        // TODO: 2023-03-08 22:46:39 移除的这两个filter替换成自己的并完善
+        // 移除 AuthorizationFilter
+        http.removeConfigurer(AuthorizeHttpRequestsConfigurer.class);
+        // 移除 ExceptionTranslationFilter
+        http.removeConfigurer(ExceptionHandlingConfigurer.class);
         return http.build();
     }
 
