@@ -2,8 +2,8 @@ package com.maoatao.cas.handler;
 
 import cn.hutool.core.util.StrUtil;
 import com.maoatao.daedalus.web.util.ServletUtils;
-import com.maoatao.synapse.core.web.HttpResponseStatus;
-import com.maoatao.synapse.core.web.RestResponse;
+import com.maoatao.synapse.web.response.HttpResponseStatus;
+import com.maoatao.synapse.web.response.RestResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;

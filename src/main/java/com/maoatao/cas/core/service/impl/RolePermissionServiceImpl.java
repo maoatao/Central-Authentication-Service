@@ -8,7 +8,7 @@ import com.maoatao.cas.core.entity.RolePermissionEntity;
 import com.maoatao.cas.core.mapper.RolePermissionMapper;
 import com.maoatao.cas.core.service.RolePermissionService;
 import com.maoatao.cas.core.param.RolePermissionParam;
-import com.maoatao.synapse.core.util.SynaAssert;
+import com.maoatao.synapse.lang.util.SynaAssert;
 import org.springframework.stereotype.Service;
 
 /**

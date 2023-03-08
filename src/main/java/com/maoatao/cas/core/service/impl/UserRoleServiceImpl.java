@@ -9,7 +9,7 @@ import com.maoatao.cas.core.entity.UserRoleEntity;
 import com.maoatao.cas.core.mapper.UserRoleMapper;
 import com.maoatao.cas.core.service.UserRoleService;
 import com.maoatao.cas.core.param.UserRoleParam;
-import com.maoatao.synapse.core.util.SynaAssert;
+import com.maoatao.synapse.lang.util.SynaAssert;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

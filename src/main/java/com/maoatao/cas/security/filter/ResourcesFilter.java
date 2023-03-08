@@ -2,7 +2,7 @@ package com.maoatao.cas.security.filter;
 
 import com.maoatao.cas.security.HttpConstants;
 import com.maoatao.cas.util.FilterUtils;
-import com.maoatao.synapse.core.util.SynaSafes;
+import com.maoatao.synapse.lang.util.SynaSafes;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;

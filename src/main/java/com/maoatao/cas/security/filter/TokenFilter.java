@@ -4,8 +4,6 @@ import cn.hutool.core.util.StrUtil;
 import com.maoatao.cas.core.service.AuthorizationService;
 import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.util.FilterUtils;
-import com.maoatao.synapse.core.lang.SynaException;
-import com.maoatao.synapse.core.web.HttpResponseStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;

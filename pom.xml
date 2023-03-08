@@ -24,8 +24,6 @@
         <mysql-connector.version>8.0.32</mysql-connector.version>
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
         <daedalus.version>1.0.0-SNAPSHOT</daedalus.version>
-        <springdoc.version>2.0.2</springdoc.version>
-        <knife4j.version>3.0.3</knife4j.version>
 
         <skipTests>true</skipTests>
     </properties>
@@ -78,12 +76,6 @@
 
         <dependency>
             <groupId>com.maoatao.daedalus</groupId>
-            <artifactId>daedalus-core</artifactId>
-            <version>${daedalus.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.maoatao.daedalus</groupId>
             <artifactId>daedalus-web</artifactId>
             <version>${daedalus.version}</version>
         </dependency>
@@ -95,15 +87,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>${springdoc.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.xiaoymin</groupId>
-            <artifactId>knife4j-springdoc-ui</artifactId>
-            <version>${knife4j.version}</version>
+            <groupId>com.maoatao.daedalus</groupId>
+            <artifactId>daedalus-doc</artifactId>
+            <version>${daedalus.version}</version>
         </dependency>
     </dependencies>
 

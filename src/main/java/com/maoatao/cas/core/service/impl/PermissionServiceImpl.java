@@ -8,7 +8,7 @@ import com.maoatao.cas.core.entity.PermissionEntity;
 import com.maoatao.cas.core.mapper.PermissionMapper;
 import com.maoatao.cas.core.service.PermissionService;
 import com.maoatao.cas.core.param.PermissionParam;
-import com.maoatao.synapse.core.util.SynaAssert;
+import com.maoatao.synapse.lang.util.SynaAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

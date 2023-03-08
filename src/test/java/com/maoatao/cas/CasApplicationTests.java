@@ -20,7 +20,7 @@ import com.maoatao.cas.security.bean.CustomAccessToken;
 import com.maoatao.cas.util.FilterUtils;
 import com.maoatao.cas.util.Ids;
 import com.maoatao.cas.core.param.UserParam;
-import com.maoatao.synapse.core.util.SynaStrings;
+import com.maoatao.synapse.lang.util.SynaStrings;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;

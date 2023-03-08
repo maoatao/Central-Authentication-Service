@@ -1,6 +1,6 @@
 package com.maoatao.cas.security.filter;
 
-import com.maoatao.synapse.core.lang.SynaException;
+import com.maoatao.synapse.lang.exception.SynaException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +27,6 @@ public class ExceptionFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             filterChain.doFilter(request, response);
-            System.out.println(response);
         } catch (Exception e) {
             resolver.resolveException(request, response, null, e);
         }

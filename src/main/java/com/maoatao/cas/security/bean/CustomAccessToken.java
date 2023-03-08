@@ -1,8 +1,8 @@
 package com.maoatao.cas.security.bean;
 
 import com.maoatao.synapse.core.bean.BaseVO;
-import com.maoatao.synapse.core.util.SynaAssert;
-import com.maoatao.synapse.core.util.SynaDates;
+import com.maoatao.synapse.lang.util.SynaAssert;
+import com.maoatao.synapse.lang.util.SynaDates;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;

@@ -1,7 +1,7 @@
 package com.maoatao.cas.security;
 
 import com.maoatao.cas.core.service.UserService;
-import com.maoatao.synapse.core.util.SynaStrings;
+import com.maoatao.synapse.lang.util.SynaStrings;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
