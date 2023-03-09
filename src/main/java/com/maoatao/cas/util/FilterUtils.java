@@ -1,7 +1,9 @@
 package com.maoatao.cas.util;
 
+import cn.hutool.core.codec.Base64;
 import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationServerContext;
+import com.maoatao.synapse.lang.util.SynaSafes;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.oauth2.server.authorization.context.AuthorizationServerContext;
@@ -38,7 +40,7 @@ public abstract class FilterUtils {
      * @return 用户详情
      */
     public static ClientUser buildClientUserByToken(String token) {
-        String[] values = token.split(BASIC_TOKEN_PARAMETERS_DELIMITER);
+        String[] values = SynaSafes.of(Base64.decodeStr(token)).split(BASIC_TOKEN_PARAMETERS_DELIMITER);
         if (values.length == BASIC_TOKEN_PARAMETERS_NUM) {
             return ClientUser.builder().clientId(values[0]).username(values[1]).password(values[2]).build();
         }
