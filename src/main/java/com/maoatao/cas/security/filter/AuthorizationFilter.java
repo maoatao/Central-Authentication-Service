@@ -6,7 +6,6 @@ import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.util.FilterUtils;
 import com.maoatao.synapse.lang.exception.SynaException;
 import com.maoatao.synapse.lang.util.SynaAssert;
-import com.maoatao.synapse.lang.util.SynaSafes;
 import com.maoatao.synapse.lang.util.SynaStrings;
 import com.maoatao.synapse.web.response.HttpResponseStatus;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,6 +16,7 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -29,7 +29,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.Set;
+import java.util.List;
 
 /**
  * 授权过滤器
@@ -46,13 +46,16 @@ public class AuthorizationFilter extends GenericFilterBean {
 
     private static final String TOKEM_TYPE_BEARER = "Bearer";
 
-    private static final Set<String> WHITE_LIST = Set.of(
+    /**
+     * 请求白名单
+     */
+    private static final List<RequestMatcher> PERMIT_REQUEST_MATCHER_LIST = FilterUtils.antMatchers(null,
             "/error",
-            "/swagger-ui",
-            "/swagger-resources",
-            "/webjars",
-            "/v3",
-            "/api",
+            "/swagger-ui/**",
+            "/swagger-resources/**",
+            "/webjars/**",
+            "/v3/**",
+            "/api/**",
             "/doc.html",
             "/favicon.ico"
     );
@@ -89,9 +92,8 @@ public class AuthorizationFilter extends GenericFilterBean {
     }
 
     private boolean isPermit(HttpServletRequest request) {
-        String url = SynaSafes.of(request.getRequestURI());
-        for (String s : WHITE_LIST) {
-            if (url.startsWith(s)) {
+        for (RequestMatcher matcher : PERMIT_REQUEST_MATCHER_LIST) {
+            if (matcher.matcher(request).isMatch()) {
                 return true;
             }
         }

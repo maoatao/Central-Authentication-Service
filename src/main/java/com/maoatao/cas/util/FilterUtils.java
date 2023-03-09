@@ -3,10 +3,16 @@ package com.maoatao.cas.util;
 import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationServerContext;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.oauth2.server.authorization.context.AuthorizationServerContext;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.web.util.UrlUtils;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 过滤器工具类
@@ -47,6 +53,22 @@ public abstract class FilterUtils {
      */
     public static AuthorizationServerContext buildAuthorizationServerContext(AuthorizationServerSettings settings, HttpServletRequest request) {
         return new CustomAuthorizationServerContext(() -> resolveIssuer(settings, request), settings);
+    }
+
+    /**
+     * 构建matchers
+     *
+     * @param httpMethod  请求方法
+     * @param antPatterns 匹配 url
+     * @return matchers
+     */
+    public static List<RequestMatcher> antMatchers(HttpMethod httpMethod, String... antPatterns) {
+        String method = (httpMethod != null) ? httpMethod.toString() : null;
+        List<RequestMatcher> matchers = new ArrayList<>();
+        for (String pattern : antPatterns) {
+            matchers.add(new AntPathRequestMatcher(pattern, method));
+        }
+        return matchers;
     }
 
     private static String resolveIssuer(AuthorizationServerSettings authorizationServerSettings, HttpServletRequest request) {
