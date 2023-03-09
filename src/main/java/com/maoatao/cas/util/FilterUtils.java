@@ -1,20 +1,12 @@
 package com.maoatao.cas.util;
 
-import cn.hutool.json.JSONUtil;
 import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationServerContext;
-import com.maoatao.synapse.web.response.HttpResponseStatus;
-import com.maoatao.synapse.web.response.RestResponse;
-import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.server.authorization.context.AuthorizationServerContext;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.web.util.UrlUtils;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 /**
  * 过滤器工具类
@@ -57,27 +49,6 @@ public abstract class FilterUtils {
         return new CustomAuthorizationServerContext(() -> resolveIssuer(settings, request), settings);
     }
 
-    /**
-     * 未找到资源
-     */
-    public static void notFound(ServletResponse response) throws IOException {
-        buildResponse(response, RestResponse.failed(HttpResponseStatus.NOT_FOUND));
-    }
-
-    /**
-     * 未授权的请求
-     */
-    public static void unauthorized(ServletResponse response) throws IOException {
-        buildResponse(response, RestResponse.failed(HttpResponseStatus.UNAUTHORIZED));
-    }
-
-    private static void buildResponse(ServletResponse response, Object obj) throws IOException {
-        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.getWriter().println(JSONUtil.parseObj(obj));
-        response.getWriter().flush();
-    }
-
     private static String resolveIssuer(AuthorizationServerSettings authorizationServerSettings, HttpServletRequest request) {
         return authorizationServerSettings.getIssuer() != null ?
                 authorizationServerSettings.getIssuer() :
@@ -85,13 +56,11 @@ public abstract class FilterUtils {
     }
 
     private static String getContextPath(HttpServletRequest request) {
-        // @formatter:off
         return UriComponentsBuilder.fromHttpUrl(UrlUtils.buildFullRequestUrl(request))
                 .replacePath(request.getContextPath())
                 .replaceQuery(null)
                 .fragment(null)
                 .build()
                 .toUriString();
-        // @formatter:on
     }
 }

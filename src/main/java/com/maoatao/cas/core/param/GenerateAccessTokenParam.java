@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
-import com.maoatao.cas.security.GrantTypeConstants;
+import com.maoatao.cas.security.GrantType;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -36,14 +36,14 @@ public class GenerateAccessTokenParam implements Serializable {
     /**
      * PKCE协议额外参数:授权码验证值
      * <p>
-     * {@link GrantTypeConstants#AUTHORIZATION_CODE} 授权模式和 {@link ClientSettings#isRequireProofKey} 为 true 时必传且不能为空
+     * {@link GrantType#AUTHORIZATION_CODE} 授权模式和 {@link ClientSettings#isRequireProofKey} 为 true 时必传且不能为空
      */
     @Schema(description = "PKCE协议额外参数:授权码验证值")
     private String verifier;
     /**
      * 授权码,刷新令牌
      * <p>
-     * {@link GrantTypeConstants#AUTHORIZATION_CODE} 和 {@link GrantTypeConstants#REFRESH_TOKEN} 授权模式必传且不能为空
+     * {@link GrantType#AUTHORIZATION_CODE} 和 {@link GrantType#REFRESH_TOKEN} 授权模式必传且不能为空
      */
     @Schema(description = "授权码,刷新令牌")
     private String code;

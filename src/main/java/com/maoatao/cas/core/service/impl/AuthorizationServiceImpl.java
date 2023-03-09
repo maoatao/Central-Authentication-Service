@@ -3,11 +3,11 @@ package com.maoatao.cas.core.service.impl;
 import com.maoatao.cas.core.param.GenerateAccessTokenParam;
 import com.maoatao.cas.security.CustomUserAuthenticationProvider;
 import com.maoatao.cas.core.service.AuthorizationService;
-import com.maoatao.cas.security.GrantTypeConstants;
+import com.maoatao.cas.security.GrantType;
 import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.security.bean.CustomAccessToken;
 import com.maoatao.cas.security.bean.CustomUserDetails;
-import com.maoatao.cas.security.filter.TokenFilter;
+import com.maoatao.cas.security.filter.AuthorizationFilter;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
 import com.maoatao.cas.security.UUIDStringKeyGenerator;
 import com.maoatao.cas.core.param.GenerateAuthorizationCodeParam;
@@ -99,11 +99,11 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         Authentication clientAuthentication = buildClientAuthentication(param.getSecret());
         CustomAccessToken accessToken;
         switch (param.getType()) {
-            case GrantTypeConstants.AUTHORIZATION_CODE ->
+            case GrantType.AUTHORIZATION_CODE ->
                     accessToken = buildAccessTokenByCode(param.getCode(), clientAuthentication);
-            case GrantTypeConstants.REFRESH_TOKEN ->
+            case GrantType.REFRESH_TOKEN ->
                     accessToken = buildAccessTokenByRefresh(param.getCode(), clientAuthentication);
-            case GrantTypeConstants.CLIENT_CREDENTIALS -> accessToken = buildAccessTokenByClient(clientAuthentication);
+            case GrantType.CLIENT_CREDENTIALS -> accessToken = buildAccessTokenByClient(clientAuthentication);
             default -> throw new UnsupportedOperationException("不支持的授权类型!");
         }
         return accessToken;
@@ -357,7 +357,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     }
 
     /**
-     * 通过授权码生成访问令牌 (授权码模式 {@value GrantTypeConstants#AUTHORIZATION_CODE})
+     * 通过授权码生成访问令牌 (授权码模式 {@value GrantType#AUTHORIZATION_CODE})
      * <p>
      * 构建授权码认证源码{@link OAuth2AuthorizationCodeAuthenticationConverter#convert}
      *
@@ -370,7 +370,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     }
 
     /**
-     * 刷新访问令牌 (刷新令牌模式 {@value GrantTypeConstants#REFRESH_TOKEN})
+     * 刷新访问令牌 (刷新令牌模式 {@value GrantType#REFRESH_TOKEN})
      * <p>
      * 构建刷新令牌认证源码{@link OAuth2RefreshTokenAuthenticationConverter#convert}
      *
@@ -383,7 +383,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     }
 
     /**
-     * 通过客户端生成访问令牌 (客户端模式 {@value GrantTypeConstants#CLIENT_CREDENTIALS})
+     * 通过客户端生成访问令牌 (客户端模式 {@value GrantType#CLIENT_CREDENTIALS})
      * <p>
      * 构建刷新令牌认证源码{@link OAuth2ClientCredentialsAuthenticationConverter#convert}
      *
@@ -417,7 +417,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     /**
      * 从上下文获取用户授权主体
      * <p>
-     * 设置主体位置 {@link TokenFilter}
+     * 设置主体位置 {@link AuthorizationFilter}
      *
      * @return 用户授权主体
      */

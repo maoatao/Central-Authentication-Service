@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.core.entity.UserEntity;
 import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.core.param.UserParam;
-import com.maoatao.cas.security.HttpConstants;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2021-05-13 13:28:20
  */
 @RestController
-@RequestMapping(HttpConstants.BASE_URL + "/user")
+@RequestMapping("/user")
 @Tag(name = "UserController", description = "用户管理")
 public class UserController {
 

@@ -57,4 +57,4 @@ mybatis-plus:
 
 logging:
   level:
-    com.maoatao.cas*: debug
+    com.maoatao.*: debug

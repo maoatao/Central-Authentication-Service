@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.core.entity.RolePermissionEntity;
 import com.maoatao.cas.core.service.RolePermissionService;
 import com.maoatao.cas.core.param.RolePermissionParam;
-import com.maoatao.cas.security.HttpConstants;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2022-12-12 14:18:23
  */
 @RestController
-@RequestMapping(HttpConstants.BASE_URL + "/rolepermission")
+@RequestMapping("/rolepermission")
 @Tag(name = "RolePermissionController", description = "角色权限关系管理")
 public class RolePermissionController {
 

@@ -1,6 +1,7 @@
 package com.maoatao.cas.security.filter;
 
 import com.maoatao.cas.util.FilterUtils;
+import com.maoatao.synapse.lang.util.SynaAssert;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -10,24 +11,26 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.oauth2.server.authorization.context.AuthorizationServerContext;
 import org.springframework.security.oauth2.server.authorization.context.AuthorizationServerContextHolder;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
-import org.springframework.util.Assert;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
 
 /**
+ * 授权服务器上下文过滤
+ *
  * @author MaoAtao
  * @date 2023-03-05 15:13:40
  */
+@Component
 public class AuthorizationServerContextFilter extends GenericFilterBean {
 
     private final AuthorizationServerSettings authorizationServerSettings;
 
     public AuthorizationServerContextFilter(AuthorizationServerSettings authorizationServerSettings) {
-        Assert.notNull(authorizationServerSettings, "authorizationServerSettings cannot be null");
+        SynaAssert.notNull(authorizationServerSettings, "authorizationServerSettings cannot be null");
         this.authorizationServerSettings = authorizationServerSettings;
     }
-
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -36,11 +39,13 @@ public class AuthorizationServerContextFilter extends GenericFilterBean {
 
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        // TODO: 2023-03-09 16:35:16 特定请求执行
         try {
             AuthorizationServerContext authorizationServerContext = FilterUtils.buildAuthorizationServerContext(authorizationServerSettings, request);
             AuthorizationServerContextHolder.setContext(authorizationServerContext);
             filterChain.doFilter(request, response);
         } finally {
+            // TODO: 2023-03-09 16:35:43 这里清了,业务处理能拿到么?
             AuthorizationServerContextHolder.resetContext();
         }
     }

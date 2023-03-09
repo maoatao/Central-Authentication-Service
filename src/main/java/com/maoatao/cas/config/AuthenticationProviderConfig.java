@@ -1,4 +1,4 @@
-package com.maoatao.cas.config.secutity;
+package com.maoatao.cas.config;
 
 import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.security.CustomUserAuthenticationProvider;

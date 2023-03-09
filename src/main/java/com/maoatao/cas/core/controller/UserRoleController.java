@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.core.entity.UserRoleEntity;
 import com.maoatao.cas.core.service.UserRoleService;
 import com.maoatao.cas.core.param.UserRoleParam;
-import com.maoatao.cas.security.HttpConstants;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2022-12-12 14:18:22
  */
 @RestController
-@RequestMapping(HttpConstants.BASE_URL + "/userrole")
+@RequestMapping("/userrole")
 @Tag(name = "UserRoleController", description = "用户角色关系管理")
 public class UserRoleController {
 

@@ -3,7 +3,7 @@ package com.maoatao.cas;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
-import com.maoatao.cas.config.secutity.AuthorizationServerConfig;
+import com.maoatao.cas.config.AuthorizationServerConfig;
 import com.maoatao.cas.core.entity.PermissionEntity;
 import com.maoatao.cas.core.entity.RoleEntity;
 import com.maoatao.cas.core.entity.RolePermissionEntity;

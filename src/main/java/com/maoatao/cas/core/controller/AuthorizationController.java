@@ -3,7 +3,6 @@ package com.maoatao.cas.core.controller;
 import com.maoatao.cas.core.param.GenerateAccessTokenParam;
 import com.maoatao.cas.core.service.AuthorizationService;
 import com.maoatao.cas.core.param.GenerateAuthorizationCodeParam;
-import com.maoatao.cas.security.HttpConstants;
 import com.maoatao.cas.security.bean.AuthorizationInfo;
 import com.maoatao.cas.security.bean.CustomAccessToken;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2022-10-23 17:17:17
  */
 @RestController
-@RequestMapping(HttpConstants.BASE_URL + HttpConstants.AUTHORIZATION_URL)
+@RequestMapping("/authorization")
 @Tag(name = "AuthorizationController", description = "授权管理")
 public class AuthorizationController {
 
@@ -37,7 +36,7 @@ public class AuthorizationController {
      * @param param 参数
      * @return 授权码
      */
-    @PostMapping(HttpConstants.AUTHORIZATION_CODE_URL)
+    @PostMapping("/code")
     @Operation(summary = "generateAuthorizationCode", description = "生成授权码")
     public String generateAuthorizationCode(@RequestBody GenerateAuthorizationCodeParam param) {
         return authorizationService.generateAuthorizationCode(param);
@@ -49,7 +48,7 @@ public class AuthorizationController {
      * @param param 参数
      * @return 访问令牌
      */
-    @PostMapping(HttpConstants.AUTHORIZATION_TOKEN_URL)
+    @PostMapping("/token")
     @Operation(summary = "generateAccessToken", description = "生成令牌")
     public CustomAccessToken generateAccessToken(@RequestBody GenerateAccessTokenParam param) {
         return authorizationService.generateAccessToken(param);
@@ -61,7 +60,7 @@ public class AuthorizationController {
      * @param accessToken 令牌
      * @return true -> 吊销token成功,false -> 没有该token,吊销失败
      */
-    @DeleteMapping(HttpConstants.AUTHORIZATION_TOKEN_URL)
+    @DeleteMapping("/token")
     @Operation(summary = "revokeAccessToken", description = "吊销令牌")
     public boolean revokeAccessToken(@RequestHeader(value = "Authorization") String accessToken) {
         return authorizationService.revokeAccessToken(accessToken);
@@ -73,7 +72,7 @@ public class AuthorizationController {
      * @param accessToken 令牌
      * @return 授权信息
      */
-    @GetMapping(HttpConstants.AUTHORIZATION_TOKEN_URL)
+    @GetMapping("/token")
     @Operation(summary = "getAuthorizationInfo", description = "查询授权信息")
     public AuthorizationInfo getAuthorizationInfo(@RequestHeader(value = "Authorization") String accessToken) {
         return authorizationService.getAuthorizationInfo(accessToken);
