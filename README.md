@@ -58,7 +58,7 @@ Central Authentication Service (CAS 中央认证服务 OAuth2.1协议)
    1. 接口地址：http://127.0.0.1:8080/oauth2/authorize
    2. 方法：GET
    3. 权限：Spring Security 用户登录后同意授权（如果需要同意）
-   4. 示例：`http://127.0.0.1:8080/oauth2/authorize?response_type=code&client_id=test-client&scope=test.read test.write&redirect_uri=https://cn.bing.com&code_challenge_method=S256&code_challenge=3vrxycun-VbyenvO5GiFOaOBazUBX_xcFElnqbl-TXA`
+   4. 示例：`http://127.0.0.1:8080/oauth2/authorize?response_type=code&client_id=test-client&scope=test.read%20test.write&redirect_uri=https://cn.bing.com&code_challenge_method=S256&code_challenge=3vrxycun-VbyenvO5GiFOaOBazUBX_xcFElnqbl-TXA`
 2. 我自定义的
     1. 接口地址：http://127.0.0.1:8080/authorization
     2. 方法：POST **(application/json)**
