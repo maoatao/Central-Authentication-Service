@@ -45,7 +45,6 @@ public class AuthorizationServerContextFilter extends GenericFilterBean {
             AuthorizationServerContextHolder.setContext(authorizationServerContext);
             filterChain.doFilter(request, response);
         } finally {
-            // TODO: 2023-03-09 16:35:43 这里清了,业务处理能拿到么?
             AuthorizationServerContextHolder.resetContext();
         }
     }
