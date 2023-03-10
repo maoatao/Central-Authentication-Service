@@ -57,20 +57,8 @@ public abstract class FilterUtils {
         return new CustomAuthorizationServerContext(() -> resolveIssuer(settings, request), settings);
     }
 
-    /**
-     * 构建matchers
-     *
-     * @param httpMethod  请求方法
-     * @param antPatterns 匹配 url
-     * @return matchers
-     */
-    public static List<RequestMatcher> antMatchers(HttpMethod httpMethod, String... antPatterns) {
-        String method = (httpMethod != null) ? httpMethod.toString() : null;
-        List<RequestMatcher> matchers = new ArrayList<>();
-        for (String pattern : antPatterns) {
-            matchers.add(new AntPathRequestMatcher(pattern, method));
-        }
-        return matchers;
+    public static RequestMatchersBuilder requestMatchersBuilder() {
+        return new RequestMatchersBuilder();
     }
 
     private static String resolveIssuer(AuthorizationServerSettings authorizationServerSettings, HttpServletRequest request) {
@@ -86,5 +74,36 @@ public abstract class FilterUtils {
                 .fragment(null)
                 .build()
                 .toUriString();
+    }
+
+    public static class RequestMatchersBuilder {
+        private final List<RequestMatcher> matchers;
+
+        public RequestMatchersBuilder() {
+            this.matchers = new ArrayList<>();
+        }
+
+        /**
+         * 构建matchers
+         *
+         * @param httpMethod  请求方法
+         * @param antPatterns 匹配 url
+         * @return RequestMatchersBuilder
+         */
+        public RequestMatchersBuilder antMatchers(HttpMethod httpMethod, String... antPatterns) {
+            addMatchers(httpMethod, antPatterns);
+            return this;
+        }
+
+        public List<RequestMatcher> build() {
+            return this.matchers;
+        }
+
+        private void addMatchers(HttpMethod httpMethod, String... antPatterns) {
+            String method = (httpMethod != null) ? httpMethod.toString() : null;
+            for (String pattern : antPatterns) {
+                this.matchers.add(new AntPathRequestMatcher(pattern, method));
+            }
+        }
     }
 }

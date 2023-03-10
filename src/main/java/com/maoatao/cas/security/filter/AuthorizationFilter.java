@@ -10,6 +10,7 @@ import com.maoatao.synapse.lang.util.SynaStrings;
 import com.maoatao.synapse.web.response.HttpResponseStatus;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -49,16 +50,12 @@ public class AuthorizationFilter extends GenericFilterBean {
     /**
      * 请求白名单
      */
-    private static final List<RequestMatcher> PERMIT_REQUEST_MATCHER_LIST = FilterUtils.antMatchers(null,
-            "/error",
-            "/swagger-ui/**",
-            "/swagger-resources/**",
-            "/webjars/**",
-            "/v3/**",
-            "/api/**",
-            "/doc.html",
-            "/favicon.ico"
-    );
+    private static final List<RequestMatcher> PERMIT_REQUEST_MATCHER_LIST = FilterUtils.requestMatchersBuilder()
+            .antMatchers(null,
+                    "/error", "/swagger-ui/**", "/swagger-resources/**",
+                    "/webjars/**", "/v3/**", "/api/**", "/doc.html", "/favicon.ico"
+            )
+            .build();
 
     private final OAuth2AuthorizationService oAuth2AuthorizationService;
 
