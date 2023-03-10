@@ -83,12 +83,16 @@ public class AuthorizationFilter extends GenericFilterBean {
     }
 
     private void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (!isPermit(request) && !isAuthenticated(request)) {
-            // 既不是白名单也没有授权就拦截请求(抛出异常,全局拦截)
-            resolver.resolveException(request, response, null, new SynaException(HttpResponseStatus.UNAUTHORIZED));
-            return;
+        try {
+            if (!isPermit(request) && !isAuthenticated(request)) {
+                // 既不是白名单也没有授权就拦截请求(抛出异常,全局拦截)
+                resolver.resolveException(request, response, null, new SynaException(HttpResponseStatus.UNAUTHORIZED));
+                return;
+            }
+            filterChain.doFilter(request, response);
+        } finally {
+            SecurityContextHolder.clearContext();
         }
-        filterChain.doFilter(request, response);
     }
 
     private boolean isPermit(HttpServletRequest request) {
