@@ -51,7 +51,7 @@ VALUES (1, 1, 1);
 -- 步骤 5 创建用户
 -- ----------------------------
 INSERT INTO `cas`.`t_cas_user` (`id`, `open_id`, `client_id`, `name`, `password`, `enabled`)
-VALUES (1, 'uol6KmWQh00itT6eK6pwwWSqTBpe5MnqwZVzaOMUPlu8Y', 'test-client', 'user',
+VALUES (1, 'UO640ada346f505467dc399155', 'test-client', 'user',
         '{bcrypt}$2a$10$stcBm3H1qfgEOqeIhJHDbeiEfas/XXE5trPJPncUcRGozT.hejzzO', 1);
 
 -- ----------------------------

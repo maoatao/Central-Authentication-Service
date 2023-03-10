@@ -1,9 +1,6 @@
 package com.maoatao.cas.util;
 
-import org.springframework.security.crypto.keygen.Base64StringKeyGenerator;
-import org.springframework.security.crypto.keygen.StringKeyGenerator;
-
-import java.util.Base64;
+import cn.hutool.core.util.IdUtil;
 
 /**
  * Id 工具类
@@ -13,9 +10,7 @@ import java.util.Base64;
  */
 public abstract class Ids {
 
-    private static final StringKeyGenerator SECURE_KEY_GENERATOR = new Base64StringKeyGenerator(Base64.getUrlEncoder().withoutPadding());
-
-    private static final String USER_OPEN_ID_PREFIX = "uo";
+    private static final String USER_OPEN_ID_PREFIX = "UO";
 
     /**
      * 获取用户 open id
@@ -23,6 +18,6 @@ public abstract class Ids {
      * @return 用户 open id
      */
     public static String nextUserOpenId() {
-        return USER_OPEN_ID_PREFIX.concat(SECURE_KEY_GENERATOR.generateKey());
+        return USER_OPEN_ID_PREFIX.concat(IdUtil.objectId());
     }
 }
