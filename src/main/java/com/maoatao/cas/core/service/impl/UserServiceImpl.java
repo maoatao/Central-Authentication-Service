@@ -87,7 +87,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         checkClient(param.getClientId());
         checkUserName(param.getName(), param.getClientId());
         param.setId(null);
-        param.setOpenId(Ids.user());
+        param.setOpenId(Ids.nextUserOpenId());
         UserEntity user = BeanUtil.copyProperties(param, UserEntity.class);
         user.setPassword(passwordEncoder.encode(param.getPassword()));
         user.setEnabled(true);

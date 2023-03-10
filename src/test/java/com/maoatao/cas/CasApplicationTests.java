@@ -252,7 +252,7 @@ class CasApplicationTests {
     @Test
     void save_user_test() {
         UserParam param = new UserParam();
-        param.setOpenId(Ids.user());
+        param.setOpenId(Ids.nextUserOpenId());
         param.setClientId(TEST_CLIENT_ID);
         param.setName(TEST_USER_NAME);
         param.setPassword(TEST_USER_PASSWORD);
