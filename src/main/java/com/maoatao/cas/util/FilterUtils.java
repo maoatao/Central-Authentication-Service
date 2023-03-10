@@ -3,8 +3,11 @@ package com.maoatao.cas.util;
 import cn.hutool.core.codec.Base64;
 import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationServerContext;
+import com.maoatao.synapse.lang.exception.SynaException;
 import com.maoatao.synapse.lang.util.SynaSafes;
+import com.maoatao.synapse.web.response.HttpResponseStatus;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.oauth2.server.authorization.context.AuthorizationServerContext;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
@@ -55,6 +58,20 @@ public abstract class FilterUtils {
      */
     public static AuthorizationServerContext buildAuthorizationServerContext(AuthorizationServerSettings settings, HttpServletRequest request) {
         return new CustomAuthorizationServerContext(() -> resolveIssuer(settings, request), settings);
+    }
+
+    /**
+     * 请求失败时,构建响应状态
+     *
+     * @param response 响应
+     * @return 异常
+     */
+    public static SynaException buildResponseStatus(HttpServletResponse response) {
+        return new SynaException(switch (response.getStatus()) {
+            case 401 -> HttpResponseStatus.UNAUTHORIZED;
+            case 500 -> HttpResponseStatus.FAILED;
+            default -> HttpResponseStatus.NOT_FOUND;
+        });
     }
 
     public static RequestMatchersBuilder requestMatchersBuilder() {

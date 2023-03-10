@@ -2,13 +2,13 @@ package com.maoatao.cas.config;
 
 import com.maoatao.cas.security.configurer.AuthorizationFilterConfigurer;
 import com.maoatao.cas.security.configurer.AuthorizationServerContextFilterConfigurer;
+import com.maoatao.cas.security.configurer.CustomUserAuthenticationFilterConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
-import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -53,12 +53,12 @@ public class SecutityConfig {
     private void applyConfigurers(HttpSecurity http) throws Exception {
         // 移除 AuthorizationFilter
         http.removeConfigurer(AuthorizeHttpRequestsConfigurer.class);
-        // 移除 LogoutFilter
-        http.removeConfigurer(LogoutConfigurer.class);
 
         // 权限,白名单拦截
         http.apply(new AuthorizationFilterConfigurer());
         // 授权服务器上下文配置
         http.apply(new AuthorizationServerContextFilterConfigurer());
+        // 用户登录授权
+        http.apply(new CustomUserAuthenticationFilterConfigurer());
     }
 }

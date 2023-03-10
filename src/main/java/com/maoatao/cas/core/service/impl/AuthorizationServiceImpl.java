@@ -97,16 +97,12 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     @Override
     public CustomAccessToken generateAccessToken(GenerateAccessTokenParam param) {
         Authentication clientAuthentication = buildClientAuthentication(param.getSecret());
-        CustomAccessToken accessToken;
-        switch (param.getType()) {
-            case GrantType.AUTHORIZATION_CODE ->
-                    accessToken = buildAccessTokenByCode(param.getCode(), clientAuthentication);
-            case GrantType.REFRESH_TOKEN ->
-                    accessToken = buildAccessTokenByRefresh(param.getCode(), clientAuthentication);
-            case GrantType.CLIENT_CREDENTIALS -> accessToken = buildAccessTokenByClient(clientAuthentication);
+        return switch (param.getType()) {
+            case GrantType.AUTHORIZATION_CODE -> buildAccessTokenByCode(param.getCode(), clientAuthentication);
+            case GrantType.REFRESH_TOKEN -> buildAccessTokenByRefresh(param.getCode(), clientAuthentication);
+            case GrantType.CLIENT_CREDENTIALS -> buildAccessTokenByClient(clientAuthentication);
             default -> throw new UnsupportedOperationException("不支持的授权类型!");
-        }
-        return accessToken;
+        };
     }
 
     @Override

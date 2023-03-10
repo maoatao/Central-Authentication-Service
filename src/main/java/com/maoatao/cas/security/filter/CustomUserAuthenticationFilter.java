@@ -1,6 +1,5 @@
 package com.maoatao.cas.security.filter;
 
-import com.maoatao.daedalus.core.util.SpringContextUtils;
 import com.maoatao.synapse.lang.util.SynaSafes;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,6 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.stereotype.Component;
 
 /**
  * 自定义用户权限过滤器
@@ -21,12 +21,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * @author MaoAtao
  * @date 2023-03-10 17:25:11
  */
+@Component
 public class CustomUserAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     public static final String SPRING_SECURITY_FORM_CLIENT_ID_KEY = "clientId";
 
-    public CustomUserAuthenticationFilter() {
-        super(SpringContextUtils.getBean(AuthenticationManager.class));
+    public CustomUserAuthenticationFilter(AuthenticationManager authenticationManager) {
+        super(authenticationManager);
     }
 
     @Override

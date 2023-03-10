@@ -4,13 +4,10 @@ import cn.hutool.core.util.StrUtil;
 import com.maoatao.cas.core.service.AuthorizationService;
 import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.util.FilterUtils;
-import com.maoatao.synapse.lang.exception.SynaException;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import com.maoatao.synapse.lang.util.SynaStrings;
-import com.maoatao.synapse.web.response.HttpResponseStatus;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -52,7 +49,7 @@ public class AuthorizationFilter extends GenericFilterBean {
      */
     private static final List<RequestMatcher> PERMIT_REQUEST_MATCHER_LIST = FilterUtils.requestMatchersBuilder()
             .antMatchers(null,
-                    "/error", "/swagger-ui/**", "/swagger-resources/**",
+                    "/swagger-ui/**", "/swagger-resources/**",
                     "/webjars/**", "/v3/**", "/api/**", "/doc.html", "/favicon.ico"
             )
             .build();
@@ -83,7 +80,7 @@ public class AuthorizationFilter extends GenericFilterBean {
         try {
             if (!isPermit(request) && !isAuthenticated(request)) {
                 // 既不是白名单也没有授权就拦截请求(抛出异常,全局拦截)
-                resolver.resolveException(request, response, null, new SynaException(HttpResponseStatus.UNAUTHORIZED));
+                resolver.resolveException(request, response, null, FilterUtils.buildResponseStatus(response));
                 return;
             }
             filterChain.doFilter(request, response);
