@@ -8,6 +8,7 @@ import com.maoatao.synapse.lang.util.SynaAssert;
 import com.maoatao.synapse.lang.util.SynaStrings;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -30,9 +31,7 @@ import java.security.Principal;
 import java.util.List;
 
 /**
- * 授权过滤器
- * <p>
- * 检查{@value TOKEM_TYPE_BEARER}令牌
+ * 授权过滤器1
  *
  * @author MaoAtao
  * @date 2022-10-24 11:17:31
@@ -49,9 +48,9 @@ public class AuthorizationFilter extends GenericFilterBean {
      */
     private static final List<RequestMatcher> PERMIT_REQUEST_MATCHER_LIST = FilterUtils.requestMatchersBuilder()
             .antMatchers(null,
-                    "/swagger-ui/**", "/swagger-resources/**",
+                    "/error", "/swagger-ui/**", "/swagger-resources/**",
                     "/webjars/**", "/v3/**", "/api/**", "/doc.html", "/favicon.ico"
-            )
+            ).antMatchers(HttpMethod.POST, "/login")
             .build();
 
     private final OAuth2AuthorizationService oAuth2AuthorizationService;

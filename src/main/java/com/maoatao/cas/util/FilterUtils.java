@@ -68,9 +68,9 @@ public abstract class FilterUtils {
      */
     public static SynaException buildResponseStatus(HttpServletResponse response) {
         return new SynaException(switch (response.getStatus()) {
-            case 401 -> HttpResponseStatus.UNAUTHORIZED;
+            case 404 -> HttpResponseStatus.NOT_FOUND;
             case 500 -> HttpResponseStatus.FAILED;
-            default -> HttpResponseStatus.NOT_FOUND;
+            default -> HttpResponseStatus.UNAUTHORIZED;
         });
     }
 

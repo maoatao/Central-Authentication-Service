@@ -2,6 +2,7 @@ package com.maoatao.cas.config;
 
 import com.maoatao.cas.security.configurer.AuthorizationFilterConfigurer;
 import com.maoatao.cas.security.configurer.AuthorizationServerContextFilterConfigurer;
+import com.maoatao.cas.security.configurer.CustomLoginPageGeneratingFilterConfigurer;
 import com.maoatao.cas.security.configurer.CustomUserAuthenticationFilterConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -60,5 +61,7 @@ public class SecutityConfig {
         http.apply(new AuthorizationServerContextFilterConfigurer());
         // 用户登录授权
         http.apply(new CustomUserAuthenticationFilterConfigurer());
+        // 登录页面
+        http.apply(new CustomLoginPageGeneratingFilterConfigurer());
     }
 }
