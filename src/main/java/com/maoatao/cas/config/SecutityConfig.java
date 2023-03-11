@@ -33,7 +33,7 @@ public class SecutityConfig {
                 .authorizeHttpRequests()
                 .anyRequest().authenticated();
         http.formLogin(Customizer.withDefaults());
-        applyConfigurers(http);
+        // applyConfigurers(http);
         return http.build();
     }
 

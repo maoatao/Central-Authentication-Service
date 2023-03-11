@@ -69,6 +69,11 @@ public class AuthorizationServerConfig {
                 .exceptionHandling((exceptions) ->
                         exceptions.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")))
                 .apply(configurer);
+        http.authorizeHttpRequests(authorizeRequests ->
+                        authorizeRequests.anyRequest().authenticated()
+                )
+                .csrf(csrf -> csrf.ignoringRequestMatchers(configurer.getEndpointsMatcher()))
+                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
         return http.build();
     }
 

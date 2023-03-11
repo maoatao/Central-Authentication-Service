@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
  * @author MaoAtao
  * @date 2023-03-10 17:25:11
  */
-@Component
+// @Component
 public class CustomUserAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     public static final String SPRING_SECURITY_FORM_CLIENT_ID_KEY = "clientId";

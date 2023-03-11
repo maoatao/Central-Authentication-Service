@@ -36,7 +36,7 @@ import java.util.List;
  * @author MaoAtao
  * @date 2022-10-24 11:17:31
  */
-@Component
+// @Component
 public class AuthorizationFilter extends GenericFilterBean {
 
     private static final String TOKEM_TYPE_BASIC = "Basic";

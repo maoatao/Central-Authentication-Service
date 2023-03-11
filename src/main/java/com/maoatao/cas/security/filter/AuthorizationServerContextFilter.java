@@ -22,7 +22,7 @@ import java.io.IOException;
  * @author MaoAtao
  * @date 2023-03-05 15:13:40
  */
-@Component
+// @Component
 public class AuthorizationServerContextFilter extends GenericFilterBean {
 
     private final AuthorizationServerSettings authorizationServerSettings;
