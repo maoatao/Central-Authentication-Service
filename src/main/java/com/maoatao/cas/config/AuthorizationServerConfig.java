@@ -68,12 +68,11 @@ public class AuthorizationServerConfig {
         http.securityMatcher(configurer.getEndpointsMatcher())
                 .exceptionHandling((exceptions) ->
                         exceptions.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")))
-                .apply(configurer);
-        http.authorizeHttpRequests(authorizeRequests ->
-                        authorizeRequests.anyRequest().authenticated()
-                )
                 .csrf(csrf -> csrf.ignoringRequestMatchers(configurer.getEndpointsMatcher()))
-                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
+                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
+                .authorizeHttpRequests().anyRequest().authenticated()
+                .and()
+                .apply(configurer);
         return http.build();
     }
 

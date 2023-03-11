@@ -30,9 +30,9 @@ public class SecutityConfig {
     @Order(2)
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
-                .authorizeHttpRequests()
-                .anyRequest().authenticated();
-        http.formLogin(Customizer.withDefaults());
+                .authorizeHttpRequests().anyRequest().authenticated()
+                .and()
+                .formLogin(Customizer.withDefaults());
         // applyConfigurers(http);
         return http.build();
     }
