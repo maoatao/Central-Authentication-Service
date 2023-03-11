@@ -16,7 +16,6 @@ import org.springframework.security.oauth2.server.authorization.OAuth2Authorizat
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
 import jakarta.servlet.FilterChain;
@@ -37,7 +36,7 @@ import java.util.List;
  * @date 2022-10-24 11:17:31
  */
 // @Component
-public class AuthorizationFilter extends GenericFilterBean {
+public class SecurityContextFilter extends GenericFilterBean {
 
     private static final String TOKEM_TYPE_BASIC = "Basic";
 
@@ -59,12 +58,12 @@ public class AuthorizationFilter extends GenericFilterBean {
 
     private final HandlerExceptionResolver resolver;
 
-    public AuthorizationFilter(OAuth2AuthorizationService oAuth2AuthorizationService,
-                               AuthorizationService authorizationService,
-                               @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver) {
+    public SecurityContextFilter(OAuth2AuthorizationService oAuth2AuthorizationService,
+                                 AuthorizationService authorizationService,
+                                 @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver) {
         SynaAssert.notNull(oAuth2AuthorizationService, "oAuth2AuthorizationService cannot be null");
         SynaAssert.notNull(authorizationService, "authorizationService cannot be null");
-        SynaAssert.notNull(resolver, "handlerExceptionResolver cannot be null");
+        // SynaAssert.notNull(resolver, "handlerExceptionResolver cannot be null");
         this.oAuth2AuthorizationService = oAuth2AuthorizationService;
         this.authorizationService = authorizationService;
         this.resolver = resolver;
@@ -77,11 +76,12 @@ public class AuthorizationFilter extends GenericFilterBean {
 
     private void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            if (!isPermit(request) && !isAuthenticated(request)) {
-                // 既不是白名单也没有授权就拦截请求(抛出异常,全局拦截)
-                resolver.resolveException(request, response, null, FilterUtils.buildResponseStatus(response));
-                return;
-            }
+            isAuthenticated(request);
+            // if (!isPermit(request) && !isAuthenticated(request)) {
+            //     // 既不是白名单也没有授权就拦截请求(抛出异常,全局拦截)
+            //     resolver.resolveException(request, response, null, FilterUtils.buildResponseStatus(response));
+            //     return;
+            // }
             filterChain.doFilter(request, response);
         } finally {
             SecurityContextHolder.clearContext();

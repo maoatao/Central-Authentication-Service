@@ -1,4 +1,4 @@
-package com.maoatao.cas.security.oauth2.auth;
+package com.maoatao.cas.security;
 
 import org.springframework.security.oauth2.server.authorization.context.AuthorizationServerContext;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
