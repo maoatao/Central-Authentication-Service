@@ -1,6 +1,6 @@
 package com.maoatao.cas.security.configurer;
 
-import com.maoatao.cas.security.filter.SecurityContextFilter;
+import com.maoatao.cas.security.filter.TokenAuthenticationFilter;
 import com.maoatao.cas.security.filter.AuthorizationServerContextFilter;
 import com.maoatao.daedalus.core.util.SpringContextUtils;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
@@ -23,6 +23,6 @@ public class AuthorizationServerContextFilterConfigurer extends SecurityConfigur
     @Override
     public void configure(HttpSecurity http) {
         AuthorizationServerContextFilter filter = new AuthorizationServerContextFilter(authorizationServerSettings);
-        http.addFilterAfter(filter, SecurityContextFilter.class);
+        http.addFilterAfter(filter, TokenAuthenticationFilter.class);
     }
 }

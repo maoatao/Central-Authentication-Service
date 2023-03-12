@@ -1,6 +1,7 @@
 package com.maoatao.cas.config;
 
-import com.maoatao.cas.security.configurer.SecurityContextConfigurer;
+import com.maoatao.cas.security.configurer.CustomLoginPageGeneratingFilterConfigurer;
+import com.maoatao.cas.security.configurer.TokenAuthenticationFilterConfigurer;
 import com.maoatao.cas.security.configurer.AuthorizationServerContextFilterConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -53,12 +54,12 @@ public class SecutityConfig {
         // http.removeConfigurer(AuthorizeHttpRequestsConfigurer.class);
 
         // 权限,白名单拦截
-        http.apply(new SecurityContextConfigurer());
+        http.apply(new TokenAuthenticationFilterConfigurer());
         // 授权服务器上下文配置
         http.apply(new AuthorizationServerContextFilterConfigurer());
         // 用户登录授权
         // http.apply(new CustomUserAuthenticationFilterConfigurer());
         // 登录页面
-        // http.apply(new CustomLoginPageGeneratingFilterConfigurer());
+        http.apply(new CustomLoginPageGeneratingFilterConfigurer());
     }
 }

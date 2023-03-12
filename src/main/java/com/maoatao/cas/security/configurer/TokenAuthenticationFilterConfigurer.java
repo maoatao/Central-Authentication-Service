@@ -1,7 +1,7 @@
 package com.maoatao.cas.security.configurer;
 
 import com.maoatao.cas.core.service.AuthorizationService;
-import com.maoatao.cas.security.filter.SecurityContextFilter;
+import com.maoatao.cas.security.filter.TokenAuthenticationFilter;
 import com.maoatao.daedalus.core.util.SpringContextUtils;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,7 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * @author MaoAtao
  * @date 2023-03-09 15:54:00
  */
-public class SecurityContextConfigurer extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
+public class TokenAuthenticationFilterConfigurer extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
 
     private final OAuth2AuthorizationService oAuth2AuthorizationService = SpringContextUtils.getBean(OAuth2AuthorizationService.class);
 
@@ -25,7 +25,7 @@ public class SecurityContextConfigurer extends SecurityConfigurerAdapter<Default
 
     @Override
     public void configure(HttpSecurity http) {
-        SecurityContextFilter filter = new SecurityContextFilter(oAuth2AuthorizationService, authorizationService, null);
+        TokenAuthenticationFilter filter = new TokenAuthenticationFilter(oAuth2AuthorizationService, authorizationService);
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
     }
 }

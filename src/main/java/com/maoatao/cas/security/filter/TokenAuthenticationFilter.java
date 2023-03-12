@@ -7,7 +7,6 @@ import com.maoatao.cas.util.FilterUtils;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import com.maoatao.synapse.lang.util.SynaStrings;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,7 +22,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -36,7 +34,7 @@ import java.util.List;
  * @date 2022-10-24 11:17:31
  */
 // @Component
-public class SecurityContextFilter extends GenericFilterBean {
+public class TokenAuthenticationFilter extends GenericFilterBean {
 
     private static final String TOKEM_TYPE_BASIC = "Basic";
 
@@ -56,17 +54,12 @@ public class SecurityContextFilter extends GenericFilterBean {
 
     private final AuthorizationService authorizationService;
 
-    private final HandlerExceptionResolver resolver;
-
-    public SecurityContextFilter(OAuth2AuthorizationService oAuth2AuthorizationService,
-                                 AuthorizationService authorizationService,
-                                 @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver) {
+    public TokenAuthenticationFilter(OAuth2AuthorizationService oAuth2AuthorizationService,
+                                     AuthorizationService authorizationService) {
         SynaAssert.notNull(oAuth2AuthorizationService, "oAuth2AuthorizationService cannot be null");
         SynaAssert.notNull(authorizationService, "authorizationService cannot be null");
-        // SynaAssert.notNull(resolver, "handlerExceptionResolver cannot be null");
         this.oAuth2AuthorizationService = oAuth2AuthorizationService;
         this.authorizationService = authorizationService;
-        this.resolver = resolver;
     }
 
     @Override
@@ -77,11 +70,6 @@ public class SecurityContextFilter extends GenericFilterBean {
     private void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             isAuthenticated(request);
-            // if (!isPermit(request) && !isAuthenticated(request)) {
-            //     // 既不是白名单也没有授权就拦截请求(抛出异常,全局拦截)
-            //     resolver.resolveException(request, response, null, FilterUtils.buildResponseStatus(response));
-            //     return;
-            // }
             filterChain.doFilter(request, response);
         } finally {
             SecurityContextHolder.clearContext();
