@@ -11,18 +11,19 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.oauth2.server.authorization.context.AuthorizationServerContext;
 import org.springframework.security.oauth2.server.authorization.context.AuthorizationServerContextHolder;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
 
 /**
  * 授权服务器上下文过滤
+ * <p>
+ * org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.AuthorizationServerContextFilter 私有
+ * 新增的部分授权接口需要AuthorizationServerContext,这里提前配置
  *
  * @author MaoAtao
  * @date 2023-03-05 15:13:40
  */
-// @Component
 public class AuthorizationServerContextFilter extends GenericFilterBean {
 
     private final AuthorizationServerSettings authorizationServerSettings;

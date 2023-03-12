@@ -1,12 +1,12 @@
 package com.maoatao.cas.config;
 
+import com.maoatao.cas.security.configurer.CustomFormLoginConfigurer;
 import com.maoatao.cas.security.configurer.CustomLoginPageGeneratingFilterConfigurer;
 import com.maoatao.cas.security.configurer.TokenAuthenticationFilterConfigurer;
 import com.maoatao.cas.security.configurer.AuthorizationServerContextFilterConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,10 +27,8 @@ public class SecutityConfig {
     @Bean
     @Order(2)
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .authorizeHttpRequests().anyRequest().authenticated()
-                .and()
-                .formLogin(Customizer.withDefaults());
+        http.csrf().disable();
+        applyRequestMatchers(http);
         applyConfigurers(http);
         return http.build();
     }
@@ -50,16 +48,26 @@ public class SecutityConfig {
      */
     @SuppressWarnings("unchecked")
     private void applyConfigurers(HttpSecurity http) throws Exception {
-        // 移除 AuthorizationFilter
-        // http.removeConfigurer(AuthorizeHttpRequestsConfigurer.class);
-
-        // 权限,白名单拦截
+        // 令牌
         http.apply(new TokenAuthenticationFilterConfigurer());
         // 授权服务器上下文配置
         http.apply(new AuthorizationServerContextFilterConfigurer());
         // 用户登录授权
-        // http.apply(new CustomUserAuthenticationFilterConfigurer());
+        http.apply(new CustomFormLoginConfigurer<>());
         // 登录页面
         http.apply(new CustomLoginPageGeneratingFilterConfigurer());
+    }
+
+    /**
+     * 配置授权访问的白名单
+     */
+    private void applyRequestMatchers(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests(authorizeHttpRequests -> {
+            authorizeHttpRequests.requestMatchers(
+                    "/error", "/swagger-ui/**", "/swagger-resources/**",
+                    "/webjars/**", "/v3/**", "/api/**", "/doc.html", "/favicon.ico"
+            ).permitAll();
+            authorizeHttpRequests.anyRequest().authenticated();
+        });
     }
 }

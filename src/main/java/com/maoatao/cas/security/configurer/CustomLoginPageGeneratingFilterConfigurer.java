@@ -1,13 +1,10 @@
 package com.maoatao.cas.security.configurer;
 
 import com.maoatao.cas.security.filter.CustomLoginPageGeneratingFilter;
-import com.maoatao.cas.security.filter.CustomUserAuthenticationFilter;
-import com.maoatao.daedalus.core.util.SpringContextUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.DefaultSecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter;
 
 /**

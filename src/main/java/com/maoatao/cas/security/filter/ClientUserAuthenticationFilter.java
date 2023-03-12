@@ -5,35 +5,31 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpMethod;
 import org.springframework.lang.Nullable;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.stereotype.Component;
 
 /**
- * 自定义用户权限过滤器
+ * 自定义用户权限过滤器(添加clientId参数)
  * <p>
  * Customized by {@link UsernamePasswordAuthenticationFilter}
  *
  * @author MaoAtao
  * @date 2023-03-10 17:25:11
  */
-// @Component
-public class CustomUserAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+public class ClientUserAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     public static final String SPRING_SECURITY_FORM_CLIENT_ID_KEY = "clientId";
 
-    public CustomUserAuthenticationFilter(AuthenticationManager authenticationManager) {
-        super(authenticationManager);
+    public ClientUserAuthenticationFilter() {
+        super();
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
-        // TODO: 2023-03-10 18:11:25 完善自定义登录
         if (!request.getMethod().equals(HttpMethod.POST.name())) {
             throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
         }

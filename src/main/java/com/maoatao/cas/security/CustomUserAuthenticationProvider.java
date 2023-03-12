@@ -85,9 +85,7 @@ public class CustomUserAuthenticationProvider extends AbstractUserDetailsAuthent
         try {
             // 上游构建 AuthorizationService generatePrincipal 时, details 设定为 clientId
             // 通过用户名和客户端 id 查询一个用户
-            // TODO: 2023-03-12 17:51:15 自定义登录test
-            String clientId = "test-client";
-            // String clientId = Optional.ofNullable(authentication.getDetails()).orElse(SynaStrings.EMPTY).toString();
+            String clientId = Optional.ofNullable(authentication.getDetails()).orElse(SynaStrings.EMPTY).toString();
             UserDetails loadedUser = this.getUserService().getUserDetails(username, clientId);
             if (loadedUser == null) {
                 throw new InternalAuthenticationServiceException(
@@ -155,5 +153,4 @@ public class CustomUserAuthenticationProvider extends AbstractUserDetailsAuthent
     public void setUserDetailsPasswordService(UserDetailsPasswordService userDetailsPasswordService) {
         this.userDetailsPasswordService = userDetailsPasswordService;
     }
-
 }
