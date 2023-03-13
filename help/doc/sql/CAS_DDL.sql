@@ -77,7 +77,7 @@ CREATE TABLE `oauth2_registered_client`
     `client_secret_expires_at`      timestamp NULL DEFAULT NULL COMMENT '客户端密码过期时间',
     `client_name`                   varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '客户端名称',
     `client_authentication_methods` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '客户端身份验证方法',
-    `authorization_grant_types`     varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '授权授权类型',
+    `authorization_grant_types`     varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '授权类型',
     `redirect_uris`                 varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci          DEFAULT NULL COMMENT '重定向URI',
     `scopes`                        varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '作用域',
     `client_settings`               varchar(2000) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '客户端设置',
