@@ -29,7 +29,7 @@ Central Authentication Service (CAS 中央认证服务 OAuth2.1协议)
 
 ### 2. 新建表
 
-使用`help/doc/sql/CAS 表结构.sql`的文件建表
+使用`help/doc/sql/CAS_DDL.sql`的文件建表
 
 | 表名                           | 描述    |
 |------------------------------|-------|
@@ -50,7 +50,7 @@ Central Authentication Service (CAS 中央认证服务 OAuth2.1协议)
    初始化测试数据单元测试：  
    `com.maoatao.cas.CasApplicationTests#initialize_test_data()`
 2. 使用SQL导入  
-   使用`help/doc/sql/CAS 测试数据.sql`的文件导入数据
+   使用`help/doc/sql/CAS_DML_DEMO.sql`的文件导入数据
 
 ### 4. 生成授权码的两种方法
 
