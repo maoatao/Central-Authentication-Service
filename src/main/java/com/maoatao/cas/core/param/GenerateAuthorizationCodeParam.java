@@ -1,13 +1,14 @@
 package com.maoatao.cas.core.param;
 
+import com.maoatao.synapse.core.bean.BaseParam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.security.oauth2.core.endpoint.PkceParameterNames;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 
 import java.io.Serial;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -19,8 +20,9 @@ import java.util.Set;
  * @date 2022-02-26 20:18:23
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Schema(description = "生成授权码请求参数")
-public class GenerateAuthorizationCodeParam implements Serializable {
+public class GenerateAuthorizationCodeParam extends BaseParam {
 
     @Serial
     private static final long serialVersionUID = -7286826147280035652L;

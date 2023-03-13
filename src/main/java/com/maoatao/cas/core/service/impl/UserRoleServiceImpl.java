@@ -9,6 +9,7 @@ import com.maoatao.cas.core.entity.UserRoleEntity;
 import com.maoatao.cas.core.mapper.UserRoleMapper;
 import com.maoatao.cas.core.service.UserRoleService;
 import com.maoatao.cas.core.param.UserRoleParam;
+import com.maoatao.daedalus.data.util.PageUtils;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +27,7 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRoleEnt
 
     @Override
     public Page<UserRoleEntity> getPage(UserRoleParam param) {
-        return page(new Page<>(param.getPageNo(), param.getPageSize()), Wrappers.query(BeanUtil.copyProperties(param, UserRoleEntity.class)));
+        return page(PageUtils.convert(param), Wrappers.query(BeanUtil.copyProperties(param, UserRoleEntity.class)));
     }
 
     @Override

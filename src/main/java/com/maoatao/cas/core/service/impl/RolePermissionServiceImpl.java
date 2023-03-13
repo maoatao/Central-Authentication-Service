@@ -8,6 +8,7 @@ import com.maoatao.cas.core.entity.RolePermissionEntity;
 import com.maoatao.cas.core.mapper.RolePermissionMapper;
 import com.maoatao.cas.core.service.RolePermissionService;
 import com.maoatao.cas.core.param.RolePermissionParam;
+import com.maoatao.daedalus.data.util.PageUtils;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,7 @@ public class RolePermissionServiceImpl extends ServiceImpl<RolePermissionMapper,
 
     @Override
     public Page<RolePermissionEntity> getPage(RolePermissionParam param) {
-        return page(new Page<>(param.getPageNo(), param.getPageSize()), Wrappers.query(BeanUtil.copyProperties(param, RolePermissionEntity.class)));
+        return page(PageUtils.convert(param), Wrappers.query(BeanUtil.copyProperties(param, RolePermissionEntity.class)));
     }
 
     @Override

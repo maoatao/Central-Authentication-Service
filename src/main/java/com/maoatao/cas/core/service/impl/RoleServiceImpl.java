@@ -9,6 +9,7 @@ import com.maoatao.cas.core.entity.RoleEntity;
 import com.maoatao.cas.core.mapper.RoleMapper;
 import com.maoatao.cas.core.service.RoleService;
 import com.maoatao.cas.core.param.RoleParam;
+import com.maoatao.daedalus.data.util.PageUtils;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import com.maoatao.synapse.lang.util.SynaSafes;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> impleme
 
     @Override
     public Page<RoleEntity> getPage(RoleParam param) {
-        return page(new Page<>(param.getPageNo(), param.getPageSize()), Wrappers.query(BeanUtil.copyProperties(param, RoleEntity.class)));
+        return page(PageUtils.convert(param), Wrappers.query(BeanUtil.copyProperties(param, RoleEntity.class)));
     }
 
     @Override

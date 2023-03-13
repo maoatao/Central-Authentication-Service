@@ -17,6 +17,7 @@ import com.maoatao.cas.security.bean.CustomAuthority;
 import com.maoatao.cas.security.bean.CustomUserDetails;
 import com.maoatao.cas.util.Ids;
 import com.maoatao.cas.core.param.UserParam;
+import com.maoatao.daedalus.data.util.PageUtils;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import com.maoatao.synapse.lang.util.SynaSafes;
 import com.maoatao.synapse.lang.util.SynaStrings;
@@ -78,7 +79,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @Override
     public Page<UserEntity> getPage(UserParam param) {
-        return page(new Page<>(param.getPageNo(), param.getPageSize()), Wrappers.query(BeanUtil.copyProperties(param, UserEntity.class)));
+        return page(PageUtils.convert(param), Wrappers.query(BeanUtil.copyProperties(param, UserEntity.class)));
     }
 
     @Override

@@ -1,13 +1,14 @@
 package com.maoatao.cas.core.param;
 
+import com.maoatao.synapse.core.bean.BaseParam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import com.maoatao.cas.security.GrantType;
 
 import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * 生成访问令牌请求参数
@@ -16,8 +17,9 @@ import java.io.Serializable;
  * @date 2023-03-04 20:56:22
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Schema(description = "生成访问令牌请求参数")
-public class GenerateAccessTokenParam implements Serializable {
+public class GenerateAccessTokenParam extends BaseParam {
 
     @Serial
     private static final long serialVersionUID = -7286826147280035652L;

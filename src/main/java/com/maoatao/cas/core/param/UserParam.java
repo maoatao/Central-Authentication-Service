@@ -1,5 +1,6 @@
 package com.maoatao.cas.core.param;
 
+import com.maoatao.daedalus.web.param.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
