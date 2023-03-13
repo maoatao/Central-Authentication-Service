@@ -94,6 +94,6 @@ public class RolePermissionController {
                           @Parameter(name = "id", description = "角色权限关系id")
                           @NotNull(message = "角色权限关系id不能为空")
                           Long id) {
-        return rolePermissionService.remove(id);
+        return rolePermissionService.removeById(id);
     }
 }

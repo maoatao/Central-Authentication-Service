@@ -49,12 +49,4 @@ public interface UserRoleService extends IService<UserRoleEntity> {
      * @return 更新成功返回true
      */
     boolean update(UserRoleParam param);
-
-    /**
-     * 删除
-     *
-     * @param id 主键id
-     * @return 删除成功返回true
-     */
-    boolean remove(Long id);
 }

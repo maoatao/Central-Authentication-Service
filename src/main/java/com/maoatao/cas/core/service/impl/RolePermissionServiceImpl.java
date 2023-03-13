@@ -34,17 +34,7 @@ public class RolePermissionServiceImpl extends ServiceImpl<RolePermissionMapper,
 
     @Override
     public boolean update(RolePermissionParam param) {
-        checkExisted(param.getId());
+        SynaAssert.notNull(getById(param.getId()), "角色权限关系不存在!");
         return updateById(BeanUtil.copyProperties(param, RolePermissionEntity.class));
-    }
-
-    @Override
-    public boolean remove(Long id) {
-        checkExisted(id);
-        return removeById(id);
-    }
-
-    private void checkExisted(Long id) {
-        SynaAssert.notNull(getById(id), "{}号角色权限关系不存在!");
     }
 }

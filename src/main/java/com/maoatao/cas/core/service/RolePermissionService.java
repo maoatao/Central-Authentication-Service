@@ -36,12 +36,4 @@ public interface RolePermissionService extends IService<RolePermissionEntity> {
      * @return 更新成功返回true
      */
     boolean update(RolePermissionParam param);
-
-    /**
-     * 删除
-     *
-     * @param id 主键id
-     * @return 删除成功返回true
-     */
-    boolean remove(Long id);
 }

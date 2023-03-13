@@ -104,7 +104,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Override
     public boolean update(UserParam param) {
         checkClient(param.getClientId());
-        checkExisted(param.getId());
         UserEntity existed = getAndCheckUser(param.getName(), param.getClientId());
         UserEntity user = BeanUtil.copyProperties(param, UserEntity.class);
         user.setId(existed.getId());
@@ -117,12 +116,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 "更新用户绑定角色失败!"
         );
         return true;
-    }
-
-    @Override
-    public boolean remove(Long id) {
-        checkExisted(id);
-        return removeById(id);
     }
 
     @Override
@@ -153,10 +146,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         SynaAssert.isTrue(StrUtil.isNotBlank(name), "用户名称不能为空!");
         SynaAssert.isTrue(StrUtil.isNotBlank(clientId), "客户端 Id 不能为空!");
         return getOne(Wrappers.query(UserEntity.builder().name(name).clientId(clientId).build()));
-    }
-
-    private void checkExisted(Long id) {
-        SynaAssert.notNull(getById(id), "{}号用户不存在!");
     }
 
     /**

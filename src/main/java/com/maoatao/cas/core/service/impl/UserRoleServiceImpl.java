@@ -64,17 +64,7 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRoleEnt
 
     @Override
     public boolean update(UserRoleParam param) {
-        checkExisted(param.getId());
+        SynaAssert.notNull(getById(param.getId()), "用户角色关系不存在!");
         return updateById(BeanUtil.copyProperties(param, UserRoleEntity.class));
-    }
-
-    @Override
-    public boolean remove(Long id) {
-        checkExisted(id);
-        return removeById(id);
-    }
-
-    private void checkExisted(Long id) {
-        SynaAssert.notNull(getById(id), "{}号用户角色关系不存在!");
     }
 }

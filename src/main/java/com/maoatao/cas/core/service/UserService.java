@@ -51,14 +51,6 @@ public interface UserService extends IService<UserEntity> {
     boolean update(UserParam param);
 
     /**
-     * 删除
-     *
-     * @param id 主键id
-     * @return 删除成功返回true
-     */
-    boolean remove(Long id);
-
-    /**
      * 删除用户
      *
      * @param username 用户名

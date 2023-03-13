@@ -94,6 +94,6 @@ public class RoleController {
                           @Parameter(name = "id", description = "角色id")
                           @NotNull(message = "角色id不能为空")
                           Long id) {
-        return roleService.remove(id);
+        return roleService.removeById(id);
     }
 }

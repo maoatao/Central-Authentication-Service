@@ -94,6 +94,6 @@ public class UserController {
                               @Parameter(name = "id", description = "用户id")
                               @NotNull(message = "用户id不能为空")
                               Long id) {
-        return userService.remove(id);
+        return userService.removeById(id);
     }
 }

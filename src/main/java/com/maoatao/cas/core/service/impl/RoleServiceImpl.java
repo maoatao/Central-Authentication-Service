@@ -47,17 +47,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> impleme
 
     @Override
     public boolean update(RoleParam param) {
-        checkExisted(param.getId());
+        SynaAssert.notNull(getById(param.getId()), "角色不存在!");
         return updateById(BeanUtil.copyProperties(param, RoleEntity.class));
-    }
-
-    @Override
-    public boolean remove(Long id) {
-        checkExisted(id);
-        return removeById(id);
-    }
-
-    private void checkExisted(Long id) {
-        SynaAssert.notNull(getById(id), "{}号角色不存在!");
     }
 }

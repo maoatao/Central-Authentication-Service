@@ -44,17 +44,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
 
     @Override
     public boolean update(PermissionParam param) {
-        checkExisted(param.getId());
+        SynaAssert.notNull(getById(param.getId()), "权限不存在!");
         return updateById(BeanUtil.copyProperties(param, PermissionEntity.class));
-    }
-
-    @Override
-    public boolean remove(Long id) {
-        checkExisted(id);
-        return removeById(id);
-    }
-
-    private void checkExisted(Long id) {
-        SynaAssert.notNull(getById(id), "{}号权限不存在!");
     }
 }

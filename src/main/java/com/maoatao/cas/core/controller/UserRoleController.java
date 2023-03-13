@@ -94,6 +94,6 @@ public class UserRoleController {
                           @Parameter(name = "id", description = "用户角色关系id")
                           @NotNull(message = "用户角色关系id不能为空")
                           Long id) {
-        return userRoleService.remove(id);
+        return userRoleService.removeById(id);
     }
 }

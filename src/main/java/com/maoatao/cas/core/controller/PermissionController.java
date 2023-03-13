@@ -94,7 +94,7 @@ public class PermissionController {
                           @Parameter(name = "id", description = "权限id")
                           @NotNull(message = "权限id不能为空")
                           Long id) {
-        return permissionService.remove(id);
+        return permissionService.removeById(id);
     }
 
 }
