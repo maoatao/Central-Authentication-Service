@@ -1,15 +1,11 @@
 package com.maoatao.cas.core.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.maoatao.cas.core.entity.RoleEntity;
 import com.maoatao.cas.core.mapper.RoleMapper;
 import com.maoatao.cas.core.service.RoleService;
-import com.maoatao.cas.core.param.RoleParam;
-import com.maoatao.daedalus.data.util.PageUtils;
+import com.maoatao.daedalus.data.service.impl.DaedalusServiceImpl;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import com.maoatao.synapse.lang.util.SynaSafes;
 import org.springframework.stereotype.Service;
@@ -23,12 +19,7 @@ import java.util.List;
  * @date 2022-12-12 14:18:23
  */
 @Service
-public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> implements RoleService {
-
-    @Override
-    public Page<RoleEntity> getPage(RoleParam param) {
-        return page(PageUtils.convert(param), Wrappers.query(BeanUtil.copyProperties(param, RoleEntity.class)));
-    }
+public class RoleServiceImpl extends DaedalusServiceImpl<RoleMapper, RoleEntity> implements RoleService {
 
     @Override
     public List<RoleEntity> listByRolesAndClient(List<String> roleNames, String clientId) {
@@ -37,17 +28,5 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> impleme
         return SynaSafes.of(list(
                 Wrappers.<RoleEntity>lambdaQuery().in(RoleEntity::getName, roleNames).eq(RoleEntity::getClientId, clientId)
         ));
-    }
-
-    @Override
-    public boolean save(RoleParam param) {
-        param.setId(null);
-        return save(BeanUtil.copyProperties(param, RoleEntity.class));
-    }
-
-    @Override
-    public boolean update(RoleParam param) {
-        SynaAssert.notNull(getById(param.getId()), "角色不存在!");
-        return updateById(BeanUtil.copyProperties(param, RoleEntity.class));
     }
 }

@@ -4,8 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.IterUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.maoatao.cas.core.entity.RoleEntity;
 import com.maoatao.cas.core.entity.UserEntity;
 import com.maoatao.cas.core.mapper.UserMapper;
@@ -17,7 +15,7 @@ import com.maoatao.cas.security.bean.CustomAuthority;
 import com.maoatao.cas.security.bean.CustomUserDetails;
 import com.maoatao.cas.util.Ids;
 import com.maoatao.cas.core.param.UserParam;
-import com.maoatao.daedalus.data.util.PageUtils;
+import com.maoatao.daedalus.data.service.impl.DaedalusServiceImpl;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import com.maoatao.synapse.lang.util.SynaSafes;
 import com.maoatao.synapse.lang.util.SynaStrings;
@@ -41,7 +39,7 @@ import java.util.stream.Collectors;
  * @create: 2022-03-11 16:13:35
  */
 @Service
-public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> implements UserService {
+public class UserServiceImpl extends DaedalusServiceImpl<UserMapper, UserEntity> implements UserService {
 
     @Autowired
     private PermissionService permissionService;
@@ -75,11 +73,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 .credentialsExpired(false)
                 .authorities(getAuthorities(existed.getId()))
                 .build();
-    }
-
-    @Override
-    public Page<UserEntity> getPage(UserParam param) {
-        return page(PageUtils.convert(param), Wrappers.query(BeanUtil.copyProperties(param, UserEntity.class)));
     }
 
     @Override

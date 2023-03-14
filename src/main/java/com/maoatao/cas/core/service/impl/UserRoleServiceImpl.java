@@ -1,15 +1,11 @@
 package com.maoatao.cas.core.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.IterUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.maoatao.cas.core.entity.UserRoleEntity;
 import com.maoatao.cas.core.mapper.UserRoleMapper;
 import com.maoatao.cas.core.service.UserRoleService;
-import com.maoatao.cas.core.param.UserRoleParam;
-import com.maoatao.daedalus.data.util.PageUtils;
+import com.maoatao.daedalus.data.service.impl.DaedalusServiceImpl;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,12 +19,7 @@ import java.util.List;
  * @date 2022-12-12 14:18:22
  */
 @Service
-public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRoleEntity> implements UserRoleService {
-
-    @Override
-    public Page<UserRoleEntity> getPage(UserRoleParam param) {
-        return page(PageUtils.convert(param), Wrappers.query(BeanUtil.copyProperties(param, UserRoleEntity.class)));
-    }
+public class UserRoleServiceImpl extends DaedalusServiceImpl<UserRoleMapper, UserRoleEntity> implements UserRoleService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -54,17 +45,5 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRoleEnt
             SynaAssert.isTrue(saveBatch(newUserRoles), "新增用户角色关系失败!");
         }
         return true;
-    }
-
-    @Override
-    public boolean save(UserRoleParam param) {
-        param.setId(null);
-        return save(BeanUtil.copyProperties(param, UserRoleEntity.class));
-    }
-
-    @Override
-    public boolean update(UserRoleParam param) {
-        SynaAssert.notNull(getById(param.getId()), "用户角色关系不存在!");
-        return updateById(BeanUtil.copyProperties(param, UserRoleEntity.class));
     }
 }

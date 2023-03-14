@@ -1,9 +1,7 @@
 package com.maoatao.cas.core.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.maoatao.cas.core.entity.PermissionEntity;
-import com.maoatao.cas.core.param.PermissionParam;
+import com.maoatao.daedalus.data.service.DaedalusService;
 
 import java.util.List;
 
@@ -13,15 +11,7 @@ import java.util.List;
  * @author MaoAtao
  * @date 2022-12-12 14:18:23
  */
-public interface PermissionService extends IService<PermissionEntity> {
-
-    /**
-     * 分页
-     *
-     * @param param 参数
-     * @return 分页
-     */
-    Page<PermissionEntity> getPage(PermissionParam param);
+public interface PermissionService extends DaedalusService<PermissionEntity> {
 
     /**
      * 通过用户id查询列表
@@ -30,20 +20,4 @@ public interface PermissionService extends IService<PermissionEntity> {
      * @return 权限列表
      */
     List<PermissionEntity> listByUser(Long userId);
-
-    /**
-     * 新增
-     *
-     * @param param 参数
-     * @return 新增成功返回true
-     */
-    boolean save(PermissionParam param);
-
-    /**
-     * 更新
-     *
-     * @param param 参数
-     * @return 更新成功返回true
-     */
-    boolean update(PermissionParam param);
 }

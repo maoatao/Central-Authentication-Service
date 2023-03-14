@@ -2,9 +2,8 @@ package com.maoatao.cas.core.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.maoatao.daedalus.data.bean.IdEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
@@ -24,17 +23,11 @@ import java.io.Serial;
 @TableName("t_cas_user")
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "用户表")
-public class UserEntity extends Model<UserEntity> {
+public class UserEntity extends IdEntity<UserEntity> {
 
     @Serial
     private static final long serialVersionUID = -5231977144633077127L;
 
-    /**
-     * 主键id(自增)
-     */
-    @TableId
-    @Schema(description = "主键id(自增)")
-    private Long id;
     /**
      * CAS 全局唯一id
      */

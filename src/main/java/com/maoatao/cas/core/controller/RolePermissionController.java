@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * 角色权限关系管理
  *
@@ -62,11 +64,11 @@ public class RolePermissionController {
      * 新增
      *
      * @param param 参数
-     * @return 新增成功返回true
+     * @return 新增成功返回主键 id
      */
     @PostMapping
     @Operation(summary = "save", description = "新增角色权限关系")
-    public boolean save(RolePermissionParam param) {
+    public long save(RolePermissionParam param) {
         return rolePermissionService.save(param);
     }
 
@@ -85,15 +87,15 @@ public class RolePermissionController {
     /**
      * 删除
      *
-     * @param id 主键id
+     * @param ids 主键id
      * @return 删除成功返回true
      */
-    @DeleteMapping("/{id}")
-    @Operation(summary = "remove", description = "通过id删除角色权限关系")
+    @DeleteMapping("/{ids}")
+    @Operation(summary = "remove", description = "通过id删除角色权限关系(多个 id 使用,分隔)")
     public boolean remove(@PathVariable
-                          @Parameter(name = "id", description = "角色权限关系id")
+                          @Parameter(name = "id", description = "角色权限关系id集合")
                           @NotNull(message = "角色权限关系id不能为空")
-                          Long id) {
-        return rolePermissionService.removeById(id);
+                          List<Long> ids) {
+        return rolePermissionService.remove(ids);
     }
 }

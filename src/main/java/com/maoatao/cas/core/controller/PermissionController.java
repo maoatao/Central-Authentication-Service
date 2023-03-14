@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * 权限管理
  *
@@ -62,11 +64,11 @@ public class PermissionController {
      * 新增
      *
      * @param param 参数
-     * @return 新增成功返回true
+     * @return 新增成功返回主键 id
      */
     @PostMapping
     @Operation(summary = "save", description = "新增权限")
-    public boolean save(PermissionParam param) {
+    public long save(PermissionParam param) {
         return permissionService.save(param);
     }
 
@@ -85,16 +87,15 @@ public class PermissionController {
     /**
      * 删除
      *
-     * @param id 主键id
+     * @param ids 主键id
      * @return 删除成功返回true
      */
-    @DeleteMapping("/{id}")
-    @Operation(summary = "remove", description = "通过id删除权限")
+    @DeleteMapping("/{ids}")
+    @Operation(summary = "remove", description = "通过id删除权限(多个 id 使用,分隔)")
     public boolean remove(@PathVariable
-                          @Parameter(name = "id", description = "权限id")
+                          @Parameter(name = "id", description = "权限id集合")
                           @NotNull(message = "权限id不能为空")
-                          Long id) {
-        return permissionService.removeById(id);
+                          List<Long> ids) {
+        return permissionService.remove(ids);
     }
-
 }

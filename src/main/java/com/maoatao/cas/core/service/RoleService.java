@@ -1,9 +1,7 @@
 package com.maoatao.cas.core.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.maoatao.cas.core.entity.RoleEntity;
-import com.maoatao.cas.core.param.RoleParam;
+import com.maoatao.daedalus.data.service.DaedalusService;
 
 import java.util.List;
 
@@ -13,15 +11,7 @@ import java.util.List;
  * @author MaoAtao
  * @date 2022-12-12 14:18:23
  */
-public interface RoleService extends IService<RoleEntity> {
-
-    /**
-     * 分页
-     *
-     * @param param 参数
-     * @return 分页
-     */
-    Page<RoleEntity> getPage(RoleParam param);
+public interface RoleService extends DaedalusService<RoleEntity> {
 
     /**
      * 通过角色名称和客户端 id 查询角色
@@ -31,20 +21,4 @@ public interface RoleService extends IService<RoleEntity> {
      * @return 角色集合
      */
     List<RoleEntity> listByRolesAndClient(List<String> roleNames, String clientId);
-
-    /**
-     * 新增
-     *
-     * @param param 参数
-     * @return 新增成功返回true
-     */
-    boolean save(RoleParam param);
-
-    /**
-     * 更新
-     *
-     * @param param 参数
-     * @return 更新成功返回true
-     */
-    boolean update(RoleParam param);
 }

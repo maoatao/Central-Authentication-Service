@@ -1,9 +1,8 @@
 package com.maoatao.cas.core.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.maoatao.cas.core.entity.UserEntity;
 import com.maoatao.cas.core.param.UserParam;
+import com.maoatao.daedalus.data.service.DaedalusService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -13,8 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
  * @author MaoAtao
  * @date 2022-03-11 16:13:35
  */
-public interface UserService extends IService<UserEntity> {
-
+public interface UserService extends DaedalusService<UserEntity> {
 
     /**
      * 通过用户名和用户详细信息
@@ -27,18 +25,10 @@ public interface UserService extends IService<UserEntity> {
     UserDetails getUserDetails(String username, String clientId) throws UsernameNotFoundException;
 
     /**
-     * 分页
-     *
-     * @param param 参数
-     * @return 分页
-     */
-    Page<UserEntity> getPage(UserParam param);
-
-    /**
      * 新增
      *
      * @param param 参数
-     * @return 新增成功返回true
+     * @return 新增成功返回主键 id
      */
     long save(UserParam param);
 
