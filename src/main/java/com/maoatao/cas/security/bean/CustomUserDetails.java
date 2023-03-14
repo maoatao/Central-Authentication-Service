@@ -39,6 +39,8 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
     @Serial
     private static final long serialVersionUID = -1660229161744567202L;
 
+    private final Long userId;
+
     private String password;
 
     private final String clientId;
@@ -58,8 +60,8 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
     /**
      * Calls the more complex constructor with all boolean arguments set to {@code true}.
      */
-    public CustomUserDetails(String clientId, String username, String password, Collection<? extends GrantedAuthority> authorities) {
-        this(clientId, username, password, true, true, true, true, authorities);
+    public CustomUserDetails(Long userId, String clientId, String username, String password, Collection<? extends GrantedAuthority> authorities) {
+        this(userId, clientId, username, password, true, true, true, true, authorities);
     }
 
     /**
@@ -81,11 +83,12 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
      * @throws IllegalArgumentException if a <code>null</code> value was passed either as
      *                                  a parameter or as an element in the <code>GrantedAuthority</code> collection
      */
-    public CustomUserDetails(String clientId, String username, String password, boolean enabled, boolean accountNonExpired,
+    public CustomUserDetails(Long userId, String clientId, String username, String password, boolean enabled, boolean accountNonExpired,
                              boolean credentialsNonExpired, boolean accountNonLocked,
                              Collection<? extends GrantedAuthority> authorities) {
         Assert.isTrue(username != null && !"".equals(username) && password != null,
                 "Cannot pass null or empty values to constructor");
+        this.userId = userId;
         this.clientId = clientId;
         this.username = username;
         this.password = password;
@@ -206,6 +209,8 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
      */
     public static final class UserBuilder {
 
+        private Long userId;
+
         private String clientId;
 
         private String username;
@@ -226,6 +231,19 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
          * Creates a new instance
          */
         private UserBuilder() {
+        }
+
+        /**
+         * Populates the userId. This attribute is required.
+         *
+         * @param userId the userId. Cannot be null.
+         * @return the {@link CustomUserDetails.UserBuilder} for method chaining (i.e. to populate
+         * additional attributes for this user)
+         */
+        public CustomUserDetails.UserBuilder userId(Long userId) {
+            Assert.notNull(userId, "userId cannot be null");
+            this.userId = userId;
+            return this;
         }
 
         /**
@@ -391,7 +409,7 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
         }
 
         public CustomUserDetails build() {
-            return new CustomUserDetails(this.clientId, this.username, this.password, !this.disabled, !this.accountExpired,
+            return new CustomUserDetails(this.userId, this.clientId, this.username, this.password, !this.disabled, !this.accountExpired,
                     !this.credentialsExpired, !this.accountLocked, this.authorities);
         }
 
