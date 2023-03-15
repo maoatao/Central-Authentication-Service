@@ -96,7 +96,8 @@ public class AuthorizationServiceImpl implements AuthorizationService {
      */
     @Override
     public CustomAccessToken generateAccessToken(GenerateAccessTokenParam param) {
-        Authentication clientAuthentication = buildClientAuthentication(param.getSecret());
+        CustomUserDetails userDetails = getUserDetails();
+        Authentication clientAuthentication = generateClientPrincipal(userDetails.getClientId(), param.getSecret());
         return switch (param.getType()) {
             case GrantType.AUTHORIZATION_CODE -> buildAccessTokenByCode(param.getCode(), clientAuthentication);
             case GrantType.REFRESH_TOKEN -> buildAccessTokenByRefresh(param.getCode(), clientAuthentication);
@@ -131,8 +132,29 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     }
 
     @Override
-    public Authentication generatePrincipal(ClientUser clientUser) {
-        return generatePrincipal(clientUser.clientId(), clientUser.username(), clientUser.password());
+    public Authentication generateUserPrincipal(ClientUser clientUser) {
+        return generateUserPrincipal(clientUser.clientId(), clientUser.username(), clientUser.password());
+    }
+
+    /**
+     * 通过客户端获取经过授权客户端主体
+     *
+     * @param clientId 客户端 ID
+     * @param secret   客户端密码
+     * @return 客户端主体
+     */
+    private Authentication generateClientPrincipal(String clientId, String secret) {
+        RegisteredClient registeredClient = registeredClientRepository.findByClientId(clientId);
+        // 构建客户端身份验证
+        Authentication clientAuthentication = new OAuth2ClientAuthenticationToken(registeredClient, ClientAuthenticationMethod.CLIENT_SECRET_BASIC, secret);
+        // 认证客户端令牌
+        OAuth2ClientAuthenticationToken clientAuthenticationToken;
+        try {
+            clientAuthenticationToken = (OAuth2ClientAuthenticationToken) this.authenticationManager.authenticate(clientAuthentication);
+        } catch (Exception e) {
+            throw new SynaException("认证客户端失败!", e);
+        }
+        return clientAuthenticationToken;
     }
 
     /**
@@ -140,7 +162,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
      * <p>
      * 这个值需要在拦截器中生成(正常情况下这个值生成失败拦截器不会放行)
      * <p>
-     * {@link this#generatePrincipal(ClientUser)}该方法反过来,从上下文中获取
+     * {@link this#generateUserPrincipal(ClientUser)}该方法反过来,从上下文中获取
      *
      * @return 用户详情
      */
@@ -160,7 +182,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
      * @param password 密码
      * @return 用户身份验证
      */
-    private Authentication generatePrincipal(String clientId, String username, String password) {
+    private Authentication generateUserPrincipal(String clientId, String username, String password) {
         Authentication authentication;
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, password);
         // 设置客户端 id 供 CustomUserAuthenticationProvider#retrieveUser 方法使用
@@ -327,29 +349,6 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             SynaAssert.isTrue(StrUtil.isNotBlank(param.getCodeChallengeMethod()), "无效的请求参数[codeChallengeMethod]");
             SynaAssert.isTrue(StrUtil.isNotBlank(param.getCodeChallenge()), "无效的请求参数[codeChallenge]");
         }
-    }
-
-    /**
-     * 构建客户端身份验证
-     * <p>
-     * 构建授权码认证源码{@link OAuth2AuthorizationCodeAuthenticationConverter#convert}
-     *
-     * @param secret 客户端密码
-     * @return 访问令牌
-     */
-    private Authentication buildClientAuthentication(String secret) {
-        CustomUserDetails userDetails = getUserDetails();
-        RegisteredClient registeredClient = registeredClientRepository.findByClientId(userDetails.getClientId());
-        // 构建客户端身份验证
-        Authentication clientAuthentication = new OAuth2ClientAuthenticationToken(registeredClient, ClientAuthenticationMethod.CLIENT_SECRET_BASIC, secret);
-        // 认证客户端令牌
-        OAuth2ClientAuthenticationToken clientAuthenticationToken;
-        try {
-            clientAuthenticationToken = (OAuth2ClientAuthenticationToken) this.authenticationManager.authenticate(clientAuthentication);
-        } catch (Exception e) {
-            throw new SynaException("认证客户端失败!", e);
-        }
-        return clientAuthenticationToken;
     }
 
     /**

@@ -56,5 +56,5 @@ public interface AuthorizationService {
      * @param clientUser 客户端用户信息
      * @return 用户主体
      */
-    Authentication generatePrincipal(ClientUser clientUser);
+    Authentication generateUserPrincipal(ClientUser clientUser);
 }

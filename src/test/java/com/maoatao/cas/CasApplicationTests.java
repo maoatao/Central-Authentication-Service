@@ -169,7 +169,7 @@ class CasApplicationTests {
     @Test
     void generate_token_test() {
         // 构建上下文
-        Authentication principal = authorizationService.generatePrincipal(ClientUser.builder()
+        Authentication principal = authorizationService.generateUserPrincipal(ClientUser.builder()
                 .clientId(TEST_CLIENT_ID)
                 .username(TEST_USER_NAME)
                 .password(TEST_USER_PASSWORD)
