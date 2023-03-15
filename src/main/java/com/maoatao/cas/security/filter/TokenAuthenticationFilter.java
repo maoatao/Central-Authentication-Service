@@ -4,8 +4,10 @@ import cn.hutool.core.util.StrUtil;
 import com.maoatao.cas.core.service.AuthorizationService;
 import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.util.FilterUtils;
+import com.maoatao.synapse.lang.exception.SynaException;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import com.maoatao.synapse.lang.util.SynaStrings;
+import com.maoatao.synapse.web.response.HttpResponseStatus;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,12 +22,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Optional;
 
 /**
- * 授权过滤器1
+ * 授权过滤器
  *
  * @author MaoAtao
  * @date 2022-10-24 11:17:31
@@ -40,12 +44,17 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
 
     private final AuthorizationService authorizationService;
 
+    private final HandlerExceptionResolver handlerExceptionResolver;
+
     public TokenAuthenticationFilter(OAuth2AuthorizationService oAuth2AuthorizationService,
-                                     AuthorizationService authorizationService) {
+                                     AuthorizationService authorizationService,
+                                     HandlerExceptionResolver handlerExceptionResolver) {
         SynaAssert.notNull(oAuth2AuthorizationService, "oAuth2AuthorizationService cannot be null");
         SynaAssert.notNull(authorizationService, "authorizationService cannot be null");
+        SynaAssert.notNull(handlerExceptionResolver, "handlerExceptionResolver cannot be null");
         this.oAuth2AuthorizationService = oAuth2AuthorizationService;
         this.authorizationService = authorizationService;
+        this.handlerExceptionResolver = handlerExceptionResolver;
     }
 
     @Override
@@ -55,7 +64,13 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
 
     private void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            doTokenFilter(request);
+            try {
+                doTokenFilter(request);
+            } catch (SynaException e) {
+                // 拦截异常,屏蔽异常信息,这里统一返回未授权响应
+                handlerExceptionResolver.resolveException(request, response, null, new SynaException(HttpResponseStatus.UNAUTHORIZED));
+                return;
+            }
             filterChain.doFilter(request, response);
         } finally {
             SecurityContextHolder.clearContext();
@@ -82,11 +97,10 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
         if (clientUser == null) {
             return;
         }
-        Authentication principal = authorizationService.generatePrincipal(clientUser);
-        if (principal == null) {
-            return;
-        }
-        SecurityContextHolder.getContext().setAuthentication(principal);
+        // 根据 token 生成已授权的主体
+        Optional.ofNullable(authorizationService.generatePrincipal(clientUser))
+                .ifPresent(principal -> SecurityContextHolder.getContext().setAuthentication(principal));
+
     }
 
     private void doBearerTokenFilter(String token) {

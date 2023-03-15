@@ -168,7 +168,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         try {
             authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
         } catch (Exception e) {
-            throw new SynaException("用户身份验证失败!", e);
+            throw new SynaException("用户身份验证失败!可能是用户名,密码或客户端ID错误.", e);
         }
         if (authentication == null) {
             throw new SynaException("生成用户身份验证失败!");

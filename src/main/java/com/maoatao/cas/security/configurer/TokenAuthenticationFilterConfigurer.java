@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 /**
  * 授权过滤配置器
@@ -23,9 +24,11 @@ public class TokenAuthenticationFilterConfigurer extends SecurityConfigurerAdapt
 
     private final AuthorizationService authorizationService = SpringContextHolder.getBean(AuthorizationService.class);
 
+    private final HandlerExceptionResolver handlerExceptionResolver = SpringContextHolder.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
+
     @Override
     public void configure(HttpSecurity http) {
-        TokenAuthenticationFilter filter = new TokenAuthenticationFilter(oAuth2AuthorizationService, authorizationService);
+        TokenAuthenticationFilter filter = new TokenAuthenticationFilter(oAuth2AuthorizationService, authorizationService, handlerExceptionResolver);
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
     }
 }
