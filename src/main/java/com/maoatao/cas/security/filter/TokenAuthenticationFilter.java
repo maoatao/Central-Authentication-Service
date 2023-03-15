@@ -109,7 +109,7 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
             return;
         }
         // 根据 token 生成已授权的主体
-        Optional.ofNullable(authorizationService.generatePrincipal(clientUser))
+        Optional.ofNullable(authorizationService.generateUserPrincipal(clientUser))
                 .ifPresent(principal -> SecurityContextHolder.getContext().setAuthentication(principal));
     }
 
@@ -120,15 +120,13 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
         if (authorization == null || authorization.getAccessToken() == null || !authorization.getAccessToken().isActive()) {
             return;
         }
+        // TODO: 2023-03-15 16:27:29 自定义 context 区分客户端和其他令牌,方便人机,机机接口鉴权
+        setContext(authorization);
+    }
+
+    private void setContext(OAuth2Authorization authorization) {
         Authentication principal = authorization.getAttribute(Principal.class.getName());
-        boolean isClient = AuthorizationGrantType.CLIENT_CREDENTIALS.equals(authorization.getAuthorizationGrantType());
-        if (isClient) {
-            // TODO: 2023-03-06 18:10:26 客户端授权主体咋搞?
-            SecurityContextHolder.getContext().setAuthentication(principal);
-            return;
-        }
-        boolean isAuthenticated = principal != null && principal.isAuthenticated();
-        if (isAuthenticated) {
+        if (principal != null && principal.isAuthenticated()) {
             SecurityContextHolder.getContext().setAuthentication(principal);
         }
     }

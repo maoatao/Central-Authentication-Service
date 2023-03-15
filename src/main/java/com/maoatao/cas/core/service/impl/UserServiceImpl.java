@@ -64,6 +64,7 @@ public class UserServiceImpl extends DaedalusServiceImpl<UserMapper, UserEntity>
         }
         SynaAssert.isTrue(existed.getEnabled(), "用户 {} 已被禁用", username);
         return CustomUserDetails.builder()
+                .userId(existed.getId())
                 .clientId(existed.getClientId())
                 .username(existed.getName())
                 .password(existed.getPassword())

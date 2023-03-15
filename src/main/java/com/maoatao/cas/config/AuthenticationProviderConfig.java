@@ -5,6 +5,7 @@ import com.maoatao.cas.security.CustomUserAuthenticationProvider;
 import com.maoatao.cas.security.UUIDStringKeyGenerator;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeAccessTokenProvider;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
+import com.maoatao.cas.security.oauth2.auth.CustomClientCredentialsTokenProvider;
 import com.maoatao.cas.security.oauth2.auth.CustomRefreshTokenProvider;
 import com.maoatao.cas.security.oauth2.odic.CustomClientRegistrationProvider;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +17,6 @@ import org.springframework.security.oauth2.server.authorization.OAuth2Authorizat
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.authentication.ClientSecretAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationProvider;
-import org.springframework.security.oauth2.server.authorization.authentication.OAuth2ClientCredentialsAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
@@ -33,24 +33,34 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Toke
 public class AuthenticationProviderConfig {
 
     /**
-     * OAuth2 授权服务器配置程序(自定义令牌提供者)
+     * OAuth2 授权服务器配置程序(给原生接口使用的配置)
+     *
+     * @param authorizationCodeProvider  授权码提供者
+     * @param clientRegistrationProvider 客户端注册提供者
+     * @param accessTokenProvider        授权码模式 生成访问令牌
+     * @param refreshTokenProvider       刷新令牌模式 生成访问令牌
+     * @param clientTokenProvider        客户端模式 生成访问令牌
      */
     @Bean
-    public OAuth2AuthorizationServerConfigurer oAuth2AuthorizationServerConfigurer(CustomAuthorizationCodeAccessTokenProvider accessTokenProvider,
-                                                                                   OAuth2AuthorizationCodeRequestAuthenticationProvider authorizationCodeProvider,
-                                                                                   CustomClientRegistrationProvider clientRegistrationProvider,
-                                                                                   CustomRefreshTokenProvider refreshTokenProvider) {
+    public OAuth2AuthorizationServerConfigurer oAuth2AuthorizationServerConfigurer(
+            OAuth2AuthorizationCodeRequestAuthenticationProvider authorizationCodeProvider,
+            CustomClientRegistrationProvider clientRegistrationProvider,
+            CustomAuthorizationCodeAccessTokenProvider accessTokenProvider,
+            CustomRefreshTokenProvider refreshTokenProvider,
+            CustomClientCredentialsTokenProvider clientTokenProvider) {
         OAuth2AuthorizationServerConfigurer oAuth2AuthorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
         oAuth2AuthorizationServerConfigurer.authorizationEndpoint(endpoint -> endpoint
                 .authenticationProvider(authorizationCodeProvider)
                 .authenticationProvider(clientRegistrationProvider)
                 .authenticationProvider(refreshTokenProvider)
-                .authenticationProvider(accessTokenProvider));
+                .authenticationProvider(accessTokenProvider)
+                .authenticationProvider(clientTokenProvider)
+        );
         return oAuth2AuthorizationServerConfigurer;
     }
 
     /**
-     * 认证管理
+     * 认证管理(和{@link #oAuth2AuthorizationServerConfigurer} 类似,是给自己的接口使用的)
      *
      * @param userAuthenticationProvider   用户身份授权
      * @param clientAuthenticationProvider 客户端授权
@@ -59,11 +69,12 @@ public class AuthenticationProviderConfig {
      * @param clientTokenProvider          客户端模式 生成访问令牌
      */
     @Bean
-    public AuthenticationManager authenticationManager(CustomUserAuthenticationProvider userAuthenticationProvider,
-                                                       ClientSecretAuthenticationProvider clientAuthenticationProvider,
-                                                       CustomAuthorizationCodeAccessTokenProvider accessTokenProvider,
-                                                       CustomRefreshTokenProvider refreshTokenProvider,
-                                                       OAuth2ClientCredentialsAuthenticationProvider clientTokenProvider) {
+    public AuthenticationManager authenticationManager(
+            CustomUserAuthenticationProvider userAuthenticationProvider,
+            ClientSecretAuthenticationProvider clientAuthenticationProvider,
+            CustomAuthorizationCodeAccessTokenProvider accessTokenProvider,
+            CustomRefreshTokenProvider refreshTokenProvider,
+            CustomClientCredentialsTokenProvider clientTokenProvider) {
         return new ProviderManager(userAuthenticationProvider, clientAuthenticationProvider,
                 accessTokenProvider, refreshTokenProvider, clientTokenProvider);
     }
@@ -100,9 +111,9 @@ public class AuthenticationProviderConfig {
      * 客户端模式生成访问令牌提供者
      */
     @Bean
-    public OAuth2ClientCredentialsAuthenticationProvider oAuth2ClientCredentialsAuthenticationProvider(OAuth2AuthorizationService oAuth2AuthorizationService,
-                                                                                                       OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator) {
-        return new OAuth2ClientCredentialsAuthenticationProvider(oAuth2AuthorizationService, oAuth2TokenGenerator);
+    public CustomClientCredentialsTokenProvider customClientCredentialsTokenProvider(OAuth2AuthorizationService oAuth2AuthorizationService,
+                                                                                     OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator) {
+        return new CustomClientCredentialsTokenProvider(oAuth2AuthorizationService, oAuth2TokenGenerator);
     }
 
 
@@ -138,6 +149,4 @@ public class AuthenticationProviderConfig {
                                                                  OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator) {
         return new CustomRefreshTokenProvider(oAuth2AuthorizationService, oAuth2TokenGenerator);
     }
-
-
 }
