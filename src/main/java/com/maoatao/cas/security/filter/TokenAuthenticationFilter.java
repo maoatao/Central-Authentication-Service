@@ -9,12 +9,14 @@ import com.maoatao.synapse.lang.util.SynaAssert;
 import com.maoatao.synapse.lang.util.SynaStrings;
 import com.maoatao.synapse.web.response.HttpResponseStatus;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.GenericFilterBean;
 
 import jakarta.servlet.FilterChain;
@@ -26,6 +28,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -39,6 +42,13 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
     private static final String TOKEM_TYPE_BASIC = "Basic";
 
     private static final String TOKEM_TYPE_BEARER = "Bearer";
+
+    /**
+     * 获取授权码和令牌的两个接口使用 {@value TOKEM_TYPE_BASIC} 鉴权
+     */
+    private static final List<RequestMatcher> BASIC_REQUEST_MATCHER = FilterUtils.requestMatchersBuilder()
+            .antMatchers(HttpMethod.POST, "/code", "/token")
+            .build();
 
     private final OAuth2AuthorizationService oAuth2AuthorizationService;
 
@@ -82,8 +92,9 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
         if (StrUtil.isBlank(token)) {
             return;
         }
-        if (token.startsWith(TOKEM_TYPE_BASIC)) {
+        if (token.startsWith(TOKEM_TYPE_BASIC) && FilterUtils.anyMatch(BASIC_REQUEST_MATCHER, request)) {
             doBasicTokenFilter(token);
+            return;
         }
         if (token.startsWith(TOKEM_TYPE_BEARER)) {
             doBearerTokenFilter(token);
@@ -100,7 +111,6 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
         // 根据 token 生成已授权的主体
         Optional.ofNullable(authorizationService.generatePrincipal(clientUser))
                 .ifPresent(principal -> SecurityContextHolder.getContext().setAuthentication(principal));
-
     }
 
     private void doBearerTokenFilter(String token) {

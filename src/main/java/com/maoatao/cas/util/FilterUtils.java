@@ -1,6 +1,7 @@
 package com.maoatao.cas.util;
 
 import cn.hutool.core.codec.Base64;
+import cn.hutool.core.collection.IterUtil;
 import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.security.CustomAuthorizationServerContext;
 import com.maoatao.synapse.lang.exception.SynaException;
@@ -74,8 +75,28 @@ public abstract class FilterUtils {
         });
     }
 
+    /**
+     * @return 请求匹配器构建器
+     */
     public static RequestMatchersBuilder requestMatchersBuilder() {
         return new RequestMatchersBuilder();
+    }
+
+    /**
+     * 是否存在请求匹配
+     *
+     * @return 有任意匹配返回 true, matchers 为空返回 false
+     */
+    public static boolean anyMatch(List<RequestMatcher> matchers, HttpServletRequest request) {
+        if (IterUtil.isEmpty(matchers)) {
+            return false;
+        }
+        for (RequestMatcher requestMatcher : matchers) {
+            if (requestMatcher.matcher(request).isMatch()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static String resolveIssuer(AuthorizationServerSettings authorizationServerSettings, HttpServletRequest request) {
