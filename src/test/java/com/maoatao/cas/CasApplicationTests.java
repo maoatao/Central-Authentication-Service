@@ -3,6 +3,8 @@ package com.maoatao.cas;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
+import cn.hutool.jwt.JWT;
+import cn.hutool.jwt.JWTUtil;
 import com.maoatao.cas.config.AuthorizationServerConfig;
 import com.maoatao.cas.core.entity.PermissionEntity;
 import com.maoatao.cas.core.entity.RoleEntity;
@@ -41,6 +43,8 @@ import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.core.endpoint.PkceParameterNames;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.context.AuthorizationServerContext;
@@ -92,6 +96,9 @@ class CasApplicationTests {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private JwtDecoder jwtDecoder;
 
     /**
      * 客户端 id
@@ -168,17 +175,7 @@ class CasApplicationTests {
      */
     @Test
     void generate_token_test() {
-        // 构建上下文
-        Authentication principal = authorizationService.generateUserPrincipal(ClientUser.builder()
-                .clientId(TEST_CLIENT_ID)
-                .username(TEST_USER_NAME)
-                .password(TEST_USER_PASSWORD)
-                .build()
-        );
-        SecurityContextHolder.getContext().setAuthentication(principal);
-        AuthorizationServerContext authorizationServerContext = FilterUtils.buildAuthorizationServerContext(authorizationServerSettings, new MockHttpServletRequest());
-        AuthorizationServerContextHolder.setContext(authorizationServerContext);
-
+        mock_context_test();
         System.out.println("\n========================== 授权码模式 开始 ==========================");
         String authorizationCode = generate_authorization_code_test();
         CustomAccessToken customAccessToken = generate_token_by_code_test(authorizationCode);
@@ -312,7 +309,7 @@ class CasApplicationTests {
         Assert.assertTrue("获取令牌请求失败!", StrUtil.isNotBlank(mockResponse.getContentAsString()));
 
         System.out.println("\n----------------------------------------------------");
-        System.out.println(SynaStrings.format("已成功获取令牌:"));
+        System.out.println("已成功获取令牌:");
         System.out.println(new JSONObject(mockResponse.getContentAsString()).toStringPretty());
         System.out.println("----------------------------------------------------");
     }
@@ -334,7 +331,7 @@ class CasApplicationTests {
         Assert.assertNotNull("授权码模式生成令牌请求失败!", accessToken);
 
         System.out.println("\n----------------------------------------------------");
-        System.out.println(SynaStrings.format("[授权码模式]已成功获取令牌:"));
+        System.out.println("[授权码模式]已成功获取令牌:");
         System.out.println(new JSONObject(accessToken).toStringPretty());
         System.out.println("----------------------------------------------------");
 
@@ -357,7 +354,7 @@ class CasApplicationTests {
         Assert.assertNotNull("刷新令牌模式生成令牌请求失败!", accessToken);
 
         System.out.println("\n----------------------------------------------------");
-        System.out.println(SynaStrings.format("[刷新令牌模式]已成功获取令牌:"));
+        System.out.println("[刷新令牌模式]已成功获取令牌:");
         System.out.println(new JSONObject(accessToken).toStringPretty());
         System.out.println("----------------------------------------------------");
     }
@@ -375,13 +372,46 @@ class CasApplicationTests {
         Assert.assertNotNull("客户端模式生成令牌请求失败!", accessToken);
 
         System.out.println("\n----------------------------------------------------");
-        System.out.println(SynaStrings.format("[客户端模式]已成功获取令牌:"));
+        System.out.println("[客户端模式]已成功获取令牌:");
         System.out.println(new JSONObject(accessToken).toStringPretty());
         System.out.println("----------------------------------------------------");
     }
 
+    private void mock_context_test() {
+        // 构建上下文
+        Authentication principal = authorizationService.generateUserPrincipal(ClientUser.builder()
+                .clientId(TEST_CLIENT_ID)
+                .username(TEST_USER_NAME)
+                .password(TEST_USER_PASSWORD)
+                .build()
+        );
+        SecurityContextHolder.getContext().setAuthentication(principal);
+        AuthorizationServerContext authorizationServerContext = FilterUtils.buildAuthorizationServerContext(authorizationServerSettings, new MockHttpServletRequest());
+        AuthorizationServerContextHolder.setContext(authorizationServerContext);
+    }
+
 
     //------------------------------------------------ 生成令牌 结束 ------------------------------------------------
+
+    /**
+     * 此方法需要 令牌设置{@link OAuth2TokenFormat#SELF_CONTAINED}
+     */
+    @Test
+    void read_jwt_token_test() {
+        mock_context_test();
+        String authorizationCode = generate_authorization_code_test();
+        CustomAccessToken customAccessToken = generate_token_by_code_test(authorizationCode);
+        Jwt jwt = jwtDecoder.decode(customAccessToken.getAccessToken());
+        JWT htJwt = JWTUtil.parseToken(customAccessToken.getAccessToken());
+        System.out.println("\n----------------------------------------------------");
+        System.out.println("[JWT解码]原生:");
+        System.out.println(new JSONObject(jwt).toStringPretty());
+        System.out.println("----------------------------------------------------");
+        System.out.println("[JWT解码]Hutool:");
+        System.out.println("\"header\": " + htJwt.getHeaders().toStringPretty());
+        System.out.println("\"payload\": " + htJwt.getPayloads().toStringPretty());
+        System.out.println("----------------------------------------------------");
+    }
 
     /**
      * 非必要
