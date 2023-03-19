@@ -2,7 +2,6 @@ package com.maoatao.cas.config;
 
 import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.security.CustomUserAuthenticationProvider;
-import com.maoatao.cas.security.UUIDStringKeyGenerator;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeAccessTokenProvider;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
 import com.maoatao.cas.security.oauth2.auth.CustomClientCredentialsTokenProvider;
@@ -12,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
@@ -123,11 +123,12 @@ public class AuthenticationProviderConfig {
     @Bean
     public OAuth2AuthorizationCodeRequestAuthenticationProvider oAuth2AuthorizationCodeRequestAuthenticationProvider(RegisteredClientRepository registeredClientRepository,
                                                                                                                      OAuth2AuthorizationService oAuth2AuthorizationService,
-                                                                                                                     OAuth2AuthorizationConsentService oAuth2AuthorizationConsentService) {
+                                                                                                                     OAuth2AuthorizationConsentService oAuth2AuthorizationConsentService,
+                                                                                                                     StringKeyGenerator stringKeyGenerator) {
         OAuth2AuthorizationCodeRequestAuthenticationProvider oAuth2AuthorizationCodeRequestAuthenticationProvider =
                 new OAuth2AuthorizationCodeRequestAuthenticationProvider(registeredClientRepository, oAuth2AuthorizationService, oAuth2AuthorizationConsentService);
         // 配置自定义授权码生成器
-        oAuth2AuthorizationCodeRequestAuthenticationProvider.setAuthorizationCodeGenerator(new CustomAuthorizationCodeGenerator(new UUIDStringKeyGenerator()));
+        oAuth2AuthorizationCodeRequestAuthenticationProvider.setAuthorizationCodeGenerator(new CustomAuthorizationCodeGenerator(stringKeyGenerator));
         return oAuth2AuthorizationCodeRequestAuthenticationProvider;
     }
 
