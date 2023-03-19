@@ -12,6 +12,8 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
@@ -22,6 +24,7 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationCode;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
@@ -32,8 +35,10 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Toke
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
 
 import java.security.KeyPair;
+import java.security.Principal;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -101,6 +106,12 @@ public class GeneratorConfig {
             if (context.getTokenType().equals(OAuth2TokenType.ACCESS_TOKEN)) {
                 jwsHeader.header("customerHeader", "这是一个自定义access_token header");
                 claims.claim("customerClaim", "这是一个自定义access_token claim");
+                // 添加权限列表
+                Optional.ofNullable(context.get(OAuth2Authorization.class)).ifPresent(o -> {
+                    if (o.getAttribute(Principal.class.getName()) instanceof UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken) {
+                        claims.claim("authorities", usernamePasswordAuthenticationToken.getAuthorities());
+                    }
+                });
             }
         };
     }
