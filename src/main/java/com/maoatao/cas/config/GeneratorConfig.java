@@ -1,6 +1,7 @@
 package com.maoatao.cas.config;
 
 import com.maoatao.cas.security.UUIDStringKeyGenerator;
+import com.maoatao.cas.security.bean.CustomUserDetails;
 import com.maoatao.cas.security.oauth2.auth.CustomAccessTokenGenerator;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
 import com.maoatao.cas.security.oauth2.auth.CustomRefreshTokenGenerator;
@@ -109,7 +110,11 @@ public class GeneratorConfig {
                 // 添加权限列表
                 Optional.ofNullable(context.get(OAuth2Authorization.class)).ifPresent(o -> {
                     if (o.getAttribute(Principal.class.getName()) instanceof UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken) {
-                        claims.claim("authorities", usernamePasswordAuthenticationToken.getAuthorities());
+                        if (usernamePasswordAuthenticationToken.getPrincipal() instanceof CustomUserDetails customUserDetails){
+                            claims.claim("userId", customUserDetails.getUserId());
+                            claims.claim("openId", customUserDetails.getOpenId());
+                            claims.claim("authorities", customUserDetails.getAuthorities());
+                        }
                     }
                 });
             }
