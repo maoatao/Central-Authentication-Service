@@ -1,6 +1,6 @@
 package com.maoatao.cas.core.param;
 
-import com.maoatao.synapse.core.bean.BaseParam;
+import com.maoatao.synapse.core.bean.base.BaseParam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

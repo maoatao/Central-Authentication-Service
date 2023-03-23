@@ -1,6 +1,6 @@
 package com.maoatao.cas.security.bean;
 
-import com.maoatao.synapse.core.bean.BaseVO;
+import com.maoatao.synapse.core.bean.base.BaseVO;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import com.maoatao.synapse.lang.util.SynaDates;
 import io.swagger.v3.oas.annotations.media.Schema;
