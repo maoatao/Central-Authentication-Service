@@ -14,7 +14,6 @@ import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
@@ -111,7 +110,6 @@ public class GeneratorConfig {
                 Optional.ofNullable(context.get(OAuth2Authorization.class)).ifPresent(o -> {
                     if (o.getAttribute(Principal.class.getName()) instanceof UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken) {
                         if (usernamePasswordAuthenticationToken.getPrincipal() instanceof CustomUserDetails customUserDetails){
-                            claims.claim("userId", customUserDetails.getUserId());
                             claims.claim("openId", customUserDetails.getOpenId());
                             claims.claim("authorities", customUserDetails.getAuthorities());
                         }

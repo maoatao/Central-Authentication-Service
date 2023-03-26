@@ -2,7 +2,7 @@ package com.maoatao.cas.core.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.maoatao.daedalus.data.bean.IdEntity;
+import com.maoatao.daedalus.data.bean.BaseIdEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
@@ -22,7 +22,7 @@ import java.io.Serial;
 @TableName("t_cas_role_permission")
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "角色权限关系")
-public class RolePermissionEntity extends IdEntity<RolePermissionEntity> {
+public class RolePermissionEntity extends BaseIdEntity<RolePermissionEntity> {
 
     @Serial
     private static final long serialVersionUID = 1296674573072507831L;
