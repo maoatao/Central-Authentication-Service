@@ -1,7 +1,7 @@
 package com.maoatao.cas.openapi.converter;
 
 import cn.hutool.jwt.JWTUtil;
-import com.maoatao.cas.common.bean.CasJwt;
+import com.maoatao.cas.common.authentication.CasJwt;
 import com.maoatao.cas.openapi.context.JwtOperatorContext;
 import com.maoatao.daedalus.core.context.DaedalusOperatorContext;
 import com.maoatao.synapse.lang.util.SynaAssert;

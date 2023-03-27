@@ -1,6 +1,6 @@
 package com.maoatao.cas.openapi.authentication;
 
-import com.maoatao.cas.common.bean.CasAuthorization;
+import com.maoatao.cas.common.authentication.CasAuthorization;
 
 /**
  * 令牌服务接口

@@ -1,4 +1,4 @@
-package com.maoatao.cas.common.bean;
+package com.maoatao.cas.common.authentication;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;

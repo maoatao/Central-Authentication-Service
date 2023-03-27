@@ -1,4 +1,4 @@
-package com.maoatao.cas.common.bean;
+package com.maoatao.cas.common.authentication;
 
 import com.maoatao.synapse.core.bean.base.BaseBean;
 import java.io.Serial;

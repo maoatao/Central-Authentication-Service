@@ -1,6 +1,6 @@
 package com.maoatao.cas.openapi.converter;
 
-import com.maoatao.cas.common.bean.CasAuthorization;
+import com.maoatao.cas.common.authentication.CasAuthorization;
 import com.maoatao.cas.openapi.authentication.DaedalusTokenService;
 import com.maoatao.daedalus.core.context.DaedalusOperatorContext;
 import com.maoatao.daedalus.core.context.DefalutOperatorContext;
