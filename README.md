@@ -29,7 +29,7 @@ Central Authentication Service (CAS 中央认证服务 OAuth2.1协议)
 
 ### 2. 新建表
 
-使用`help/doc/sql/CAS_DDL.sql`的文件建表
+使用`docs/sql/CAS_DDL.sql`的文件建表
 
 | 表名                           | 描述    |
 |------------------------------|-------|
@@ -50,7 +50,7 @@ Central Authentication Service (CAS 中央认证服务 OAuth2.1协议)
    初始化测试数据单元测试：  
    `com.maoatao.cas.CasApplicationTests#initialize_test_data()`
 2. 使用SQL导入  
-   使用`help/doc/sql/CAS_DML_DEMO.sql`的文件导入数据
+   使用`docs/sql/CAS_DML_DEMO.sql`的文件导入数据
 
 ### 4. 生成授权码的两种方法
 
@@ -75,7 +75,7 @@ Central Authentication Service (CAS 中央认证服务 OAuth2.1协议)
        "codeChallengeMethod": "S256",
        "codeChallenge": "3vrxycun-VbyenvO5GiFOaOBazUBX_xcFElnqbl-TXA"
        }`
-       ![获取授权码](help/readme_imags/获取授权码.png "获取授权码")
+       ![获取授权码](docs/readme_imags/获取授权码.png "获取授权码")
 
 
 > 客户端的配置require_proof_key为true时就使用PKCE协议，额外使用三个参数。分别是请求授权码时使用的code_challenge和code_challenge_method和请求令牌时使用的code_verifier。
@@ -89,7 +89,7 @@ Central Authentication Service (CAS 中央认证服务 OAuth2.1协议)
 1. 接口地址：http://127.0.0.1:8080/oauth2/token
 2. 方法：POST **(multipart/form-data)**
 3. 权限：Basic (客户端ID:客户端密码)
-   ![权限](help/readme_imags/BasicAuth.png "权限")
+   ![权限](docs/readme_imags/BasicAuth.png "权限")
 4. 示例(Body)：
    `{
    "grant_type": "authorization_code",
@@ -97,7 +97,7 @@ Central Authentication Service (CAS 中央认证服务 OAuth2.1协议)
    "code_verifier": "eT3Zhtr7Tmz20-qpTk9zs8EWhN63qdZd8GWiq5-h67TrujxzIg0p_tPUfWH1dXQg278ZEiMcq9ehYPvbBehNe8f4VP4o8EOnFoQY7wVwjUyG_l0ksZUUuPWg5dWKAEth",
    "code": "c360646f-4f35-44a7-bac0-05a7925d1e5a"
    }`
-   ![获取令牌](help/readme_imags/获取令牌.png "获取令牌")
+   ![获取令牌](docs/readme_imags/获取令牌.png "获取令牌")
    > 参数中code是第四步获取的授权码
 
 ### 6. 刷新令牌
@@ -105,25 +105,25 @@ Central Authentication Service (CAS 中央认证服务 OAuth2.1协议)
 1. 接口地址：http://127.0.0.1:8080/oauth2/token
 2. 方法：POST **(multipart/form-data)**
 3. 权限：Basic (客户端ID:客户端密码)
-   ![权限](help/readme_imags/BasicAuth.png "权限")
+   ![权限](docs/readme_imags/BasicAuth.png "权限")
 4. 示例(Body)：
    `{
    "grant_type": "refresh_token",
    "refresh_token": "07236457-6fbb-4115-9402-850865440d77"
    }`
-   ![刷新令牌](help/readme_imags/刷新令牌.png "刷新令牌")
+   ![刷新令牌](docs/readme_imags/刷新令牌.png "刷新令牌")
 
 ### 7. 验证令牌
 
 1. 接口地址：http://127.0.0.1:8080/oauth2/introspect
 2. 方法：POST **(multipart/form-data)**
 3. 权限：Basic (客户端ID:客户端密码)
-   ![权限](help/readme_imags/BasicAuth.png "权限")
+   ![权限](docs/readme_imags/BasicAuth.png "权限")
 4. 示例(Body)：
    `{
    "token": "fade5f4b-6817-47bd-9549-2732a83e30c7"
    }`
-   ![验证令牌](help/readme_imags/验证令牌.png "验证令牌")
+   ![验证令牌](docs/readme_imags/验证令牌.png "验证令牌")
 
 ### 8. 吊销令牌（我自定义的）
 
@@ -132,7 +132,7 @@ Central Authentication Service (CAS 中央认证服务 OAuth2.1协议)
 3. 权限：Bearer (令牌)
 4. 示例(Auth)：
    `Bearer fade5f4b-6817-47bd-9549-2732a83e30c71`
-   ![吊销令牌](help/readme_imags/吊销令牌.png "吊销令牌")
+   ![吊销令牌](docs/readme_imags/吊销令牌.png "吊销令牌")
 
 ## OAuth 2.0 扩展协议之 PKCE
 
