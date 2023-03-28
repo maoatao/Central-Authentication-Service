@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.maoatao.cas.core.mapper.PermissionMapper">
-    <resultMap id="permissionMap" type="com.maoatao.cas.core.entity.PermissionEntity">
+    <resultMap id="resultMap" type="com.maoatao.cas.core.entity.PermissionEntity">
         <id property="id" column="id"/>
         <result property="clientId" column="client_id"/>
         <result property="name" column="name"/>
@@ -10,8 +10,8 @@
         <result property="enabled" column="enabled"/>
     </resultMap>
 
-    <select id="getPermissionByUser" resultType="com.maoatao.cas.core.entity.PermissionEntity">
-        SELECT c.name, c.client_id
+    <select id="getPermissionByUser" resultMap="resultMap">
+        SELECT c.`name`, c.`client_id`
         FROM `t_cas_user_role` a,
              `t_cas_role_permission` b,
              `t_cas_permission` c

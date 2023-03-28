@@ -18,7 +18,15 @@ public interface RoleService extends DaedalusService<RoleEntity> {
      *
      * @param roleNames 角色名称集合
      * @param clientId  客户端 id
-     * @return 角色集合
+     * @return 角色列表
      */
     List<RoleEntity> listByRolesAndClient(List<String> roleNames, String clientId);
+
+    /**
+     * 通过用户id查询列表
+     *
+     * @param userId 用户ID
+     * @return 角色列表
+     */
+    List<RoleEntity> listByUser(Long userId);
 }

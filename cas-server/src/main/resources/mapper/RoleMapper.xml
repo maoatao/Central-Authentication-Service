@@ -2,11 +2,20 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.maoatao.cas.core.mapper.RoleMapper">
-    <resultMap id="roleMap" type="com.maoatao.cas.core.entity.RoleEntity">
+    <resultMap id="resultMap" type="com.maoatao.cas.core.entity.RoleEntity">
         <id property="id" column="id"/>
         <result property="clientId" column="client_id"/>
         <result property="name" column="name"/>
         <result property="description" column="description"/>
         <result property="enabled" column="enabled"/>
     </resultMap>
+
+    <select id="getRoleByUser" resultMap="resultMap">
+        SELECT b.`name`, b.`client_id`
+        FROM `t_cas_user_role` a,
+             `t_cas_role` b
+        WHERE a.`role_id` = b.`id`
+          AND b.`enabled` = b'1'
+          AND a.`user_id` = #{userId};
+    </select>
 </mapper>

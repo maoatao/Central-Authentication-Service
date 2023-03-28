@@ -29,4 +29,9 @@ public class RoleServiceImpl extends DaedalusServiceImpl<RoleMapper, RoleEntity>
                 Wrappers.<RoleEntity>lambdaQuery().in(RoleEntity::getName, roleNames).eq(RoleEntity::getClientId, clientId)
         ));
     }
+
+    @Override
+    public List<RoleEntity> listByUser(Long userId) {
+        return getBaseMapper().getRoleByUser(userId);
+    }
 }

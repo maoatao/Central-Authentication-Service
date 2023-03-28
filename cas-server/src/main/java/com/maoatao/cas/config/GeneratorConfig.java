@@ -3,7 +3,6 @@ package com.maoatao.cas.config;
 import com.maoatao.cas.security.UUIDStringKeyGenerator;
 import com.maoatao.cas.security.bean.CustomUserDetails;
 import com.maoatao.cas.security.oauth2.auth.CustomAccessTokenGenerator;
-import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
 import com.maoatao.cas.security.oauth2.auth.CustomRefreshTokenGenerator;
 import com.maoatao.cas.util.AuthorizationUtils;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -14,18 +13,17 @@ import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
 import org.springframework.security.oauth2.core.OAuth2Token;
-import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
-import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationCode;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.token.DelegatingOAuth2TokenGenerator;
@@ -101,17 +99,16 @@ public class GeneratorConfig {
     @Bean
     public OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer() {
         return context -> {
-            JwsHeader.Builder jwsHeader = context.getJwsHeader();
             JwtClaimsSet.Builder claims = context.getClaims();
             if (context.getTokenType().equals(OAuth2TokenType.ACCESS_TOKEN)) {
-                jwsHeader.header("customerHeader", "这是一个自定义access_token header");
-                claims.claim("customerClaim", "这是一个自定义access_token claim");
                 // 添加权限列表
                 Optional.ofNullable(context.get(OAuth2Authorization.class)).ifPresent(o -> {
-                    if (o.getAttribute(Principal.class.getName()) instanceof UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken) {
-                        if (usernamePasswordAuthenticationToken.getPrincipal() instanceof CustomUserDetails customUserDetails){
+                    if (o.getAttribute(Principal.class.getName()) instanceof Authentication authentication) {
+                        if (authentication.getPrincipal() instanceof CustomUserDetails customUserDetails) {
                             claims.claim("openId", customUserDetails.getOpenId());
-                            claims.claim("authorities", customUserDetails.getAuthorities());
+                            claims.claim("permissions", customUserDetails.getPermissions());
+                            claims.claim("roles", customUserDetails.getRoles());
+                            claims.claim("scope", o.getAuthorizedScopes());
                         }
                     }
                 });
@@ -131,13 +128,6 @@ public class GeneratorConfig {
      */
     private OAuth2TokenGenerator<OAuth2RefreshToken> customRefreshTokenGenerator(StringKeyGenerator stringKeyGenerator) {
         return new CustomRefreshTokenGenerator(stringKeyGenerator);
-    }
-
-    /**
-     * 授权码生成者
-     */
-    private OAuth2TokenGenerator<OAuth2AuthorizationCode> customAuthorizationCodeGenerator(StringKeyGenerator stringKeyGenerator) {
-        return new CustomAuthorizationCodeGenerator(stringKeyGenerator);
     }
 
     /**

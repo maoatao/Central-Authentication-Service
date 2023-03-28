@@ -1,5 +1,7 @@
 package com.maoatao.cas.common.authentication;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.maoatao.synapse.lang.util.SynaDates;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -59,6 +61,7 @@ public interface CasAuthorization extends Serializable {
      *
      * @return 过期时间
      */
+    @JsonFormat(pattern = SynaDates.DATE_TIME_FORMAT, timezone = SynaDates.CN_TIME_ZONE)
     LocalDateTime getExpiresAt();
 
     /**
@@ -66,5 +69,6 @@ public interface CasAuthorization extends Serializable {
      *
      * @return 过期时间
      */
+    @JsonFormat(pattern = SynaDates.DATE_TIME_FORMAT, timezone = SynaDates.CN_TIME_ZONE)
     LocalDateTime getIssuedAt();
 }

@@ -1,9 +1,9 @@
 package com.maoatao.cas.core.controller;
 
+import com.maoatao.cas.common.authentication.CasAccessToken;
+import com.maoatao.cas.common.authentication.CasAuthorization;
 import com.maoatao.cas.core.param.GenerateAccessTokenParam;
 import com.maoatao.cas.core.service.AuthorizationService;
-import com.maoatao.cas.security.bean.AuthorizationInfo;
-import com.maoatao.cas.security.bean.CustomAccessToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class AccessTokenController {
      */
     @PostMapping
     @Operation(summary = "generateAccessToken", description = "生成令牌")
-    public CustomAccessToken generateAccessToken(@RequestBody GenerateAccessTokenParam param) {
+    public CasAccessToken generateAccessToken(@RequestBody GenerateAccessTokenParam param) {
         return authorizationService.generateAccessToken(param);
     }
 
@@ -61,7 +61,7 @@ public class AccessTokenController {
      */
     @GetMapping
     @Operation(summary = "getAuthorizationInfo", description = "查询授权信息")
-    public AuthorizationInfo getAuthorizationInfo(@RequestHeader(value = "Authorization") String accessToken) {
+    public CasAuthorization getAuthorizationInfo(@RequestHeader(value = "Authorization") String accessToken) {
         return authorizationService.getAuthorizationInfo(accessToken);
     }
 }

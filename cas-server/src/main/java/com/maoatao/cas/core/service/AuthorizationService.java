@@ -1,11 +1,11 @@
 package com.maoatao.cas.core.service;
 
+import com.maoatao.cas.common.authentication.CasAccessToken;
+import com.maoatao.cas.common.authentication.CasAuthorization;
 import com.maoatao.cas.core.param.GenerateAccessTokenParam;
 import com.maoatao.cas.core.param.GenerateAuthorizationCodeParam;
 import com.maoatao.cas.security.CustomUserAuthenticationProvider;
-import com.maoatao.cas.security.bean.AuthorizationInfo;
 import com.maoatao.cas.security.bean.ClientUser;
-import com.maoatao.cas.security.bean.CustomAccessToken;
 import org.springframework.security.core.Authentication;
 
 /**
@@ -30,7 +30,7 @@ public interface AuthorizationService {
      * @param param 参数
      * @return 访问令牌
      */
-    CustomAccessToken generateAccessToken(GenerateAccessTokenParam param);
+    CasAccessToken generateAccessToken(GenerateAccessTokenParam param);
 
     /**
      * 吊销令牌
@@ -46,7 +46,7 @@ public interface AuthorizationService {
      * @param accessToken 令牌
      * @return 授权信息
      */
-    AuthorizationInfo getAuthorizationInfo(String accessToken);
+    CasAuthorization getAuthorizationInfo(String accessToken);
 
     /**
      * 通过客户端用户获取经过授权用户主体

@@ -16,6 +16,7 @@
 
         <junit.version>4.13.2</junit.version>
         <daedalus.version>1.0.0-SNAPSHOT</daedalus.version>
+        <jackson.version>2.14.2</jackson.version>
     </properties>
 
     <dependencies>
@@ -29,6 +30,11 @@
             <groupId>com.maoatao.daedalus</groupId>
             <artifactId>daedalus-core</artifactId>
             <version>${daedalus.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
     </dependencies>
 

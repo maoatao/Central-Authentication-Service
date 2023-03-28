@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.IterUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.maoatao.cas.core.entity.PermissionEntity;
 import com.maoatao.cas.core.entity.RoleEntity;
 import com.maoatao.cas.core.entity.UserEntity;
 import com.maoatao.cas.core.mapper.UserMapper;
@@ -11,13 +12,11 @@ import com.maoatao.cas.core.service.PermissionService;
 import com.maoatao.cas.core.service.RoleService;
 import com.maoatao.cas.core.service.UserRoleService;
 import com.maoatao.cas.core.service.UserService;
-import com.maoatao.cas.security.bean.CustomAuthority;
 import com.maoatao.cas.security.bean.CustomUserDetails;
 import com.maoatao.cas.util.Ids;
 import com.maoatao.cas.core.param.UserParam;
 import com.maoatao.daedalus.data.service.impl.DaedalusServiceImpl;
 import com.maoatao.synapse.lang.util.SynaAssert;
-import com.maoatao.synapse.lang.util.SynaSafes;
 import com.maoatao.synapse.lang.util.SynaStrings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -63,17 +62,7 @@ public class UserServiceImpl extends DaedalusServiceImpl<UserMapper, UserEntity>
             throw new UsernameNotFoundException(SynaStrings.format("用户 {} 不存在!", username));
         }
         SynaAssert.isTrue(existed.getEnabled(), "用户 {} 已被禁用", username);
-        return CustomUserDetails.builder()
-                .openId(existed.getOpenId())
-                .clientId(existed.getClientId())
-                .username(existed.getName())
-                .password(existed.getPassword())
-                .disabled(false)
-                .accountExpired(false)
-                .accountLocked(false)
-                .credentialsExpired(false)
-                .authorities(getAuthorities(existed.getId()))
-                .build();
+        return buildUserDetails(existed);
     }
 
     @Override
@@ -143,19 +132,6 @@ public class UserServiceImpl extends DaedalusServiceImpl<UserMapper, UserEntity>
     }
 
     /**
-     * 获取权限
-     *
-     * @param userId 用户id
-     * @return 权限列表
-     */
-    private List<CustomAuthority> getAuthorities(Long userId) {
-        // TODO: 2023-03-02 22:28:34 目前一个Authority是一个权限, 是否考虑换成一个角色
-        return SynaSafes.of(permissionService.listByUser(userId)).stream()
-                .map(o -> CustomAuthority.builder().authority(o.getName()).client(o.getClientId()).build())
-                .toList();
-    }
-
-    /**
      * 校验客户端是否存在
      *
      * @param clientId 客户端 id
@@ -208,5 +184,30 @@ public class UserServiceImpl extends DaedalusServiceImpl<UserMapper, UserEntity>
             SynaAssert.notNull(roleId, "角色 {} 不存在", o);
             return roleId;
         }).toList();
+    }
+
+    private UserDetails buildUserDetails(UserEntity userEntity) {
+        CustomUserDetails.CustomUserDetailsBuilder customUserDetailsBuilder = CustomUserDetails.builder()
+                .openId(userEntity.getOpenId())
+                .clientId(userEntity.getClientId())
+                .username(userEntity.getName())
+                .password(userEntity.getPassword())
+                .enabled(true)
+                .accountNonExpired(true)
+                .accountNonLocked(true)
+                .credentialsNonExpired(true);
+        List<PermissionEntity> permissionEntities = permissionService.listByUser(userEntity.getId());
+        if (IterUtil.isNotEmpty(permissionEntities)) {
+            customUserDetailsBuilder.permissions(permissionEntities.stream()
+                    .map(PermissionEntity::getName)
+                    .collect(Collectors.toSet()));
+        }
+        List<RoleEntity> roleEntities = roleService.listByUser(userEntity.getId());
+        if (IterUtil.isNotEmpty(roleEntities)) {
+            customUserDetailsBuilder.roles(roleEntities.stream()
+                    .map(RoleEntity::getName)
+                    .collect(Collectors.toSet()));
+        }
+        return customUserDetailsBuilder.build();
     }
 }

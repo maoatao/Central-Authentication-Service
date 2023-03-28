@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.jwt.JWT;
 import cn.hutool.jwt.JWTUtil;
+import com.maoatao.cas.common.authentication.CasAccessToken;
 import com.maoatao.cas.config.AuthorizationServerConfig;
 import com.maoatao.cas.core.entity.PermissionEntity;
 import com.maoatao.cas.core.entity.RoleEntity;
@@ -18,7 +19,6 @@ import com.maoatao.cas.core.service.RolePermissionService;
 import com.maoatao.cas.core.service.RoleService;
 import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.security.bean.ClientUser;
-import com.maoatao.cas.security.bean.CustomAccessToken;
 import com.maoatao.cas.util.FilterUtils;
 import com.maoatao.cas.util.Ids;
 import com.maoatao.cas.core.param.UserParam;
@@ -178,7 +178,7 @@ class CasApplicationTests {
         mock_context_test();
         System.out.println("\n========================== 授权码模式 开始 ==========================");
         String authorizationCode = generate_authorization_code_test();
-        CustomAccessToken customAccessToken = generate_token_by_code_test(authorizationCode);
+        CasAccessToken customAccessToken = generate_token_by_code_test(authorizationCode);
         System.out.println("\n========================== 授权码模式 结束 ==========================");
         System.out.println("\n========================== 刷新令牌模式 开始 ==========================");
         String refreshToken = customAccessToken.getRefreshToken();
@@ -319,14 +319,14 @@ class CasApplicationTests {
      *
      * @param authorizationCode 授权码
      */
-    private CustomAccessToken generate_token_by_code_test(String authorizationCode) {
+    private CasAccessToken generate_token_by_code_test(String authorizationCode) {
         GenerateAccessTokenParam param = new GenerateAccessTokenParam();
         param.setType(AuthorizationGrantType.AUTHORIZATION_CODE.getValue());
         param.setCode(authorizationCode);
         param.setSecret(TEST_CLIENT_SECRET);
         param.setVerifier("eT3Zhtr7Tmz20-qpTk9zs8EWhN63qdZd8GWiq5-h67TrujxzIg0p_tPUfWH1dXQg278ZEiMcq9ehYPvbBehNe8f4VP4o8EOnFoQY7wVwjUyG_l0ksZUUuPWg5dWKAEth");
 
-        CustomAccessToken accessToken = authorizationService.generateAccessToken(param);
+        CasAccessToken accessToken = authorizationService.generateAccessToken(param);
 
         Assert.assertNotNull("授权码模式生成令牌请求失败!", accessToken);
 
@@ -349,7 +349,7 @@ class CasApplicationTests {
         param.setCode(refreshToken);
         param.setSecret(TEST_CLIENT_SECRET);
 
-        CustomAccessToken accessToken = authorizationService.generateAccessToken(param);
+        CasAccessToken accessToken = authorizationService.generateAccessToken(param);
 
         Assert.assertNotNull("刷新令牌模式生成令牌请求失败!", accessToken);
 
@@ -367,7 +367,7 @@ class CasApplicationTests {
         param.setType(AuthorizationGrantType.CLIENT_CREDENTIALS.getValue());
         param.setSecret(TEST_CLIENT_SECRET);
 
-        CustomAccessToken accessToken = authorizationService.generateAccessToken(param);
+        CasAccessToken accessToken = authorizationService.generateAccessToken(param);
 
         Assert.assertNotNull("客户端模式生成令牌请求失败!", accessToken);
 
@@ -400,7 +400,7 @@ class CasApplicationTests {
     void read_jwt_token_test() {
         mock_context_test();
         String authorizationCode = generate_authorization_code_test();
-        CustomAccessToken customAccessToken = generate_token_by_code_test(authorizationCode);
+        CasAccessToken customAccessToken = generate_token_by_code_test(authorizationCode);
         Jwt jwt = jwtDecoder.decode(customAccessToken.getAccessToken());
         JWT htJwt = JWTUtil.parseToken(customAccessToken.getAccessToken());
         System.out.println("\n----------------------------------------------------");

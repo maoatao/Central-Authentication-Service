@@ -7,6 +7,7 @@ import com.maoatao.cas.security.configurer.AuthorizationServerContextFilterConfi
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -67,6 +68,8 @@ public class SecutityConfig {
                     "/error", "/swagger-ui/**", "/swagger-resources/**",
                     "/webjars/**", "/v3/**", "/api/**", "/doc.html", "/favicon.ico"
             ).permitAll();
+            authorizeHttpRequests.requestMatchers(HttpMethod.GET,"/token").permitAll();
+            authorizeHttpRequests.requestMatchers(HttpMethod.DELETE,"/token").permitAll();
             authorizeHttpRequests.anyRequest().authenticated();
         });
     }

@@ -1,20 +1,34 @@
 package com.maoatao.cas.core.service.impl;
 
+import cn.hutool.core.collection.IterUtil;
+import com.maoatao.cas.common.authentication.CasAccessToken;
+import com.maoatao.cas.common.authentication.CasAuthorization;
+import com.maoatao.cas.common.authentication.CasPermission;
+import com.maoatao.cas.common.authentication.CasRole;
+import com.maoatao.cas.common.authentication.DefaultAccessToken;
+import com.maoatao.cas.common.authentication.DefaultAuthorization;
+import com.maoatao.cas.core.entity.PermissionEntity;
+import com.maoatao.cas.core.entity.RoleEntity;
+import com.maoatao.cas.core.entity.UserEntity;
 import com.maoatao.cas.core.param.GenerateAccessTokenParam;
+import com.maoatao.cas.core.service.PermissionService;
+import com.maoatao.cas.core.service.RoleService;
+import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.security.CustomUserAuthenticationProvider;
 import com.maoatao.cas.core.service.AuthorizationService;
 import com.maoatao.cas.security.GrantType;
 import com.maoatao.cas.security.bean.ClientUser;
-import com.maoatao.cas.security.bean.CustomAccessToken;
 import com.maoatao.cas.security.bean.CustomUserDetails;
 import com.maoatao.cas.security.filter.TokenAuthenticationFilter;
 import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
 import com.maoatao.cas.security.UUIDStringKeyGenerator;
 import com.maoatao.cas.core.param.GenerateAuthorizationCodeParam;
-import com.maoatao.cas.security.bean.AuthorizationInfo;
 import com.maoatao.daedalus.web.util.ServletUtils;
 import com.maoatao.synapse.lang.exception.SynaException;
 import com.maoatao.synapse.lang.util.SynaAssert;
+import com.maoatao.synapse.lang.util.SynaDates;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +40,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.OAuth2RefreshToken;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
@@ -72,6 +87,15 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     @Autowired
     private OAuth2AuthorizationService oAuth2AuthorizationService;
 
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private PermissionService permissionService;
+
+    @Autowired
+    private RoleService roleService;
+
     private static final OAuth2TokenGenerator<OAuth2AuthorizationCode> TOKEN_GENERATOR = new CustomAuthorizationCodeGenerator(new UUIDStringKeyGenerator());
 
     @Override
@@ -95,7 +119,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
      * @return 访问令牌
      */
     @Override
-    public CustomAccessToken generateAccessToken(GenerateAccessTokenParam param) {
+    public CasAccessToken generateAccessToken(GenerateAccessTokenParam param) {
         CustomUserDetails userDetails = getUserDetails();
         Authentication clientAuthentication = generateClientPrincipal(userDetails.getClientId(), param.getSecret());
         return switch (param.getType()) {
@@ -121,14 +145,29 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     }
 
     @Override
-    public AuthorizationInfo getAuthorizationInfo(String accessToken) {
+    public CasAuthorization getAuthorizationInfo(String accessToken) {
         OAuth2Authorization authorization = findByAccessToken(accessToken);
-        if (authorization == null) {
+        if (authorization == null || authorization.getAccessToken() == null
+                || !authorization.getAccessToken().isActive() || authorization.getAccessToken().getToken() == null) {
             return null;
         }
-        Authentication principal = authorization.getAttribute(Principal.class.getName());
-        boolean isActive = authorization.getAccessToken().isActive();
-        return AuthorizationInfo.of(principal, isActive);
+        Authentication authentication = authorization.getAttribute(Principal.class.getName());
+        if (authentication == null) {
+            return null;
+        }
+        if (authentication.getPrincipal() instanceof CustomUserDetails principal) {
+            return DefaultAuthorization.builder()
+                    .user(principal.getUsername())
+                    .openId(principal.getOpenId())
+                    .clientId(principal.getClientId())
+                    .permissions(principal.getPermissions())
+                    .roles(principal.getRoles())
+                    .scope(authorization.getAuthorizedScopes())
+                    .expiresAt(SynaDates.of(authorization.getAccessToken().getToken().getExpiresAt()))
+                    .issuedAt(SynaDates.of(authorization.getAccessToken().getToken().getIssuedAt()))
+                    .build();
+        }
+        return null;
     }
 
     @Override
@@ -360,7 +399,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
      * @param client 客户端身份验证
      * @return 访问令牌
      */
-    private CustomAccessToken buildAccessTokenByCode(String code, Authentication client) {
+    private CasAccessToken buildAccessTokenByCode(String code, Authentication client) {
         return buildAccessToken(new OAuth2AuthorizationCodeAuthenticationToken(code, client, null, null));
     }
 
@@ -373,7 +412,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
      * @param client       客户端身份验证
      * @return 访问令牌
      */
-    private CustomAccessToken buildAccessTokenByRefresh(String refreshToken, Authentication client) {
+    private CasAccessToken buildAccessTokenByRefresh(String refreshToken, Authentication client) {
         return buildAccessToken(new OAuth2RefreshTokenAuthenticationToken(refreshToken, client, null, null));
     }
 
@@ -385,7 +424,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
      * @param client 客户端身份验证
      * @return 访问令牌
      */
-    private CustomAccessToken buildAccessTokenByClient(Authentication client) {
+    private CasAccessToken buildAccessTokenByClient(Authentication client) {
         return buildAccessToken(new OAuth2ClientCredentialsAuthenticationToken(client, null, null));
     }
 
@@ -397,7 +436,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
      * @param authentication 授权认证信息(根据不同的AuthenticationToken识别授权模式)
      * @return 访问令牌
      */
-    private CustomAccessToken buildAccessToken(Authentication authentication) {
+    private CasAccessToken buildAccessToken(Authentication authentication) {
         OAuth2AccessTokenAuthenticationToken accessTokenAuthentication;
         try {
             // 生成访问令牌
@@ -406,7 +445,25 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             throw new SynaException("令牌生成失败!", e);
         }
         SynaAssert.notNull(accessTokenAuthentication, "令牌生成失败!");
-        return CustomAccessToken.of(accessTokenAuthentication);
+        OAuth2AccessToken accessToken = accessTokenAuthentication.getAccessToken();
+        SynaAssert.notNull(accessToken, "令牌生成失败!");
+        OAuth2RefreshToken refreshToken = accessTokenAuthentication.getRefreshToken();
+        DefaultAccessToken.DefaultAccessTokenBuilder defaultAccessTokenBuilder = DefaultAccessToken.builder();
+        long now = SynaDates.now(SynaDates.DateType.MILLI_SECOND);
+        long expiresAt = accessTokenAuthentication.getAccessToken().getExpiresAt().toEpochMilli();
+        // 求差值去毫秒
+        long expiresIn = (expiresAt - now) / 1000;
+        if (expiresIn <= 0) {
+            log.warn("令牌生成成功,但已过期? issuedAt:{},expiresAt:{},now:{}", accessTokenAuthentication.getAccessToken().getIssuedAt().toEpochMilli(), expiresAt, now);
+        }
+        defaultAccessTokenBuilder.accessToken(accessToken.getTokenValue()).scope(accessToken.getScopes()).expiresIn(expiresIn);
+        if (accessToken.getTokenType() != null) {
+            defaultAccessTokenBuilder.tokenType(accessToken.getTokenType().getValue());
+        }
+        if (refreshToken != null) {
+            defaultAccessTokenBuilder.refreshToken(refreshToken.getTokenValue());
+        }
+        return defaultAccessTokenBuilder.build();
     }
 
     /**
