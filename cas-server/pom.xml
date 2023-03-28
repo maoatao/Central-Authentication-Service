@@ -28,6 +28,7 @@
         <mysql-connector.version>8.0.32</mysql-connector.version>
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
         <daedalus.version>1.0.0-SNAPSHOT</daedalus.version>
+        <cas.version>1.0.0-SNAPSHOT</cas.version>
 
         <skipTests>true</skipTests>
     </properties>
@@ -94,6 +95,12 @@
             <groupId>com.maoatao.daedalus</groupId>
             <artifactId>daedalus-doc</artifactId>
             <version>${daedalus.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.maoatao.cas</groupId>
+            <artifactId>cas-common</artifactId>
+            <version>${cas.version}</version>
         </dependency>
     </dependencies>
 
