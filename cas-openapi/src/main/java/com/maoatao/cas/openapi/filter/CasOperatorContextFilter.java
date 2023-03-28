@@ -2,9 +2,9 @@ package com.maoatao.cas.openapi.filter;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import com.maoatao.cas.openapi.authentication.DaedalusSecuritySettings;
+import com.maoatao.cas.openapi.authentication.CasServerSettings;
 import com.maoatao.cas.openapi.converter.ContextConverter;
-import com.maoatao.cas.openapi.matcher.DaedalusRequestMatcher;
+import com.maoatao.cas.openapi.matcher.CasRequestMatcher;
 import com.maoatao.daedalus.core.context.AnonymousOperatorContext;
 import com.maoatao.daedalus.core.context.DaedalusOperatorContext;
 import com.maoatao.daedalus.core.context.OperatorContextHolder;
@@ -36,8 +36,8 @@ import org.springframework.web.filter.GenericFilterBean;
  */
 @Slf4j
 @Component
-@Order(DaedalusOperatorContextFilter.ORDER)
-public class DaedalusOperatorContextFilter extends GenericFilterBean {
+@Order(CasOperatorContextFilter.ORDER)
+public class CasOperatorContextFilter extends GenericFilterBean {
 
     public static final int ORDER = 1;
 
@@ -45,12 +45,12 @@ public class DaedalusOperatorContextFilter extends GenericFilterBean {
 
     private final ContextConverter contextConverter;
 
-    private final List<DaedalusRequestMatcher> permitMatchers;
+    private final List<CasRequestMatcher> permitMatchers;
 
-    public DaedalusOperatorContextFilter(DaedalusSecuritySettings daedalusSecuritySettings) {
-        SynaAssert.notNull(daedalusSecuritySettings, "daedalusSecuritySetting cannot be null");
-        this.contextConverter = daedalusSecuritySettings.getContextConverter();
-        this.permitMatchers = daedalusSecuritySettings.getPermitMatchers();
+    public CasOperatorContextFilter(CasServerSettings casServerSettings) {
+        SynaAssert.notNull(casServerSettings, "daedalusSecuritySetting cannot be null");
+        this.contextConverter = casServerSettings.getContextConverter();
+        this.permitMatchers = casServerSettings.getPermitMatchers();
     }
 
     @Override
@@ -71,7 +71,7 @@ public class DaedalusOperatorContextFilter extends GenericFilterBean {
     }
 
     private boolean doPermitFilter(HttpServletRequest request) {
-        for (DaedalusRequestMatcher matcher : this.permitMatchers) {
+        for (CasRequestMatcher matcher : this.permitMatchers) {
             if (matcher.isMatch(request)) {
                 OperatorContextHolder.setContext(AnonymousOperatorContext::new);
                 return true;

@@ -7,13 +7,13 @@ import org.springframework.util.AntPathMatcher;
  * @author MaoAtao
  * @date 2023-03-26 16:29:12
  */
-public class DaedalusMatcher {
+public class CasMatcher {
 
     private final AntPathMatcher antMatcher;
 
     private final String pattern;
 
-    public DaedalusMatcher(String pattern, boolean caseSensitive) {
+    public CasMatcher(String pattern, boolean caseSensitive) {
         this.pattern = pattern;
         this.antMatcher = createMatcher(caseSensitive);
     }

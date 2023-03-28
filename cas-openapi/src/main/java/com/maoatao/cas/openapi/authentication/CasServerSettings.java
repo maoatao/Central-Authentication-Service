@@ -3,18 +3,18 @@ package com.maoatao.cas.openapi.authentication;
 import cn.hutool.core.collection.IterUtil;
 import com.maoatao.cas.openapi.converter.ContextConverter;
 import com.maoatao.cas.openapi.converter.JwtOperatorContextConverter;
-import com.maoatao.cas.openapi.matcher.DaedalusRequestMatcher;
+import com.maoatao.cas.openapi.matcher.CasRequestMatcher;
 import java.util.List;
 import lombok.Getter;
 
 /**
- * Daedalus 安全设置
+ * CAS 服务配置
  *
  * @author MaoAtao
  * @date 2023-03-26 15:55:36
  */
 @Getter
-public class DaedalusSecuritySettings {
+public class CasServerSettings {
 
     /**
      * 上下文转换者
@@ -24,9 +24,9 @@ public class DaedalusSecuritySettings {
     /**
      * 白名单适配器
      */
-    private final List<DaedalusRequestMatcher> permitMatchers;
+    private final List<CasRequestMatcher> permitMatchers;
 
-    private DaedalusSecuritySettings(ContextConverter contextConverter, List<DaedalusRequestMatcher> permitMatchers) {
+    private CasServerSettings(ContextConverter contextConverter, List<CasRequestMatcher> permitMatchers) {
         this.contextConverter = contextConverter;
         this.permitMatchers = permitMatchers;
     }
@@ -37,7 +37,7 @@ public class DaedalusSecuritySettings {
 
     public static class DaedalusSecuritySettingsBuilder {
         private ContextConverter contextConverter;
-        private List<DaedalusRequestMatcher> permitMatchers;
+        private List<CasRequestMatcher> permitMatchers;
 
         private DaedalusSecuritySettingsBuilder() {
         }
@@ -47,16 +47,16 @@ public class DaedalusSecuritySettings {
             return this;
         }
 
-        public DaedalusSecuritySettingsBuilder permitMatchers(List<DaedalusRequestMatcher> permitMatchers) {
+        public DaedalusSecuritySettingsBuilder permitMatchers(List<CasRequestMatcher> permitMatchers) {
             this.permitMatchers = permitMatchers;
             return this;
         }
 
-        public DaedalusSecuritySettings build() {
+        public CasServerSettings build() {
             // 默认jwt转换者和空白名单
-            return new DaedalusSecuritySettings(
+            return new CasServerSettings(
                     this.contextConverter == null ? new JwtOperatorContextConverter() : this.contextConverter,
-                    IterUtil.isEmpty(this.permitMatchers) ? DaedalusRequestMatcher.builder().build() : this.permitMatchers
+                    IterUtil.isEmpty(this.permitMatchers) ? CasRequestMatcher.builder().build() : this.permitMatchers
             );
         }
     }

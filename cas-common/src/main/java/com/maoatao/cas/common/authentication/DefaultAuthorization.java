@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 /**
- * Synapse 授权信息
+ * 授权信息
  *
  * @author MaoAtao
  * @date 2023-03-24 23:06:36

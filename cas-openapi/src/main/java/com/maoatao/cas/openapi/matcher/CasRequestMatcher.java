@@ -9,40 +9,40 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * Daedalus 请求匹配
+ * 请求匹配
  *
  * @author MaoAtao
  * @date 2023-03-26 16:29:12
  */
-public class DaedalusRequestMatcher {
+public class CasRequestMatcher {
 
     private static final String MATCH_ALL = "/**";
 
-    private final DaedalusMatcher matcher;
+    private final CasMatcher matcher;
 
     private final String pattern;
 
     private final HttpMethod httpMethod;
 
-    public static DaedalusRequestMatcher antMatcher(HttpMethod method, String pattern) {
+    public static CasRequestMatcher antMatcher(HttpMethod method, String pattern) {
         Assert.notNull(method, "method cannot be null");
         Assert.hasText(pattern, "pattern cannot be empty");
-        return new DaedalusRequestMatcher(pattern, method);
+        return new CasRequestMatcher(pattern, method);
     }
 
-    public DaedalusRequestMatcher(String pattern) {
+    public CasRequestMatcher(String pattern) {
         this(pattern, null);
     }
 
-    public DaedalusRequestMatcher(String pattern, HttpMethod httpMethod) {
+    public CasRequestMatcher(String pattern, HttpMethod httpMethod) {
         this(pattern, httpMethod, true);
     }
 
 
-    public DaedalusRequestMatcher(String pattern, HttpMethod httpMethod, boolean caseSensitive) {
+    public CasRequestMatcher(String pattern, HttpMethod httpMethod, boolean caseSensitive) {
         this.pattern = pattern;
         this.httpMethod = httpMethod;
-        this.matcher = new DaedalusMatcher(pattern, caseSensitive);
+        this.matcher = new CasMatcher(pattern, caseSensitive);
     }
 
     public boolean isMatch(HttpServletRequest request) {
@@ -78,11 +78,11 @@ public class DaedalusRequestMatcher {
      *
      * @return 有任意匹配返回 true, matchers 为空返回 false
      */
-    public static boolean anyMatch(List<DaedalusRequestMatcher> matchers, HttpServletRequest request) {
+    public static boolean anyMatch(List<CasRequestMatcher> matchers, HttpServletRequest request) {
         if (IterUtil.isEmpty(matchers)) {
             return false;
         }
-        for (DaedalusRequestMatcher requestMatcher : matchers) {
+        for (CasRequestMatcher requestMatcher : matchers) {
             if (requestMatcher.isMatch(request)) {
                 return true;
             }
@@ -91,7 +91,7 @@ public class DaedalusRequestMatcher {
     }
 
     public static class RequestMatchersBuilder {
-        private final List<DaedalusRequestMatcher> matchers;
+        private final List<CasRequestMatcher> matchers;
 
         public RequestMatchersBuilder() {
             this.matchers = new ArrayList<>();
@@ -109,13 +109,13 @@ public class DaedalusRequestMatcher {
             return this;
         }
 
-        public List<DaedalusRequestMatcher> build() {
+        public List<CasRequestMatcher> build() {
             return this.matchers;
         }
 
         private void addMatchers(HttpMethod httpMethod, String... antPatterns) {
             for (String pattern : antPatterns) {
-                this.matchers.add(new DaedalusRequestMatcher(pattern, httpMethod));
+                this.matchers.add(new CasRequestMatcher(pattern, httpMethod));
             }
         }
     }

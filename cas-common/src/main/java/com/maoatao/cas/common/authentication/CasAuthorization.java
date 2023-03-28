@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 /**
- * Synapse 授权详情 接口
+ * 授权详情 接口
  *
  * @author MaoAtao
  * @date 2023-03-16 14:42:05

@@ -3,7 +3,7 @@ package com.maoatao.cas.openapi.converter;
 import com.maoatao.daedalus.core.context.DaedalusOperatorContext;
 
 /**
- * Synapse 上下文转换者
+ * 上下文转换者
  *
  * @author MaoAtao
  * @date 2023-03-26 12:44:49
