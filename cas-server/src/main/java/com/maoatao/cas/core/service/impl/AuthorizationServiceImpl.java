@@ -1,19 +1,10 @@
 package com.maoatao.cas.core.service.impl;
 
-import cn.hutool.core.collection.IterUtil;
 import com.maoatao.cas.common.authentication.CasAccessToken;
 import com.maoatao.cas.common.authentication.CasAuthorization;
-import com.maoatao.cas.common.authentication.CasPermission;
-import com.maoatao.cas.common.authentication.CasRole;
 import com.maoatao.cas.common.authentication.DefaultAccessToken;
 import com.maoatao.cas.common.authentication.DefaultAuthorization;
-import com.maoatao.cas.core.entity.PermissionEntity;
-import com.maoatao.cas.core.entity.RoleEntity;
-import com.maoatao.cas.core.entity.UserEntity;
 import com.maoatao.cas.core.param.GenerateAccessTokenParam;
-import com.maoatao.cas.core.service.PermissionService;
-import com.maoatao.cas.core.service.RoleService;
-import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.security.CustomUserAuthenticationProvider;
 import com.maoatao.cas.core.service.AuthorizationService;
 import com.maoatao.cas.security.GrantType;
@@ -27,8 +18,6 @@ import com.maoatao.daedalus.web.util.ServletUtils;
 import com.maoatao.synapse.lang.exception.SynaException;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import com.maoatao.synapse.lang.util.SynaDates;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,15 +75,6 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
     @Autowired
     private OAuth2AuthorizationService oAuth2AuthorizationService;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private PermissionService permissionService;
-
-    @Autowired
-    private RoleService roleService;
 
     private static final OAuth2TokenGenerator<OAuth2AuthorizationCode> TOKEN_GENERATOR = new CustomAuthorizationCodeGenerator(new UUIDStringKeyGenerator());
 
@@ -155,7 +135,22 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         if (authentication == null) {
             return null;
         }
+        if (authentication instanceof OAuth2ClientAuthenticationToken client) {
+            // 客户端令牌
+            return DefaultAuthorization.builder()
+                    .user(client.getRegisteredClient().getClientName())
+                    // 将 openid 和 客户端 id 设置为一致用于鉴权时辨别人机接口和机机接口
+                    .openId(client.getRegisteredClient().getClientId())
+                    .clientId(client.getRegisteredClient().getClientId())
+                    .permissions(Set.of())
+                    .roles(Set.of())
+                    .scope(authorization.getAuthorizedScopes())
+                    .expiresAt(SynaDates.of(authorization.getAccessToken().getToken().getExpiresAt()))
+                    .issuedAt(SynaDates.of(authorization.getAccessToken().getToken().getIssuedAt()))
+                    .build();
+        }
         if (authentication.getPrincipal() instanceof CustomUserDetails principal) {
+            // 访问令牌
             return DefaultAuthorization.builder()
                     .user(principal.getUsername())
                     .openId(principal.getOpenId())
