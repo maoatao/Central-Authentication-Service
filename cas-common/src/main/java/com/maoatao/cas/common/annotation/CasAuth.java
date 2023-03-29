@@ -1,6 +1,5 @@
 package com.maoatao.cas.common.annotation;
 
-import com.maoatao.cas.common.enums.Api;
 import com.maoatao.synapse.lang.util.SynaStrings;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -22,17 +21,9 @@ import java.lang.annotation.Target;
 public @interface CasAuth {
 
     /**
-     * 接口类型
+     * 角色或权限,默认为空(机机接口)
+     * <p>
+     * 人机接口必填
      */
-    Api type();
-
-    /**
-     * 角色
-     */
-    String[] role() default SynaStrings.EMPTY;
-
-    /**
-     * 权限
-     */
-    String[] permission() default SynaStrings.EMPTY;
+    String[] value() default SynaStrings.EMPTY;
 }
