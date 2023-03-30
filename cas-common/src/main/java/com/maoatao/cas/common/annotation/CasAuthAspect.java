@@ -47,15 +47,18 @@ public class CasAuthAspect {
         AtomicBoolean isAuthentication = new AtomicBoolean(false);
         // 是人机接口 (Human–Computer Interaction)
         AtomicBoolean isHci = new AtomicBoolean(false);
-        getMethodAuthentication(joinPoint, isAuthentication, isHci);
-        preClassAuthentication(joinPoint, isAuthentication, isHci);
-        throwException(isAuthentication.get(), isHci.get());
-    }
-
-    private void getMethodAuthentication(JoinPoint joinPoint, AtomicBoolean isAuthentication, AtomicBoolean isHci) {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         Method method = methodSignature.getMethod();
         CasAuth methodAnnotation = method.getAnnotation(CasAuth.class);
+        preMethodAuthentication(methodAnnotation, isAuthentication, isHci);
+        // 以方法注解为主,没有方法注解时尝试使用类注解
+        if (methodAnnotation == null) {
+            preClassAuthentication(joinPoint, isAuthentication, isHci);
+        }
+        throwException(isAuthentication.get(), isHci.get());
+    }
+
+    private void preMethodAuthentication(CasAuth methodAnnotation, AtomicBoolean isAuthentication, AtomicBoolean isHci) {
         Set<String> methodAuths = getAnnotationValues(methodAnnotation);
         if (methodAnnotation != null) {
             if (IterUtil.isNotEmpty(methodAuths)) {
