@@ -43,10 +43,6 @@ public final class DefaultAuthorization extends BaseBean implements CasAuthoriza
      */
     private final Set<String> permissions;
     /**
-     * 作用域
-     */
-    private final Set<String> scope;
-    /**
      * 过期时间
      */
     private final LocalDateTime expiresAt;
@@ -54,4 +50,8 @@ public final class DefaultAuthorization extends BaseBean implements CasAuthoriza
      * 签发时间
      */
     private final LocalDateTime issuedAt;
+    /**
+     * 客户端凭据
+     */
+    private final boolean clientCredentials;
 }

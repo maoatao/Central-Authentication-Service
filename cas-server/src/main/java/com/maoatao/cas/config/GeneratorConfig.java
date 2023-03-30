@@ -24,6 +24,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2ClientAuthenticationToken;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.token.DelegatingOAuth2TokenGenerator;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
@@ -103,11 +104,15 @@ public class GeneratorConfig {
                 // 添加权限列表
                 Optional.ofNullable(context.get(OAuth2Authorization.class)).ifPresent(o -> {
                     if (o.getAttribute(Principal.class.getName()) instanceof Authentication authentication) {
+                        if (authentication.getPrincipal() instanceof OAuth2ClientAuthenticationToken client) {
+                            claims.claim("openId", client.getRegisteredClient().getClientId());
+                            claims.claim("clientCredentials", true);
+                        }
                         if (authentication.getPrincipal() instanceof CustomUserDetails customUserDetails) {
                             claims.claim("openId", customUserDetails.getOpenId());
                             claims.claim("permissions", customUserDetails.getPermissions());
                             claims.claim("roles", customUserDetails.getRoles());
-                            claims.claim("scope", o.getAuthorizedScopes());
+                            claims.claim("clientCredentials", false);
                         }
                     }
                 });

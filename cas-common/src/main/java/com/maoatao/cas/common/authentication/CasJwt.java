@@ -54,10 +54,6 @@ public class CasJwt extends BaseBean {
      */
     private String openId;
     /**
-     * 作用域
-     */
-    private Set<String> scope;
-    /**
      * 权限
      */
     private Set<String> permissions;
@@ -65,4 +61,8 @@ public class CasJwt extends BaseBean {
      * 角色
      */
     private Set<String> roles;
+    /**
+     * 客户端凭据
+     */
+    private boolean clientCredentials;
 }

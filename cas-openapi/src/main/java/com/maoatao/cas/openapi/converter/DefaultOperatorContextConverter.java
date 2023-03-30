@@ -5,6 +5,7 @@ import com.maoatao.cas.openapi.authentication.DaedalusTokenService;
 import com.maoatao.daedalus.core.context.DaedalusOperatorContext;
 import com.maoatao.daedalus.core.context.DefalutOperatorContext;
 import com.maoatao.synapse.lang.util.SynaAssert;
+import com.maoatao.synapse.lang.util.SynaSafes;
 
 /**
  * 默认 上下文转换者
@@ -30,9 +31,10 @@ public class DefaultOperatorContextConverter implements ContextConverter {
                     .operatorId(authorization.getOpenId())
                     .operatorName(authorization.getUser())
                     .clientId(authorization.getClientId())
-                    .roles(authorization.getRoles())
-                    .permissions(authorization.getPermissions())
+                    .roles(SynaSafes.of(authorization.getRoles()))
+                    .permissions(SynaSafes.of(authorization.getPermissions()))
                     .expiresAt(authorization.getExpiresAt())
+                    .clientCredentials(authorization.isClientCredentials())
                     .build();
         } catch (Exception e) {
             return null;

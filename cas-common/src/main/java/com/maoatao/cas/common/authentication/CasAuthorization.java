@@ -50,13 +50,6 @@ public interface CasAuthorization extends Serializable {
     Set<String> getPermissions();
 
     /**
-     * 获取作用域
-     *
-     * @return 授权作用域
-     */
-    Set<String> getScope();
-
-    /**
      * 获取过期时间
      *
      * @return 过期时间
@@ -71,4 +64,11 @@ public interface CasAuthorization extends Serializable {
      */
     @JsonFormat(pattern = SynaDates.DATE_TIME_FORMAT, timezone = SynaDates.CN_TIME_ZONE)
     LocalDateTime getIssuedAt();
+
+    /**
+     * 是客户端凭据
+     *
+     * @return 如果是客户端凭据返回true
+     */
+    boolean isClientCredentials();
 }

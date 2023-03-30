@@ -144,9 +144,9 @@ public class AuthorizationServiceImpl implements AuthorizationService {
                     .clientId(client.getRegisteredClient().getClientId())
                     .permissions(Set.of())
                     .roles(Set.of())
-                    .scope(authorization.getAuthorizedScopes())
                     .expiresAt(SynaDates.of(authorization.getAccessToken().getToken().getExpiresAt()))
                     .issuedAt(SynaDates.of(authorization.getAccessToken().getToken().getIssuedAt()))
+                    .clientCredentials(true)
                     .build();
         }
         if (authentication.getPrincipal() instanceof CustomUserDetails principal) {
@@ -157,9 +157,9 @@ public class AuthorizationServiceImpl implements AuthorizationService {
                     .clientId(principal.getClientId())
                     .permissions(principal.getPermissions())
                     .roles(principal.getRoles())
-                    .scope(authorization.getAuthorizedScopes())
                     .expiresAt(SynaDates.of(authorization.getAccessToken().getToken().getExpiresAt()))
                     .issuedAt(SynaDates.of(authorization.getAccessToken().getToken().getIssuedAt()))
+                    .clientCredentials(false)
                     .build();
         }
         return null;

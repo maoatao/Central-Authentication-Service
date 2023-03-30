@@ -14,12 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
  * @author LiYuanHao
  * @date 2023-03-30 15:07:16
  */
+@CasAuth("DemoController")
 @RestController
 @RequestMapping("/demo")
 @Tag(name = "DemoController", description = "演示")
 public class DemoController {
 
-    @CasAuth
+    @CasAuth("demo1")
     @GetMapping
     @Operation(summary = "demo1", description = "demo1")
     public String demo1() {

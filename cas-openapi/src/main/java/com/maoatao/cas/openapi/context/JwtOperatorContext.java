@@ -44,10 +44,6 @@ public class JwtOperatorContext extends BaseBean implements DaedalusOperatorCont
      */
     private final Set<String> permissions;
     /**
-     * 作用域
-     */
-    private final Set<String> scope;
-    /**
      * 过期时间
      */
     private final LocalDateTime expiresAt;
@@ -59,4 +55,8 @@ public class JwtOperatorContext extends BaseBean implements DaedalusOperatorCont
      * 签发者 (CAS URL)
      */
     private final String issuer;
+    /**
+     * 客户端凭据
+     */
+    private final boolean clientCredentials;
 }

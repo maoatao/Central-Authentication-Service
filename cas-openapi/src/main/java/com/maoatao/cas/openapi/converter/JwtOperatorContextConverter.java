@@ -25,12 +25,12 @@ public class JwtOperatorContextConverter implements ContextConverter {
                     .operatorId(jwt.getOpenId())
                     .operatorName(jwt.getSub())
                     .clientId(jwt.getAud())
-                    .roles(Collections.emptySet())
+                    .roles(jwt.getRoles())
                     .permissions(jwt.getPermissions())
-                    .scope(jwt.getScope())
                     .expiresAt(SynaDates.of(1000L * Long.parseLong(jwt.getExp())))
                     .issuedAt(SynaDates.of(1000L * Long.parseLong(jwt.getIat())))
                     .issuer(jwt.getIss())
+                    .clientCredentials(jwt.isClientCredentials())
                     .build();
         } catch (Exception e) {
             return null;
