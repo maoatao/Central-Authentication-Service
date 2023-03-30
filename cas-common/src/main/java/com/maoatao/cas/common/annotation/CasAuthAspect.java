@@ -1,5 +1,7 @@
 package com.maoatao.cas.common.annotation;
 
+import com.maoatao.synapse.lang.exception.SynaException;
+import com.maoatao.synapse.web.response.HttpResponseStatus;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -31,6 +33,6 @@ public class CasAuthAspect {
     @Before(value = "casAuthPoinCut()", argNames = "joinPoint")
     public void beforeCasAuth(JoinPoint joinPoint) {
         System.out.println(joinPoint);
-        // throw new SynaException(HttpResponseStatus.UNAUTHORIZED);
+        throw new SynaException(HttpResponseStatus.UNAUTHORIZED);
     }
 }

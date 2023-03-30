@@ -18,6 +18,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+
+        <daedalus.version>1.0.0-SNAPSHOT</daedalus.version>
+        <cas.version>1.0.0-SNAPSHOT</cas.version>
     </properties>
 
     <dependencies>
@@ -35,6 +38,18 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.maoatao.daedalus</groupId>
+            <artifactId>daedalus-web</artifactId>
+            <version>${daedalus.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.maoatao.cas</groupId>
+            <artifactId>cas-openapi</artifactId>
+            <version>${daedalus.version}</version>
         </dependency>
     </dependencies>
 </project>
