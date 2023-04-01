@@ -64,6 +64,7 @@ public class CasAuthAspect {
             if (IterUtil.isNotEmpty(methodAuths)) {
                 isAuthentication.set(anyAuthMatch(methodAuths, SynaSafes.of(OperatorContextHolder.getContext().getPermissions())) ||
                         anyAuthMatch(methodAuths, SynaSafes.of(OperatorContextHolder.getContext().getRoles())));
+                isHci.set(true);
             } else {
                 // 有注解,没权限值 就是机机接口
                 isHci.set(false);

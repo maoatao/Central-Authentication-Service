@@ -4,9 +4,12 @@ import com.maoatao.synapse.core.bean.base.BaseBean;
 import java.io.Serial;
 import java.time.LocalDateTime;
 import java.util.Set;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
@@ -15,43 +18,44 @@ import lombok.ToString;
  * @author MaoAtao
  * @date 2023-03-24 23:06:36
  */
-@Getter
+@Data
 @Builder
-@ToString
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public final class DefaultAuthorization extends BaseBean implements CasAuthorization {
+public class DefaultAuthorization extends BaseBean implements CasAuthorization {
     @Serial
     private static final long serialVersionUID = 1009233448803558861L;
     /**
      * 用户名
      */
-    private final String user;
+    private String user;
     /**
      * 开放 ID (CAS全局唯一)
      */
-    private final String openId;
+    private String openId;
     /**
      * 客户端 ID
      */
-    private final String clientId;
+    private String clientId;
     /**
      * 角色集
      */
-    private final Set<String> roles;
+    private Set<String> roles;
     /**
      * 权限集
      */
-    private final Set<String> permissions;
+    private Set<String> permissions;
     /**
      * 过期时间
      */
-    private final LocalDateTime expiresAt;
+    private LocalDateTime expiresAt;
     /**
      * 签发时间
      */
-    private final LocalDateTime issuedAt;
+    private LocalDateTime issuedAt;
     /**
      * 客户端凭据
      */
-    private final boolean clientCredentials;
+    private boolean clientCredentials;
 }

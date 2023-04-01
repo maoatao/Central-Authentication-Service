@@ -1,7 +1,7 @@
 package com.maoatao.cas.openapi.converter;
 
 import com.maoatao.cas.common.authentication.CasAuthorization;
-import com.maoatao.cas.openapi.authentication.DaedalusTokenService;
+import com.maoatao.cas.openapi.authentication.CasAuthorizationService;
 import com.maoatao.daedalus.core.context.DaedalusOperatorContext;
 import com.maoatao.daedalus.core.context.DefalutOperatorContext;
 import com.maoatao.synapse.lang.util.SynaAssert;
@@ -15,18 +15,18 @@ import com.maoatao.synapse.lang.util.SynaSafes;
  */
 public class DefaultOperatorContextConverter implements ContextConverter {
 
-    private final DaedalusTokenService daedalusTokenService;
+    private final CasAuthorizationService casAuthorizationService;
 
-    public DefaultOperatorContextConverter(DaedalusTokenService daedalusTokenService) {
-        SynaAssert.notNull(daedalusTokenService, "daedalusTokenService cannot be null");
-        this.daedalusTokenService = daedalusTokenService;
+    public DefaultOperatorContextConverter(CasAuthorizationService casAuthorizationService) {
+        SynaAssert.notNull(casAuthorizationService, "casAuthorizationService cannot be null");
+        this.casAuthorizationService = casAuthorizationService;
     }
 
     @Override
     public DaedalusOperatorContext convert(String token) {
         DaedalusOperatorContext operatorContext;
         try {
-            CasAuthorization authorization = getDaedalusTokenService().getAuthorization(token);
+            CasAuthorization authorization = casAuthorizationService.getAuthorization(token);
             operatorContext = DefalutOperatorContext.builder()
                     .operatorId(authorization.getOpenId())
                     .operatorName(authorization.getUser())
@@ -40,9 +40,5 @@ public class DefaultOperatorContextConverter implements ContextConverter {
             return null;
         }
         return operatorContext;
-    }
-
-    public DaedalusTokenService getDaedalusTokenService() {
-        return this.daedalusTokenService;
     }
 }

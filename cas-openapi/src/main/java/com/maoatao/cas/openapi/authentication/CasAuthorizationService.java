@@ -10,7 +10,7 @@ import com.maoatao.cas.common.authentication.CasAuthorization;
  * @author MaoAtao
  * @date 2023-03-26 14:03:41
  */
-public interface DaedalusTokenService {
+public interface CasAuthorizationService {
 
     /**
      * 通过令牌值获取授权信息
