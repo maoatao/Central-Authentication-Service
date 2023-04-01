@@ -11,17 +11,16 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * 演示
  *
- * @author LiYuanHao
+ * @author MaoAtao
  * @date 2023-03-30 15:07:16
  */
-@CasAuth("DemoController")
 @RestController
 @RequestMapping("/demo")
 @Tag(name = "DemoController", description = "演示")
 public class DemoController {
 
-    @CasAuth("demo1")
     @GetMapping
+    @CasAuth("PERMISSION_TEST")
     @Operation(summary = "demo1", description = "demo1")
     public String demo1() {
         return "NOW DATE: ".concat(SynaDates.now(SynaDates.DateType.STRING_DATE_TIME));
