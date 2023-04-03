@@ -1,7 +1,6 @@
 package com.maoatao.cas.config;
 
 import com.maoatao.cas.security.authorization.CasServerSettings;
-import com.maoatao.cas.common.keygen.AlphabetDigitalGenerator;
 import com.maoatao.cas.security.oauth2.auth.service.RedisAuthorizationService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
