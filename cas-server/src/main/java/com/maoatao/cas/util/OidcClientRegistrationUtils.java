@@ -10,7 +10,9 @@ import java.time.Duration;
  * @author MaoAtao
  * @date 2022-10-17 00:35:25
  */
-public abstract class OidcClientRegistrationUtils {
+public final class OidcClientRegistrationUtils {
+
+    private OidcClientRegistrationUtils() {}
 
     private static final String REFERENCE = "reference";
 

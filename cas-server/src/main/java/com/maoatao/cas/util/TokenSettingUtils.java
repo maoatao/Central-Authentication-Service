@@ -10,7 +10,9 @@ import java.util.Objects;
  * @author MaoAtao
  * @date 2022-10-19 13:18:42
  */
-public abstract class TokenSettingUtils {
+public final class TokenSettingUtils {
+
+    private TokenSettingUtils() {}
 
     /**
      * 授权码有效时间

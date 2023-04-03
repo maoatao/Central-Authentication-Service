@@ -13,7 +13,7 @@ import com.maoatao.cas.core.service.RoleService;
 import com.maoatao.cas.core.service.UserRoleService;
 import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.security.bean.CustomUserDetails;
-import com.maoatao.cas.util.Ids;
+import com.maoatao.cas.util.IdUtils;
 import com.maoatao.cas.core.param.UserParam;
 import com.maoatao.daedalus.data.service.impl.DaedalusServiceImpl;
 import com.maoatao.synapse.lang.util.SynaAssert;
@@ -71,7 +71,7 @@ public class UserServiceImpl extends DaedalusServiceImpl<UserMapper, UserEntity>
         checkClient(param.getClientId());
         checkUserName(param.getName(), param.getClientId());
         param.setId(null);
-        param.setOpenId(Ids.nextUserOpenId());
+        param.setOpenId(IdUtils.nextUserOpenId());
         UserEntity user = BeanUtil.copyProperties(param, UserEntity.class);
         user.setPassword(passwordEncoder.encode(param.getPassword()));
         user.setEnabled(true);

@@ -26,7 +26,9 @@ import java.util.List;
  * @author MaoAtao
  * @date 2023-03-04 19:02:52
  */
-public abstract class FilterUtils {
+public final class FilterUtils {
+
+    private FilterUtils() {}
 
     /**
      * Basic 令牌参数分隔符

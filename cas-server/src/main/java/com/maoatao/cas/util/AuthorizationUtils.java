@@ -20,7 +20,9 @@ import java.security.KeyPairGenerator;
  * @author MaoAtao
  * @date 2022-10-13 12:00:37
  */
-public abstract class AuthorizationUtils {
+public final class AuthorizationUtils {
+
+    private AuthorizationUtils() {}
 
     public static KeyPair generateRsaKey() {
         KeyPair keyPair;

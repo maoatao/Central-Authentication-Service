@@ -20,7 +20,7 @@ import com.maoatao.cas.core.service.RoleService;
 import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.util.FilterUtils;
-import com.maoatao.cas.util.Ids;
+import com.maoatao.cas.util.IdUtils;
 import com.maoatao.cas.core.param.UserParam;
 import com.maoatao.synapse.lang.util.SynaStrings;
 import lombok.extern.slf4j.Slf4j;
@@ -255,7 +255,7 @@ class CasApplicationTests {
     @Test
     void save_user_test() {
         UserParam param = new UserParam();
-        param.setOpenId(Ids.nextUserOpenId());
+        param.setOpenId(IdUtils.nextUserOpenId());
         param.setClientId(TEST_CLIENT_ID);
         param.setName(TEST_USER_NAME);
         param.setPassword(TEST_USER_PASSWORD);

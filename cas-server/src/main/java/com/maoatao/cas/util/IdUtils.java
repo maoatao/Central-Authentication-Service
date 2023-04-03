@@ -8,7 +8,9 @@ import cn.hutool.core.util.IdUtil;
  * @author MaoAtao
  * @date 2023-03-02 11:09:29
  */
-public abstract class Ids {
+public final class IdUtils {
+
+    private IdUtils() {}
 
     private static final String USER_OPEN_ID_PREFIX = "UO";
 
