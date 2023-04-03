@@ -81,12 +81,6 @@
 
         <dependency>
             <groupId>com.maoatao.daedalus</groupId>
-            <artifactId>daedalus-web</artifactId>
-            <version>${daedalus.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.maoatao.daedalus</groupId>
             <artifactId>daedalus-data</artifactId>
             <version>${daedalus.version}</version>
         </dependency>

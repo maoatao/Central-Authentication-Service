@@ -6,7 +6,7 @@ import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.security.CustomAuthorizationServerContext;
 import com.maoatao.synapse.lang.exception.SynaException;
 import com.maoatao.synapse.lang.util.SynaSafes;
-import com.maoatao.synapse.web.response.HttpResponseStatus;
+import com.maoatao.daedalus.web.response.HttpResponseStatus;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpMethod;

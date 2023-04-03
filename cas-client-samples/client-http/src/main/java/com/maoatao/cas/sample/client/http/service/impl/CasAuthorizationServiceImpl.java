@@ -8,7 +8,7 @@ import com.maoatao.cas.common.authentication.CasAuthorization;
 import com.maoatao.cas.common.authentication.DefaultAuthorization;
 import com.maoatao.cas.openapi.authentication.CasAuthorizationService;
 import com.maoatao.synapse.lang.exception.SynaException;
-import com.maoatao.synapse.web.response.RestResponse;
+import com.maoatao.daedalus.web.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

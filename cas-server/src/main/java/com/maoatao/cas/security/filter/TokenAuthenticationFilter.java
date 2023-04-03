@@ -7,7 +7,7 @@ import com.maoatao.cas.util.FilterUtils;
 import com.maoatao.synapse.lang.exception.SynaException;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import com.maoatao.synapse.lang.util.SynaStrings;
-import com.maoatao.synapse.web.response.HttpResponseStatus;
+import com.maoatao.daedalus.web.response.HttpResponseStatus;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.core.Authentication;

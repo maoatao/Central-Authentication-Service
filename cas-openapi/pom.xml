@@ -30,16 +30,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.maoatao.synapse</groupId>
-            <artifactId>synapse-web</artifactId>
-            <version>${synapse.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.maoatao.daedalus</groupId>
-            <artifactId>daedalus-core</artifactId>
-            <version>${daedalus.version}</version>
-        </dependency>
-        <dependency>
             <groupId>com.maoatao.cas</groupId>
             <artifactId>cas-common</artifactId>
             <version>${cas.version}</version>

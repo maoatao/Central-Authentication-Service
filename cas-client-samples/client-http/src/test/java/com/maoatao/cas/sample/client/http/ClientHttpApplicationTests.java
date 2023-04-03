@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maoatao.cas.common.authentication.CasAuthorization;
 import com.maoatao.cas.common.authentication.DefaultAuthorization;
-import com.maoatao.synapse.web.response.RestResponse;
+import com.maoatao.daedalus.web.response.RestResponse;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

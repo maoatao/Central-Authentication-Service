@@ -4,7 +4,7 @@ import cn.hutool.core.collection.IterUtil;
 import com.maoatao.daedalus.core.context.OperatorContextHolder;
 import com.maoatao.synapse.lang.exception.SynaException;
 import com.maoatao.synapse.lang.util.SynaSafes;
-import com.maoatao.synapse.web.response.HttpResponseStatus;
+import com.maoatao.daedalus.web.response.HttpResponseStatus;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;

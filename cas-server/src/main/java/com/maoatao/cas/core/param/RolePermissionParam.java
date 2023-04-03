@@ -1,6 +1,6 @@
 package com.maoatao.cas.core.param;
 
-import com.maoatao.daedalus.web.param.PageParam;
+import com.maoatao.daedalus.web.request.param.BasePageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -17,7 +17,7 @@ import java.io.Serial;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "角色权限关系")
-public class RolePermissionParam extends PageParam {
+public class RolePermissionParam extends BasePageParam {
 
     @Serial
     private static final long serialVersionUID = -7036910121720283031L;

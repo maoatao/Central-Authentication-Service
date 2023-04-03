@@ -1,6 +1,6 @@
 package com.maoatao.cas.core.param;
 
-import com.maoatao.daedalus.web.param.PageParam;
+import com.maoatao.daedalus.web.request.param.BasePageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -18,7 +18,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "用户表")
-public class UserParam extends PageParam {
+public class UserParam extends BasePageParam {
 
     @Serial
     private static final long serialVersionUID = 4486807411370303523L;
