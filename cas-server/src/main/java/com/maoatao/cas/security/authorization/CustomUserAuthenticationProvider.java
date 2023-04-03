@@ -1,4 +1,4 @@
-package com.maoatao.cas.security;
+package com.maoatao.cas.security.authorization;
 
 import com.maoatao.cas.core.service.UserService;
 import com.maoatao.synapse.lang.util.SynaStrings;

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.core.entity.PermissionEntity;
 import com.maoatao.cas.core.service.PermissionService;
 import com.maoatao.cas.core.param.PermissionParam;
+import com.maoatao.daedalus.web.annotation.ResponseHandle;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,6 +26,7 @@ import java.util.List;
  * @author MaoAtao
  * @date 2022-12-12 14:18:23
  */
+@ResponseHandle
 @RestController
 @RequestMapping("/permission")
 @Tag(name = "PermissionController", description = "权限管理")

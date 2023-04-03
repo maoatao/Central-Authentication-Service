@@ -1,4 +1,4 @@
-package com.maoatao.cas.security.oauth2.auth;
+package com.maoatao.cas.security.oauth2.auth.provider;
 
 import com.maoatao.cas.util.AuthorizationUtils;
 import org.apache.commons.logging.Log;

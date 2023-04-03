@@ -1,9 +1,9 @@
-package com.maoatao.cas.security.oauth2.auth;
+package com.maoatao.cas.security.oauth2.auth.generator;
 
+import com.maoatao.cas.common.keygen.CasStringKeyGenerator;
+import com.maoatao.cas.common.keygen.UUIDGenerator;
 import com.maoatao.cas.util.TokenSettingUtils;
 import org.springframework.lang.Nullable;
-import org.springframework.security.crypto.keygen.Base64StringKeyGenerator;
-import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationCode;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
@@ -12,7 +12,6 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Toke
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Base64;
 import java.util.Objects;
 
 /**
@@ -25,14 +24,14 @@ import java.util.Objects;
  */
 public class CustomAuthorizationCodeGenerator implements OAuth2TokenGenerator<OAuth2AuthorizationCode> {
 
-    private final StringKeyGenerator authorizationCodeGenerator;
+    private final CasStringKeyGenerator keyGenerator;
 
     public CustomAuthorizationCodeGenerator() {
         this(null);
     }
 
-    public CustomAuthorizationCodeGenerator(StringKeyGenerator authorizationCodeGenerator) {
-        this.authorizationCodeGenerator = Objects.requireNonNullElseGet(authorizationCodeGenerator, () -> new Base64StringKeyGenerator(Base64.getUrlEncoder().withoutPadding(), 96));
+    public CustomAuthorizationCodeGenerator(CasStringKeyGenerator keyGenerator) {
+        this.keyGenerator = Objects.requireNonNullElseGet(keyGenerator, UUIDGenerator::new);
     }
 
     @Nullable
@@ -46,7 +45,7 @@ public class CustomAuthorizationCodeGenerator implements OAuth2TokenGenerator<OA
         Instant issuedAt = Instant.now();
         Duration authorizationCodeTimeToLive = TokenSettingUtils.getAuthorizationCodeTimeToLive(registeredClient.getTokenSettings());
         Instant expiresAt = issuedAt.plus(authorizationCodeTimeToLive);
-        return new OAuth2AuthorizationCode(this.authorizationCodeGenerator.generateKey(), issuedAt, expiresAt);
+        return new OAuth2AuthorizationCode(this.keyGenerator.generate(), issuedAt, expiresAt);
     }
 
 }

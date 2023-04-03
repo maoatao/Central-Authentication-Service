@@ -1,8 +1,13 @@
-package com.maoatao.cas.security.oauth2.auth;
+package com.maoatao.cas.security.oauth2.auth.generator;
 
+import com.maoatao.cas.common.keygen.CasStringKeyGenerator;
+import com.maoatao.cas.common.keygen.UUIDGenerator;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 import org.springframework.lang.Nullable;
-import org.springframework.security.crypto.keygen.Base64StringKeyGenerator;
-import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.security.oauth2.core.ClaimAccessor;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
@@ -16,7 +21,6 @@ import org.springframework.util.StringUtils;
 
 import java.io.Serial;
 import java.time.Instant;
-import java.util.*;
 
 /**
  * 自定义OAuth2访问令牌生成器
@@ -27,15 +31,15 @@ import java.util.*;
  * @date 2022-10-06 21:27:30
  */
 public class CustomAccessTokenGenerator implements OAuth2TokenGenerator<OAuth2AccessToken> {
-    private final StringKeyGenerator accessTokenGenerator;
+    private final CasStringKeyGenerator keyGenerator;
     private OAuth2TokenCustomizer<OAuth2TokenClaimsContext> accessTokenCustomizer;
 
     public CustomAccessTokenGenerator() {
         this(null);
     }
 
-    public CustomAccessTokenGenerator(StringKeyGenerator accessTokenGenerator) {
-        this.accessTokenGenerator = Objects.requireNonNullElseGet(accessTokenGenerator, () -> new Base64StringKeyGenerator(Base64.getUrlEncoder().withoutPadding(), 96));
+    public CustomAccessTokenGenerator(CasStringKeyGenerator keyGenerator) {
+        this.keyGenerator = Objects.requireNonNullElseGet(keyGenerator, UUIDGenerator::new);
     }
 
     @Nullable
@@ -95,11 +99,9 @@ public class CustomAccessTokenGenerator implements OAuth2TokenGenerator<OAuth2Ac
 
         OAuth2TokenClaimsSet accessTokenClaimsSet = claimsBuilder.build();
 
-        OAuth2AccessToken accessToken = new OAuth2AccessTokenClaims(OAuth2AccessToken.TokenType.BEARER,
-                this.accessTokenGenerator.generateKey(), accessTokenClaimsSet.getIssuedAt(), accessTokenClaimsSet.getExpiresAt(),
+        return new OAuth2AccessTokenClaims(OAuth2AccessToken.TokenType.BEARER,
+                this.keyGenerator.generate(), accessTokenClaimsSet.getIssuedAt(), accessTokenClaimsSet.getExpiresAt(),
                 context.getAuthorizedScopes(), accessTokenClaimsSet.getClaims());
-
-        return accessToken;
     }
 
     /**
@@ -130,5 +132,4 @@ public class CustomAccessTokenGenerator implements OAuth2TokenGenerator<OAuth2Ac
         }
 
     }
-
 }

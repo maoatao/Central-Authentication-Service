@@ -6,7 +6,7 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.jwt.JWT;
 import cn.hutool.jwt.JWTUtil;
 import com.maoatao.cas.common.authentication.CasAccessToken;
-import com.maoatao.cas.config.AuthorizationServerConfig;
+import com.maoatao.cas.config.CasServerConfig;
 import com.maoatao.cas.core.entity.PermissionEntity;
 import com.maoatao.cas.core.entity.RoleEntity;
 import com.maoatao.cas.core.entity.RolePermissionEntity;
@@ -37,6 +37,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authorization.AuthorityAuthorizationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.keygen.Base64StringKeyGenerator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -136,6 +137,11 @@ class CasApplicationTests {
      */
     private static final String TEST_USER_PASSWORD = "password";
 
+    @Test
+    void test(){
+        System.out.println(new Base64StringKeyGenerator(java.util.Base64.getUrlEncoder().withoutPadding(), 96).generateKey());
+    }
+
     /**
      * 测试步骤 1
      * <p>
@@ -165,7 +171,7 @@ class CasApplicationTests {
     /**
      * 测试步骤 2
      * <p>
-     * 条件:服务配置正确的redis连接(默认使用redis来储存授权信息,详情{@link AuthorizationServerConfig#oAuth2AuthorizationService })
+     * 条件:服务配置正确的redis连接(默认使用redis来储存授权信息,详情{@link CasServerConfig#oAuth2AuthorizationService })
      * <p>
      * 创建一个授权码,并使用该授权码请求令牌
      * <p>

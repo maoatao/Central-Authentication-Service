@@ -1,4 +1,4 @@
-package com.maoatao.cas.security;
+package com.maoatao.cas.security.authorization;
 
 import org.springframework.security.oauth2.server.authorization.context.AuthorizationServerContext;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
@@ -9,6 +9,7 @@ import java.util.function.Supplier;
  * 自定义 CustomAuthorizationServerContext
  * <p>
  * 源码不能公共访问,这里复制了一边
+ * com.maoatao.cas.security.filter.AuthorizationServerContextFilter.DefaultAuthorizationServerContext
  *
  * @author MaoAtao
  * @date 2023-03-05 15:09:02
@@ -31,5 +32,4 @@ public class CustomAuthorizationServerContext implements AuthorizationServerCont
     public AuthorizationServerSettings getAuthorizationServerSettings() {
         return this.authorizationServerSettings;
     }
-
 }

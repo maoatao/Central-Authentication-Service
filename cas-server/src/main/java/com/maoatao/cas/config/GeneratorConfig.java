@@ -1,9 +1,10 @@
 package com.maoatao.cas.config;
 
-import com.maoatao.cas.security.UUIDStringKeyGenerator;
+import com.maoatao.cas.security.authorization.CasServerSettings;
 import com.maoatao.cas.security.bean.CustomUserDetails;
-import com.maoatao.cas.security.oauth2.auth.CustomAccessTokenGenerator;
-import com.maoatao.cas.security.oauth2.auth.CustomRefreshTokenGenerator;
+import com.maoatao.cas.security.oauth2.auth.generator.CustomAccessTokenGenerator;
+import com.maoatao.cas.security.oauth2.auth.generator.CustomAuthorizationCodeGenerator;
+import com.maoatao.cas.security.oauth2.auth.generator.CustomRefreshTokenGenerator;
 import com.maoatao.cas.util.AuthorizationUtils;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -13,7 +14,6 @@ import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
 import org.springframework.security.oauth2.core.OAuth2Token;
@@ -23,6 +23,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationCode;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2ClientAuthenticationToken;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
@@ -49,16 +50,6 @@ import java.util.UUID;
 public class GeneratorConfig {
 
     /**
-     * uuid 字符串生成者
-     * <p>
-     * 授权码,访问令牌,刷新令牌使用了该uuid
-     */
-    @Bean
-    public StringKeyGenerator uuidStringKeyGenerator() {
-        return new UUIDStringKeyGenerator();
-    }
-
-    /**
      * 令牌生成器(多生成方式,构造函数参数最左最先使用,如果成功生成将不再继续尝试剩下的生成发生)
      * <p>
      * {@link DelegatingOAuth2TokenGenerator#generate}
@@ -66,11 +57,13 @@ public class GeneratorConfig {
     @Bean
     public OAuth2TokenGenerator<OAuth2Token> tokenGenerator(JwtEncoder jwtEncoder,
                                                             OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer,
-                                                            StringKeyGenerator stringKeyGenerator) {
+                                                            CasServerSettings casServerSettings) {
         return new DelegatingOAuth2TokenGenerator(
                 jwtGenerator(jwtEncoder, jwtCustomizer),
-                customAccessTokenGenerator(stringKeyGenerator),
-                customRefreshTokenGenerator(stringKeyGenerator));
+                customAccessTokenGenerator(casServerSettings),
+                customRefreshTokenGenerator(casServerSettings),
+                customAuthorizationCodeGenerator(casServerSettings)
+        );
     }
 
     @Bean
@@ -123,15 +116,22 @@ public class GeneratorConfig {
     /**
      * 访问令牌生成者
      */
-    private OAuth2TokenGenerator<OAuth2AccessToken> customAccessTokenGenerator(StringKeyGenerator stringKeyGenerator) {
-        return new CustomAccessTokenGenerator(stringKeyGenerator);
+    private OAuth2TokenGenerator<OAuth2AccessToken> customAccessTokenGenerator(CasServerSettings casServerSettings) {
+        return new CustomAccessTokenGenerator(casServerSettings.getAccessTokenGenerator());
     }
 
     /**
      * 刷新令牌生成者
      */
-    private OAuth2TokenGenerator<OAuth2RefreshToken> customRefreshTokenGenerator(StringKeyGenerator stringKeyGenerator) {
-        return new CustomRefreshTokenGenerator(stringKeyGenerator);
+    private OAuth2TokenGenerator<OAuth2RefreshToken> customRefreshTokenGenerator(CasServerSettings casServerSettings) {
+        return new CustomRefreshTokenGenerator(casServerSettings.getRefreshTokenGenerator());
+    }
+
+    /**
+     * 授权码生成者
+     */
+    private OAuth2TokenGenerator<OAuth2AuthorizationCode> customAuthorizationCodeGenerator(CasServerSettings casServerSettings) {
+        return new CustomAuthorizationCodeGenerator(casServerSettings.getAuthorizationCodeGenerator());
     }
 
     /**

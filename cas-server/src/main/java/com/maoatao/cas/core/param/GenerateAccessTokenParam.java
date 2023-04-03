@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
-import com.maoatao.cas.security.GrantType;
+import com.maoatao.cas.security.constant.GrantType;
 
 import java.io.Serial;
 

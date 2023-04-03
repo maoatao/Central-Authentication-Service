@@ -1,4 +1,4 @@
-package com.maoatao.cas.security.oauth2.auth;
+package com.maoatao.cas.security.oauth2.auth.service;
 
 import cn.hutool.core.collection.IterUtil;
 import cn.hutool.core.util.StrUtil;
@@ -371,7 +371,7 @@ public class RedisAuthorizationService implements CustomAuthorizationService {
     private long getExpiresIn(Instant now, Map<Instant, OAuth2Token> tokenMap) {
         List<Instant> expires = new ArrayList<>(tokenMap.keySet());
         if (expires.size() == 0) {
-            return 0;
+            return DEFAULT_EXPIRATION_SECONDS;
         }
         if (expires.size() == 1) {
             return getExpiresIn(now, tokenMap.get(expires.get(0)));

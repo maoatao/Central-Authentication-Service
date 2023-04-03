@@ -55,12 +55,12 @@ Central Authentication Service (CAS 中央认证服务 OAuth2.1协议)
 ### 4. 生成授权码的两种方法
 
 1. OAuth2提供的
-   1. 接口地址：http://127.0.0.1:8080/oauth2/authorize
+   1. 接口地址：http://127.0.0.1:18080/oauth2/authorize
    2. 方法：GET
    3. 权限：Spring Security 用户登录后同意授权（如果需要同意）
-   4. 示例：`http://127.0.0.1:8080/oauth2/authorize?response_type=code&client_id=test-client&scope=test.read%20test.write&redirect_uri=https://cn.bing.com&code_challenge_method=S256&code_challenge=3vrxycun-VbyenvO5GiFOaOBazUBX_xcFElnqbl-TXA`
+   4. 示例：`http://127.0.0.1:18080/oauth2/authorize?response_type=code&client_id=test-client&scope=test.read%20test.write&redirect_uri=https://cn.bing.com&code_challenge_method=S256&code_challenge=3vrxycun-VbyenvO5GiFOaOBazUBX_xcFElnqbl-TXA`
 2. 我自定义的
-    1. 接口地址：http://127.0.0.1:8080/authorization
+    1. 接口地址：http://127.0.0.1:18080/authorization
     2. 方法：POST **(application/json)**
     3. 权限：无
     4. 示例(Body)：
@@ -86,7 +86,7 @@ Central Authentication Service (CAS 中央认证服务 OAuth2.1协议)
 > 单元测试（仅供测试,自动获取授权码并请求令牌）  
 > `com.maoatao.cas.CasApplicationTests#generate_authorization_code_and_token_test()`
 
-1. 接口地址：http://127.0.0.1:8080/oauth2/token
+1. 接口地址：http://127.0.0.1:18080/oauth2/token
 2. 方法：POST **(multipart/form-data)**
 3. 权限：Basic (客户端ID:客户端密码)
    ![权限](docs/readme_imags/BasicAuth.png "权限")
@@ -102,7 +102,7 @@ Central Authentication Service (CAS 中央认证服务 OAuth2.1协议)
 
 ### 6. 刷新令牌
 
-1. 接口地址：http://127.0.0.1:8080/oauth2/token
+1. 接口地址：http://127.0.0.1:18080/oauth2/token
 2. 方法：POST **(multipart/form-data)**
 3. 权限：Basic (客户端ID:客户端密码)
    ![权限](docs/readme_imags/BasicAuth.png "权限")
@@ -115,7 +115,7 @@ Central Authentication Service (CAS 中央认证服务 OAuth2.1协议)
 
 ### 7. 验证令牌
 
-1. 接口地址：http://127.0.0.1:8080/oauth2/introspect
+1. 接口地址：http://127.0.0.1:18080/oauth2/introspect
 2. 方法：POST **(multipart/form-data)**
 3. 权限：Basic (客户端ID:客户端密码)
    ![权限](docs/readme_imags/BasicAuth.png "权限")
@@ -127,7 +127,7 @@ Central Authentication Service (CAS 中央认证服务 OAuth2.1协议)
 
 ### 8. 吊销令牌（我自定义的）
 
-1. 接口地址：http://127.0.0.1:8080/authorization
+1. 接口地址：http://127.0.0.1:18080/authorization
 2. 方法：DELETE **(none)**
 3. 权限：Bearer (令牌)
 4. 示例(Auth)：

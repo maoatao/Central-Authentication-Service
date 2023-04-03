@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.core.entity.RoleEntity;
 import com.maoatao.cas.core.service.RoleService;
 import com.maoatao.cas.core.param.RoleParam;
+import com.maoatao.daedalus.web.annotation.ResponseHandle;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,6 +26,7 @@ import java.util.List;
  * @author MaoAtao
  * @date 2022-12-12 14:18:23
  */
+@ResponseHandle
 @RestController
 @RequestMapping("/role")
 @Tag(name = "RoleController", description = "角色管理")

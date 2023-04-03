@@ -2,7 +2,7 @@ package com.maoatao.cas.openapi.filter;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import com.maoatao.cas.openapi.authentication.CasServerSettings;
+import com.maoatao.cas.openapi.authentication.CasClientSettings;
 import com.maoatao.cas.openapi.converter.ContextConverter;
 import com.maoatao.cas.openapi.matcher.CasRequestMatcher;
 import com.maoatao.daedalus.core.context.AnonymousOperatorContext;
@@ -47,10 +47,10 @@ public class CasOperatorContextFilter extends GenericFilterBean {
 
     private final List<CasRequestMatcher> permitMatchers;
 
-    public CasOperatorContextFilter(CasServerSettings casServerSettings) {
-        SynaAssert.notNull(casServerSettings, "daedalusSecuritySetting cannot be null");
-        this.contextConverter = casServerSettings.getContextConverter();
-        this.permitMatchers = casServerSettings.getPermitMatchers();
+    public CasOperatorContextFilter(CasClientSettings casClientSettings) {
+        SynaAssert.notNull(casClientSettings, "casClientSettings cannot be null");
+        this.contextConverter = casClientSettings.getContextConverter();
+        this.permitMatchers = casClientSettings.getPermitMatchers();
     }
 
     @Override

@@ -6,7 +6,6 @@ import com.maoatao.cas.openapi.context.JwtOperatorContext;
 import com.maoatao.daedalus.core.context.DaedalusOperatorContext;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import com.maoatao.synapse.lang.util.SynaDates;
-import java.util.Collections;
 
 /**
  * Jwt 上下文转换者

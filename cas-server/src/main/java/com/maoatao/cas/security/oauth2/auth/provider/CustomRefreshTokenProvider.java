@@ -1,5 +1,6 @@
-package com.maoatao.cas.security.oauth2.auth;
+package com.maoatao.cas.security.oauth2.auth.provider;
 
+import com.maoatao.cas.security.oauth2.auth.service.CustomAuthorizationService;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;

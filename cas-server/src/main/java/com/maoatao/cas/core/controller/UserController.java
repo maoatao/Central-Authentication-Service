@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.core.entity.UserEntity;
 import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.core.param.UserParam;
+import com.maoatao.daedalus.web.annotation.ResponseHandle;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,6 +26,7 @@ import java.util.List;
  * @author MaoAtao
  * @date 2021-05-13 13:28:20
  */
+@ResponseHandle
 @RestController
 @RequestMapping("/user")
 @Tag(name = "UserController", description = "用户管理")

@@ -1,4 +1,4 @@
-package com.maoatao.cas.security;
+package com.maoatao.cas.security.constant;
 
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 

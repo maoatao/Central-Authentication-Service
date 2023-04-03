@@ -1,7 +1,7 @@
 package com.maoatao.cas.sample.client.http.config;
 
 import com.maoatao.cas.openapi.authentication.CasAuthorizationService;
-import com.maoatao.cas.openapi.authentication.CasServerSettings;
+import com.maoatao.cas.openapi.authentication.CasClientSettings;
 import com.maoatao.cas.openapi.converter.DefaultOperatorContextConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,10 +16,9 @@ import org.springframework.context.annotation.Configuration;
 public class CasConfig {
 
     @Bean
-    public CasServerSettings casServerSettings(CasAuthorizationService casAuthorizationService) {
-        return CasServerSettings.builder()
+    public CasClientSettings casClientSettings(CasAuthorizationService casAuthorizationService) {
+        return CasClientSettings.builder()
                 .contextConverter(new DefaultOperatorContextConverter(casAuthorizationService))
                 .build();
     }
-
 }

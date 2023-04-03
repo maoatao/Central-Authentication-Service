@@ -3,7 +3,7 @@ package com.maoatao.cas.util;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.IterUtil;
 import com.maoatao.cas.security.bean.ClientUser;
-import com.maoatao.cas.security.CustomAuthorizationServerContext;
+import com.maoatao.cas.security.authorization.CustomAuthorizationServerContext;
 import com.maoatao.synapse.lang.exception.SynaException;
 import com.maoatao.synapse.lang.util.SynaSafes;
 import com.maoatao.daedalus.web.response.HttpResponseStatus;

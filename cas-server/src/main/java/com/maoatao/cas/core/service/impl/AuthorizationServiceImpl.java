@@ -5,14 +5,12 @@ import com.maoatao.cas.common.authentication.CasAuthorization;
 import com.maoatao.cas.common.authentication.DefaultAccessToken;
 import com.maoatao.cas.common.authentication.DefaultAuthorization;
 import com.maoatao.cas.core.param.GenerateAccessTokenParam;
-import com.maoatao.cas.security.CustomUserAuthenticationProvider;
+import com.maoatao.cas.security.authorization.CustomUserAuthenticationProvider;
 import com.maoatao.cas.core.service.AuthorizationService;
-import com.maoatao.cas.security.GrantType;
+import com.maoatao.cas.security.constant.GrantType;
 import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.security.bean.CustomUserDetails;
 import com.maoatao.cas.security.filter.TokenAuthenticationFilter;
-import com.maoatao.cas.security.oauth2.auth.CustomAuthorizationCodeGenerator;
-import com.maoatao.cas.security.UUIDStringKeyGenerator;
 import com.maoatao.cas.core.param.GenerateAuthorizationCodeParam;
 import com.maoatao.daedalus.web.util.ServletUtils;
 import com.maoatao.synapse.lang.exception.SynaException;
@@ -30,6 +28,7 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
+import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
@@ -76,7 +75,8 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     @Autowired
     private OAuth2AuthorizationService oAuth2AuthorizationService;
 
-    private static final OAuth2TokenGenerator<OAuth2AuthorizationCode> TOKEN_GENERATOR = new CustomAuthorizationCodeGenerator(new UUIDStringKeyGenerator());
+    @Autowired
+    private OAuth2TokenGenerator<OAuth2Token> tokenGenerator;
 
     @Override
     public String generateAuthorizationCode(GenerateAuthorizationCodeParam param) {
@@ -316,7 +316,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     private OAuth2AuthorizationCode buildAuthorizationCode(OAuth2TokenContext tokenContext) {
         OAuth2AuthorizationCode authorizationCode;
         try {
-            authorizationCode = TOKEN_GENERATOR.generate(tokenContext);
+            authorizationCode = (OAuth2AuthorizationCode) tokenGenerator.generate(tokenContext);
         } catch (Exception e) {
             throw new SynaException("授权码生成失败!", e);
         }

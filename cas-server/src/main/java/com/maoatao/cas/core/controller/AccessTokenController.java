@@ -4,6 +4,7 @@ import com.maoatao.cas.common.authentication.CasAccessToken;
 import com.maoatao.cas.common.authentication.CasAuthorization;
 import com.maoatao.cas.core.param.GenerateAccessTokenParam;
 import com.maoatao.cas.core.service.AuthorizationService;
+import com.maoatao.daedalus.web.annotation.ResponseHandle;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author MaoAtao
  * @date 2022-10-23 17:17:17
  */
+@ResponseHandle
 @RestController
 @RequestMapping("/token")
 @Tag(name = "TokenController", description = "令牌管理")

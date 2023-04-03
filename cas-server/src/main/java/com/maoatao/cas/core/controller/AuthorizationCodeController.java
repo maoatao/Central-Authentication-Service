@@ -2,6 +2,7 @@ package com.maoatao.cas.core.controller;
 
 import com.maoatao.cas.core.service.AuthorizationService;
 import com.maoatao.cas.core.param.GenerateAuthorizationCodeParam;
+import com.maoatao.daedalus.web.annotation.ResponseHandle;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author MaoAtao
  * @date 2022-10-23 17:18:43
  */
+@ResponseHandle
 @RestController
 @RequestMapping("/code")
 @Tag(name = "AuthorizationCodeController", description = "授权码管理")

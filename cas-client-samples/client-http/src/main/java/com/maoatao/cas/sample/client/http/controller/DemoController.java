@@ -1,6 +1,7 @@
 package com.maoatao.cas.sample.client.http.controller;
 
 import com.maoatao.cas.common.annotation.CasAuth;
+import com.maoatao.daedalus.web.annotation.ResponseHandle;
 import com.maoatao.synapse.lang.util.SynaDates;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author MaoAtao
  * @date 2023-03-30 15:07:16
  */
+@ResponseHandle
 @RestController
 @RequestMapping("/demo")
 @Tag(name = "DemoController", description = "演示")

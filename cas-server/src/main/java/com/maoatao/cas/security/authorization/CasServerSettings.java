@@ -1,0 +1,78 @@
+package com.maoatao.cas.security.authorization;
+
+import com.maoatao.cas.common.keygen.CasStringKeyGenerator;
+import com.maoatao.cas.common.keygen.UUIDGenerator;
+import java.util.Objects;
+import java.util.function.Supplier;
+import lombok.Getter;
+
+/**
+ * CAS 服务端配置
+ *
+ * @author MaoAtao
+ * @date 2023-03-26 15:55:36
+ */
+@Getter
+public class CasServerSettings {
+
+    /**
+     * 访问令牌 令牌值生成器
+     */
+    private final CasStringKeyGenerator accessTokenGenerator;
+    /**
+     * 刷新令牌 令牌值生成器
+     */
+    private final CasStringKeyGenerator refreshTokenGenerator;
+    /**
+     * 授权码 令牌值生成器
+     */
+    private final CasStringKeyGenerator authorizationCodeGenerator;
+
+    public CasServerSettings(CasStringKeyGenerator accessTokenGenerator,
+                             CasStringKeyGenerator refreshTokenGenerator,
+                             CasStringKeyGenerator authorizationCodeGenerator) {
+        this.accessTokenGenerator = accessTokenGenerator;
+        this.refreshTokenGenerator = refreshTokenGenerator;
+        this.authorizationCodeGenerator = authorizationCodeGenerator;
+    }
+
+    public static CasServerSettingsBuilder builder() {
+        return new CasServerSettingsBuilder();
+    }
+
+    public static class CasServerSettingsBuilder {
+
+        private Supplier<CasStringKeyGenerator> accessTokenGenerator;
+
+        private Supplier<CasStringKeyGenerator> refreshTokenGenerator;
+
+        private Supplier<CasStringKeyGenerator> authorizationCodeGenerator;
+
+        private CasServerSettingsBuilder() {
+        }
+
+        public CasServerSettingsBuilder accessTokenGenerator(Supplier<CasStringKeyGenerator> accessTokenGenerator) {
+            this.accessTokenGenerator = accessTokenGenerator;
+            return this;
+        }
+
+        public CasServerSettingsBuilder refreshTokenGenerator(Supplier<CasStringKeyGenerator> refreshTokenGenerator) {
+            this.refreshTokenGenerator = refreshTokenGenerator;
+            return this;
+        }
+
+        public CasServerSettingsBuilder authorizationCodeGenerator(Supplier<CasStringKeyGenerator> authorizationCodeGenerator) {
+            this.authorizationCodeGenerator = authorizationCodeGenerator;
+            return this;
+        }
+
+        public CasServerSettings build() {
+            // 默认 UUID 风格
+            return new CasServerSettings(
+                    Objects.requireNonNullElseGet(this.accessTokenGenerator.get(), UUIDGenerator::new),
+                    Objects.requireNonNullElseGet(this.refreshTokenGenerator.get(), UUIDGenerator::new),
+                    Objects.requireNonNullElseGet(this.authorizationCodeGenerator.get(), UUIDGenerator::new)
+            );
+        }
+    }
+}

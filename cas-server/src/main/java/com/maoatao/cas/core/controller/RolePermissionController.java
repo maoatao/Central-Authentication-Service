@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.core.entity.RolePermissionEntity;
 import com.maoatao.cas.core.service.RolePermissionService;
 import com.maoatao.cas.core.param.RolePermissionParam;
+import com.maoatao.daedalus.web.annotation.ResponseHandle;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,6 +26,7 @@ import java.util.List;
  * @author MaoAtao
  * @date 2022-12-12 14:18:23
  */
+@ResponseHandle
 @RestController
 @RequestMapping("/rolepermission")
 @Tag(name = "RolePermissionController", description = "角色权限关系管理")

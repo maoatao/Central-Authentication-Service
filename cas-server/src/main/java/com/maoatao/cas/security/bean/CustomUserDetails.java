@@ -1,5 +1,6 @@
 package com.maoatao.cas.security.bean;
 
+import com.maoatao.cas.security.authorization.CustomUserAuthenticationProvider;
 import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +19,7 @@ import java.util.Set;
  * <p>
  * Customized by {@link org.springframework.security.core.userdetails.User}
  * <p>
- * {@link com.maoatao.cas.security.CustomUserAuthenticationProvider}
+ * {@link CustomUserAuthenticationProvider}
  *
  * @author MaoAtao
  * @date 2023-02-28 15:26:47

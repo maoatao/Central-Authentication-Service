@@ -1,6 +1,8 @@
 package com.maoatao.cas.config;
 
-import com.maoatao.cas.security.oauth2.auth.RedisAuthorizationService;
+import com.maoatao.cas.security.authorization.CasServerSettings;
+import com.maoatao.cas.common.keygen.AlphabetDigitalGenerator;
+import com.maoatao.cas.security.oauth2.auth.service.RedisAuthorizationService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -26,7 +28,7 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
  */
 @Configuration
 @EnableWebSecurity
-public class AuthorizationServerConfig {
+public class CasServerConfig {
 
     private static final String OAUTH2_REDIS_KEY_PREFIX = "OAuth2:";
 
@@ -82,6 +84,18 @@ public class AuthorizationServerConfig {
     @Bean
     public AuthorizationServerSettings authorizationServerSettings() {
         return AuthorizationServerSettings.builder().build();
+    }
+
+    /**
+     * 默认CAS服务端配置
+     */
+    @Bean
+    public CasServerSettings casServerSettings() {
+        return CasServerSettings.builder()
+                .authorizationCodeGenerator(AlphabetDigitalGenerator::new)
+                .refreshTokenGenerator(()-> new AlphabetDigitalGenerator(32))
+                .accessTokenGenerator(()-> new AlphabetDigitalGenerator(64))
+                .build();
     }
 }
 
