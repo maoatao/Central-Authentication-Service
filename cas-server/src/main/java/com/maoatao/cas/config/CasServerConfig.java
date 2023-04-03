@@ -91,11 +91,7 @@ public class CasServerConfig {
      */
     @Bean
     public CasServerSettings casServerSettings() {
-        return CasServerSettings.builder()
-                .authorizationCodeGenerator(AlphabetDigitalGenerator::new)
-                .refreshTokenGenerator(()-> new AlphabetDigitalGenerator(32))
-                .accessTokenGenerator(()-> new AlphabetDigitalGenerator(64))
-                .build();
+        return CasServerSettings.builder().build();
     }
 }
 
