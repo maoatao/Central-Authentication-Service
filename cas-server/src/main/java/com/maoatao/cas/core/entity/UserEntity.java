@@ -1,9 +1,7 @@
 package com.maoatao.cas.core.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.maoatao.daedalus.data.bean.BaseIdEntity;
+import com.maoatao.daedalus.data.bean.base.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
@@ -23,17 +21,11 @@ import java.io.Serial;
 @TableName("t_cas_user")
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "用户表")
-public class UserEntity extends BaseIdEntity<UserEntity> {
+public class UserEntity extends BaseEntity<UserEntity> {
 
     @Serial
     private static final long serialVersionUID = -5231977144633077127L;
 
-    /**
-     * CAS 全局唯一id
-     */
-    @TableField(fill = FieldFill.INSERT)
-    @Schema(description = "CAS 全局唯一id")
-    private String openId;
     /**
      * OAuth2 客户端id
      */

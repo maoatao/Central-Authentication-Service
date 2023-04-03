@@ -1,8 +1,7 @@
 package com.maoatao.cas.core.entity;
 
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.maoatao.daedalus.data.bean.BaseIdEntity;
+import com.maoatao.daedalus.data.bean.base.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
@@ -22,17 +21,11 @@ import java.io.Serial;
 @TableName("t_cas_role")
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "角色")
-public class RoleEntity extends BaseIdEntity<RoleEntity> {
+public class RoleEntity extends BaseEntity<RoleEntity> {
 
     @Serial
     private static final long serialVersionUID = 5019116569323676861L;
 
-    /**
-     * 主键id(自增)
-     */
-    @TableId
-    @Schema(description = "主键id(自增)")
-    private Long id;
     /**
      * OAuth2 客户端id
      */
