@@ -1,5 +1,7 @@
 package com.maoatao.cas.core.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.maoatao.daedalus.data.bean.base.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,6 +28,12 @@ public class UserEntity extends BaseEntity<UserEntity> {
     @Serial
     private static final long serialVersionUID = -5231977144633077127L;
 
+    /**
+     * CAS 全局唯一id
+     */
+    @TableField(fill = FieldFill.INSERT)
+    @Schema(description = "CAS 全局唯一id")
+    private String openId;
     /**
      * OAuth2 客户端id
      */

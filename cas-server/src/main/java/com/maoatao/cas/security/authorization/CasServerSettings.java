@@ -2,7 +2,7 @@ package com.maoatao.cas.security.authorization;
 
 import com.maoatao.cas.common.keygen.CasStringKeyGenerator;
 import com.maoatao.cas.common.keygen.UUIDGenerator;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 import lombok.Getter;
 
@@ -69,9 +69,9 @@ public class CasServerSettings {
         public CasServerSettings build() {
             // 默认 UUID 风格
             return new CasServerSettings(
-                    Objects.requireNonNullElseGet(this.accessTokenGenerator.get(), UUIDGenerator::new),
-                    Objects.requireNonNullElseGet(this.refreshTokenGenerator.get(), UUIDGenerator::new),
-                    Objects.requireNonNullElseGet(this.authorizationCodeGenerator.get(), UUIDGenerator::new)
+                    Optional.ofNullable(this.accessTokenGenerator).orElse(UUIDGenerator::new).get(),
+                    Optional.ofNullable(this.refreshTokenGenerator).orElse(UUIDGenerator::new).get(),
+                    Optional.ofNullable(this.authorizationCodeGenerator).orElse(UUIDGenerator::new).get()
             );
         }
     }
