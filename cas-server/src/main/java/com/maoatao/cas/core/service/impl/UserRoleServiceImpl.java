@@ -1,11 +1,16 @@
 package com.maoatao.cas.core.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.IterUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.maoatao.cas.core.entity.UserRoleEntity;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.maoatao.cas.core.bean.param.userrole.UserRoleQueryParam;
+import com.maoatao.cas.core.bean.vo.UserRoleVO;
+import com.maoatao.cas.core.bean.entity.UserRoleEntity;
 import com.maoatao.cas.core.mapper.UserRoleMapper;
 import com.maoatao.cas.core.service.UserRoleService;
 import com.maoatao.daedalus.data.service.impl.DaedalusServiceImpl;
+import com.maoatao.daedalus.data.util.PageUtils;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +25,18 @@ import java.util.List;
  */
 @Service
 public class UserRoleServiceImpl extends DaedalusServiceImpl<UserRoleMapper, UserRoleEntity> implements UserRoleService {
+
+    @Override
+    public Page<UserRoleVO> page(UserRoleQueryParam param) {
+        UserRoleEntity entity = BeanUtil.copyProperties(param, UserRoleEntity.class);
+        Page<UserRoleEntity> page = super.page(PageUtils.convert(param), Wrappers.query(entity));
+        return PageUtils.convert(page, UserRoleVO.class);
+    }
+
+    @Override
+    public UserRoleVO details(Long id){
+        return BeanUtil.toBean(super.getById(id), UserRoleVO.class);
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)

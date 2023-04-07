@@ -2,7 +2,7 @@ package com.maoatao.cas.core.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
-import com.maoatao.cas.core.entity.RolePermissionEntity;
+import com.maoatao.cas.core.bean.entity.RolePermissionEntity;
 
 /**
  * 角色权限关系

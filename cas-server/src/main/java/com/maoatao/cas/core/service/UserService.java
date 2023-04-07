@@ -1,6 +1,9 @@
 package com.maoatao.cas.core.service;
 
-import com.maoatao.cas.core.entity.UserEntity;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.maoatao.cas.core.bean.param.user.UserQueryParam;
+import com.maoatao.cas.core.bean.vo.UserVO;
+import com.maoatao.cas.core.bean.entity.UserEntity;
 import com.maoatao.cas.core.param.UserParam;
 import com.maoatao.daedalus.data.service.DaedalusService;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +16,22 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
  * @date 2022-03-11 16:13:35
  */
 public interface UserService extends DaedalusService<UserEntity> {
+
+    /**
+     * 分页
+     *
+     * @param param 参数
+     * @return 分页
+     */
+    Page<UserVO> page(UserQueryParam param);
+
+    /**
+     * 通过id查询
+     *
+     * @param id CAS 用户id
+     * @return CAS 用户
+     */
+    UserVO details(Long id);
 
     /**
      * 通过用户名和用户详细信息

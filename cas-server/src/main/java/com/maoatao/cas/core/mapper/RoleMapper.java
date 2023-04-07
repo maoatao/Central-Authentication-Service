@@ -1,7 +1,7 @@
 package com.maoatao.cas.core.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.maoatao.cas.core.entity.RoleEntity;
+import com.maoatao.cas.core.bean.entity.RoleEntity;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 

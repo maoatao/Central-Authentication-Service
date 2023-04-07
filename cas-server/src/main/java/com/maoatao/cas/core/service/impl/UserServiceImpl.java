@@ -4,9 +4,12 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.IterUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.maoatao.cas.core.entity.PermissionEntity;
-import com.maoatao.cas.core.entity.RoleEntity;
-import com.maoatao.cas.core.entity.UserEntity;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.maoatao.cas.core.bean.param.user.UserQueryParam;
+import com.maoatao.cas.core.bean.vo.UserVO;
+import com.maoatao.cas.core.bean.entity.PermissionEntity;
+import com.maoatao.cas.core.bean.entity.RoleEntity;
+import com.maoatao.cas.core.bean.entity.UserEntity;
 import com.maoatao.cas.core.mapper.UserMapper;
 import com.maoatao.cas.core.service.PermissionService;
 import com.maoatao.cas.core.service.RoleService;
@@ -16,6 +19,7 @@ import com.maoatao.cas.security.bean.CustomUserDetails;
 import com.maoatao.cas.util.IdUtils;
 import com.maoatao.cas.core.param.UserParam;
 import com.maoatao.daedalus.data.service.impl.DaedalusServiceImpl;
+import com.maoatao.daedalus.data.util.PageUtils;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import com.maoatao.synapse.lang.util.SynaStrings;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,12 +60,23 @@ public class UserServiceImpl extends DaedalusServiceImpl<UserMapper, UserEntity>
     private PasswordEncoder passwordEncoder;
 
     @Override
+    public Page<UserVO> page(UserQueryParam param) {
+        UserEntity entity = BeanUtil.copyProperties(param, UserEntity.class);
+        Page<UserEntity> page = super.page(PageUtils.convert(param), Wrappers.query(entity));
+        return PageUtils.convert(page, UserVO.class);
+    }
+
+    @Override
+    public UserVO details(Long id){
+        return BeanUtil.toBean(super.getById(id), UserVO.class);
+    }
+
+    @Override
     public UserDetails getUserDetails(String username, String clientId) throws UsernameNotFoundException {
         UserEntity existed = getByNameAndClient(username, clientId);
         if (existed == null) {
             throw new UsernameNotFoundException(SynaStrings.format("用户 {} 不存在!", username));
         }
-        SynaAssert.isTrue(existed.getEnabled(), "用户 {} 已被禁用", username);
         return buildUserDetails(existed);
     }
 
@@ -74,7 +89,6 @@ public class UserServiceImpl extends DaedalusServiceImpl<UserMapper, UserEntity>
         param.setOpenId(IdUtils.nextUserOpenId());
         UserEntity user = BeanUtil.copyProperties(param, UserEntity.class);
         user.setPassword(passwordEncoder.encode(param.getPassword()));
-        user.setEnabled(true);
         SynaAssert.isTrue(save(user), "新增用户失败!");
         SynaAssert.notNull(user.getId(), "新增用户失败:用户 ID 为空!");
         SynaAssert.isTrue(

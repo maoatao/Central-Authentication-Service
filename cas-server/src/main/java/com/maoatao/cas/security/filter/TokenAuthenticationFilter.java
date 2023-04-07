@@ -9,6 +9,7 @@ import com.maoatao.synapse.lang.util.SynaAssert;
 import com.maoatao.synapse.lang.util.SynaStrings;
 import com.maoatao.daedalus.web.response.HttpResponseStatus;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,6 +37,7 @@ import java.util.Optional;
  * @author MaoAtao
  * @date 2022-10-24 11:17:31
  */
+@Slf4j
 public class TokenAuthenticationFilter extends GenericFilterBean {
 
     private static final String TOKEM_TYPE_BASIC = "Basic";
@@ -74,9 +76,10 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
     private void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             try {
-                doTokenFilter(request);
+                // doTokenFilter(request);
             } catch (SynaException e) {
                 // 拦截异常,屏蔽异常信息,这里统一返回未授权响应
+                log.error("鉴权拦截异常", e);
                 handlerExceptionResolver.resolveException(request, response, null, new SynaException(HttpResponseStatus.UNAUTHORIZED));
                 return;
             }

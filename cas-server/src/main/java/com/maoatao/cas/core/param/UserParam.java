@@ -1,24 +1,27 @@
 package com.maoatao.cas.core.param;
 
-import com.maoatao.daedalus.web.request.param.BasePageParam;
+import com.maoatao.daedalus.web.bean.param.BasePaginationParam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.Tolerate;
 
 import java.io.Serial;
 import java.util.List;
 
 /**
- * 用户表
+ * 用户
  *
  * @author MaoAtao
  * @date 2022-12-12 14:18:22
  */
 @Data
+@Builder
 @EqualsAndHashCode(callSuper = true)
-@Schema(description = "用户表")
-public class UserParam extends BasePageParam {
+@Schema(description = "用户")
+public class UserParam extends BasePaginationParam {
 
     @Serial
     private static final long serialVersionUID = 4486807411370303523L;
@@ -65,4 +68,7 @@ public class UserParam extends BasePageParam {
         // 去重
         return roles.stream().distinct().toList();
     }
+
+    @Tolerate
+    public UserParam() {}
 }

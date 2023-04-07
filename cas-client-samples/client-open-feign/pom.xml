@@ -9,6 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <artifactId>client-open-feign</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
     <name>${project.artifactId}</name>
     <description>
         使用 Spring Cloud OpenFeign 请求服务端获取授权信息

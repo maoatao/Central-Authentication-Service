@@ -7,10 +7,10 @@ import cn.hutool.jwt.JWT;
 import cn.hutool.jwt.JWTUtil;
 import com.maoatao.cas.common.authentication.CasAccessToken;
 import com.maoatao.cas.config.CasServerConfig;
-import com.maoatao.cas.core.entity.PermissionEntity;
-import com.maoatao.cas.core.entity.RoleEntity;
-import com.maoatao.cas.core.entity.RolePermissionEntity;
-import com.maoatao.cas.core.entity.UserEntity;
+import com.maoatao.cas.core.bean.entity.PermissionEntity;
+import com.maoatao.cas.core.bean.entity.RoleEntity;
+import com.maoatao.cas.core.bean.entity.RolePermissionEntity;
+import com.maoatao.cas.core.bean.entity.UserEntity;
 import com.maoatao.cas.core.param.GenerateAccessTokenParam;
 import com.maoatao.cas.core.param.GenerateAuthorizationCodeParam;
 import com.maoatao.cas.core.service.AuthorizationService;
@@ -232,13 +232,11 @@ class CasApplicationTests {
     void save_role_permission_test() {
         RoleEntity roleEntity = RoleEntity.builder().clientId(TEST_CLIENT_ID)
                 .name(TEST_ROLE_NAME)
-                .enabled(true)
                 .build();
         Assert.assertTrue("角色创建失败", roleService.save(roleEntity));
         PermissionEntity permissionEntity = PermissionEntity.builder()
                 .clientId(TEST_CLIENT_ID)
                 .name(TEST_PERMISSION_NAME)
-                .enabled(true)
                 .build();
         Assert.assertTrue("权限创建失败", permissionService.save(permissionEntity));
         Assert.assertTrue("角色权限关系绑定失败", rolePermissionService.save(RolePermissionEntity.builder()

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.maoatao.cas.core.mapper.ClientTokenSettingMapper">
+    <resultMap id="clientTokenSettingMap" type="com.maoatao.cas.core.bean.entity.ClientTokenSettingEntity">
+        <id property="id" column="id"/>
+        <result property="clientId" column="client_id"/>
+        <result property="authorizationCodeDuration" column="authorization_code_duration"/>
+        <result property="singleAccessToken" column="single_access_token"/>
+        <result property="accessTokenDuration" column="access_token_duration"/>
+        <result property="accessTokenFormat" column="access_token_format"/>
+        <result property="tokenValueFormat" column="token_value_format"/>
+        <result property="reuseRefreshToken" column="reuse_refresh_token"/>
+        <result property="refreshTokenDuration" column="refresh_token_duration"/>
+        <result property="signingAlgorithm" column="signing_algorithm"/>
+        <result property="createdById" column="created_by_id"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="updatedById" column="updated_by_id"/>
+        <result property="updatedDate" column="updated_date"/>
+        <result property="deleted" column="deleted"/>
+    </resultMap>
+</mapper>

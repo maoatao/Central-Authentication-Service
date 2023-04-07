@@ -1,6 +1,6 @@
 package com.maoatao.cas.core.param;
 
-import com.maoatao.daedalus.web.request.param.BasePageParam;
+import com.maoatao.daedalus.web.bean.param.BasePaginationParam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -17,7 +17,7 @@ import java.io.Serial;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "角色")
-public class RoleParam extends BasePageParam {
+public class RoleParam extends BasePaginationParam {
 
     @Serial
     private static final long serialVersionUID = 1233219274545424503L;

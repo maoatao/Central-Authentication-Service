@@ -1,35 +1,40 @@
 package com.maoatao.cas.core.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.maoatao.cas.core.entity.RoleEntity;
+import com.maoatao.cas.common.annotation.CasAuth;
+import com.maoatao.cas.core.bean.vo.RoleVO;
+import com.maoatao.cas.core.bean.param.role.RoleQueryParam;
+import com.maoatao.cas.core.bean.param.role.RoleSaveParam;
+import com.maoatao.cas.core.bean.param.role.RoleUpdateParam;
 import com.maoatao.cas.core.service.RoleService;
-import com.maoatao.cas.core.param.RoleParam;
+import com.maoatao.daedalus.web.annotation.OperationLog;
 import com.maoatao.daedalus.web.annotation.ResponseHandle;
+import com.maoatao.daedalus.web.enums.OperationType;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
 
 /**
- * 角色管理
+ * CAS 角色管理
  *
  * @author MaoAtao
- * @date 2022-12-12 14:18:23
+ * @date 2023-04-07 22:48:12
  */
 @ResponseHandle
 @RestController
 @RequestMapping("/role")
-@Tag(name = "RoleController", description = "角色管理")
+@Tag(name = "RoleController", description = "CAS 角色管理")
 public class RoleController {
 
     @Autowired
@@ -42,24 +47,25 @@ public class RoleController {
      * @return 分页
      */
     @GetMapping("/page")
-    @Operation(summary = "getPage", description = "分页查询角色列表")
-    public Page<RoleEntity> getPage(RoleParam param) {
-        return roleService.getPage(param);
+    @CasAuth("cas_role_get")
+    @Operation(summary = "getPage", description = "分页查询CAS 角色列表")
+    @OperationLog(type = OperationType.QUERY, content = "分页查询CAS 角色", moduleName = "cas")
+    public Page<RoleVO> page(@Validated RoleQueryParam param) {
+        return roleService.page(param);
     }
 
     /**
      * 通过id查询
      *
-     * @param id 主键id
-     * @return 角色
+     * @param id CAS 角色id
+     * @return CAS 角色
      */
     @GetMapping("/{id}")
-    @Operation(summary = "getById", description = "通过id查询角色")
-    public RoleEntity getById(@PathVariable
-                              @Parameter(name = "id", description = "角色id")
-                              @NotNull(message = "角色id不能为空")
-                              Long id) {
-        return roleService.getById(id);
+    @CasAuth("cas_role_get")
+    @Operation(summary = "details", description = "通过id查询CAS 角色")
+    @OperationLog(type = OperationType.QUERY, content = "查询CAS 角色", moduleName = "cas")
+    public RoleVO details(@PathVariable @Parameter(name = "id", description = "CAS 角色id") Long id) {
+        return roleService.details(id);
     }
 
     /**
@@ -69,8 +75,10 @@ public class RoleController {
      * @return 新增成功返回主键 id
      */
     @PostMapping
-    @Operation(summary = "save", description = "新增角色")
-    public long save(RoleParam param) {
+    @CasAuth("cas_role_add")
+    @Operation(summary = "save", description = "新增CAS 角色")
+    @OperationLog(type = OperationType.ADD, content = "新增CAS 角色", moduleName = "cas")
+    public long save(@Validated @RequestBody RoleSaveParam param) {
         return roleService.save(param);
     }
 
@@ -81,8 +89,10 @@ public class RoleController {
      * @return 更新成功返回true
      */
     @PutMapping
-    @Operation(summary = "update", description = "修改角色")
-    public boolean update(RoleParam param) {
+    @CasAuth("cas_role_update")
+    @Operation(summary = "update", description = "修改CAS 角色")
+    @OperationLog(type = OperationType.UPDATE, content = "修改CAS 角色", moduleName = "cas")
+    public boolean update(@Validated @RequestBody RoleUpdateParam param) {
         return roleService.update(param);
     }
 
@@ -93,11 +103,10 @@ public class RoleController {
      * @return 删除成功返回true
      */
     @DeleteMapping("/{ids}")
-    @Operation(summary = "remove", description = "通过id删除角色(多个 id 使用,分隔)")
-    public boolean remove(@PathVariable
-                          @Parameter(name = "id", description = "角色id集合")
-                          @NotNull(message = "角色id不能为空")
-                          List<Long> ids) {
+    @CasAuth("cas_role_delete")
+    @Operation(summary = "remove", description = "通过id删除CAS 角色(多个 id 使用,分隔)")
+    @OperationLog(type = OperationType.DELETE, content = "删除CAS 角色", moduleName = "cas")
+    public boolean remove(@PathVariable @Parameter(name = "ids", description = "CAS 角色id集合") List<Long> ids) {
         return roleService.remove(ids);
     }
 }

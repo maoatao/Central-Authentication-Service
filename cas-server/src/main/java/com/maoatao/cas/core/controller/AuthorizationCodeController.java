@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 授权码管理
+ * CAS 授权码管理
  *
  * @author MaoAtao
  * @date 2022-10-23 17:18:43

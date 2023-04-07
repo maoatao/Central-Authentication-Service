@@ -1,35 +1,40 @@
 package com.maoatao.cas.core.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.maoatao.cas.core.entity.UserEntity;
+import com.maoatao.cas.common.annotation.CasAuth;
+import com.maoatao.cas.core.bean.vo.UserVO;
+import com.maoatao.cas.core.bean.param.user.UserQueryParam;
+import com.maoatao.cas.core.bean.param.user.UserSaveParam;
+import com.maoatao.cas.core.bean.param.user.UserUpdateParam;
 import com.maoatao.cas.core.service.UserService;
-import com.maoatao.cas.core.param.UserParam;
+import com.maoatao.daedalus.web.annotation.OperationLog;
 import com.maoatao.daedalus.web.annotation.ResponseHandle;
+import com.maoatao.daedalus.web.enums.OperationType;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
 
 /**
- * 用户管理
+ * CAS 用户管理
  *
  * @author MaoAtao
- * @date 2021-05-13 13:28:20
+ * @date 2023-04-07 22:48:12
  */
 @ResponseHandle
 @RestController
 @RequestMapping("/user")
-@Tag(name = "UserController", description = "用户管理")
+@Tag(name = "UserController", description = "CAS 用户管理")
 public class UserController {
 
     @Autowired
@@ -42,24 +47,25 @@ public class UserController {
      * @return 分页
      */
     @GetMapping("/page")
-    @Operation(summary = "getPage", description = "分页查询用户列表")
-    public Page<UserEntity> getPage(UserParam param) {
-        return userService.getPage(param);
+    @CasAuth("cas_user_get")
+    @Operation(summary = "getPage", description = "分页查询CAS 用户列表")
+    @OperationLog(type = OperationType.QUERY, content = "分页查询CAS 用户", moduleName = "cas")
+    public Page<UserVO> page(@Validated UserQueryParam param) {
+        return userService.page(param);
     }
 
     /**
      * 通过id查询
      *
-     * @param id 用户id
-     * @return 用户
+     * @param id CAS 用户id
+     * @return CAS 用户
      */
     @GetMapping("/{id}")
-    @Operation(summary = "getById", description = "通过id查询用户")
-    public UserEntity getById(@PathVariable
-                              @Parameter(name = "id", description = "用户id")
-                              @NotNull(message = "用户id不能为空")
-                              Long id) {
-        return userService.getById(id);
+    @CasAuth("cas_user_get")
+    @Operation(summary = "details", description = "通过id查询CAS 用户")
+    @OperationLog(type = OperationType.QUERY, content = "查询CAS 用户", moduleName = "cas")
+    public UserVO details(@PathVariable @Parameter(name = "id", description = "CAS 用户id") Long id) {
+        return userService.details(id);
     }
 
     /**
@@ -69,8 +75,10 @@ public class UserController {
      * @return 新增成功返回主键 id
      */
     @PostMapping
-    @Operation(summary = "save", description = "新增用户")
-    public long save(UserParam param) {
+    @CasAuth("cas_user_add")
+    @Operation(summary = "save", description = "新增CAS 用户")
+    @OperationLog(type = OperationType.ADD, content = "新增CAS 用户", moduleName = "cas")
+    public long save(@Validated @RequestBody UserSaveParam param) {
         return userService.save(param);
     }
 
@@ -81,8 +89,10 @@ public class UserController {
      * @return 更新成功返回true
      */
     @PutMapping
-    @Operation(summary = "update", description = "修改用户")
-    public boolean update(UserParam param) {
+    @CasAuth("cas_user_update")
+    @Operation(summary = "update", description = "修改CAS 用户")
+    @OperationLog(type = OperationType.UPDATE, content = "修改CAS 用户", moduleName = "cas")
+    public boolean update(@Validated @RequestBody UserUpdateParam param) {
         return userService.update(param);
     }
 
@@ -93,11 +103,10 @@ public class UserController {
      * @return 删除成功返回true
      */
     @DeleteMapping("/{ids}")
-    @Operation(summary = "remove", description = "通过id删除用户(多个 id 使用,分隔)")
-    public boolean remove(@PathVariable
-                          @Parameter(name = "ids", description = "用户id集合")
-                          @NotNull(message = "用户id不能为空")
-                          List<Long> ids) {
+    @CasAuth("cas_user_delete")
+    @Operation(summary = "remove", description = "通过id删除CAS 用户(多个 id 使用,分隔)")
+    @OperationLog(type = OperationType.DELETE, content = "删除CAS 用户", moduleName = "cas")
+    public boolean remove(@PathVariable @Parameter(name = "ids", description = "CAS 用户id集合") List<Long> ids) {
         return userService.remove(ids);
     }
 }

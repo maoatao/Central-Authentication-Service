@@ -2,7 +2,7 @@ package com.maoatao.cas.core.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
-import com.maoatao.cas.core.entity.PermissionEntity;
+import com.maoatao.cas.core.bean.entity.PermissionEntity;
 
 import java.util.List;
 
