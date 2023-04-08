@@ -76,7 +76,7 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
     private void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             try {
-                // doTokenFilter(request);
+                doTokenFilter(request);
             } catch (SynaException e) {
                 // 拦截异常,屏蔽异常信息,这里统一返回未授权响应
                 log.error("鉴权拦截异常", e);
