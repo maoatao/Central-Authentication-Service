@@ -1,4 +1,4 @@
-package com.maoatao.cas.security.oauth2.auth.service;
+package com.maoatao.cas.security.authorization;
 
 import org.springframework.lang.Nullable;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;

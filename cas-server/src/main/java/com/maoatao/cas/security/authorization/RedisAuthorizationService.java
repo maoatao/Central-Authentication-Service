@@ -1,4 +1,4 @@
-package com.maoatao.cas.security.oauth2.auth.service;
+package com.maoatao.cas.security.authorization;
 
 import cn.hutool.core.collection.IterUtil;
 import cn.hutool.core.util.StrUtil;
