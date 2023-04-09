@@ -5,6 +5,7 @@ import com.maoatao.cas.core.bean.entity.ClientEntity;
 import com.maoatao.cas.core.bean.param.client.ClientQueryParam;
 import com.maoatao.cas.core.bean.vo.ClientVO;
 import com.maoatao.daedalus.data.service.DaedalusService;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 
 /**
  * CAS 客户端
@@ -12,7 +13,7 @@ import com.maoatao.daedalus.data.service.DaedalusService;
  * @author MaoAtao
  * @date 2023-04-07 20:51:07
  */
-public interface ClientService extends DaedalusService<ClientEntity> {
+public interface ClientService extends DaedalusService<ClientEntity>, RegisteredClientRepository {
 
     /**
      * 分页
