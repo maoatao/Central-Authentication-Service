@@ -65,6 +65,7 @@ public class SecutityConfig {
     private void applyRequestMatchers(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorizeHttpRequests -> {
             authorizeHttpRequests.requestMatchers(
+                    "/**",
                     "/error", "/swagger-ui/**", "/swagger-resources/**",
                     "/webjars/**", "/v3/**", "/api/**", "/doc.html", "/favicon.ico"
             ).permitAll();

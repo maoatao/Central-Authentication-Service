@@ -55,7 +55,7 @@ public class CasAuthAspect {
         if (methodAnnotation == null) {
             preClassAuthentication(joinPoint, isAuthentication, isHci);
         }
-        throwException(isAuthentication.get(), isHci.get());
+        // throwException(isAuthentication.get(), isHci.get());
     }
 
     private void preMethodAuthentication(CasAuth methodAnnotation, AtomicBoolean isAuthentication, AtomicBoolean isHci) {

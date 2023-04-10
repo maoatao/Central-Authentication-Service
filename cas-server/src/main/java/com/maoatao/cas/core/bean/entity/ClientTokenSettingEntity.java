@@ -31,7 +31,7 @@ public class ClientTokenSettingEntity extends BaseEntity<ClientTokenSettingEntit
     /**
      * 授权码持续时间(单位秒,默认 300 秒)
      */
-    private Integer authorizationCodeDuration;
+    private Long authorizationCodeDuration;
     /**
      * 是否启用单一授权(签发新令牌后自动吊销旧令牌);false:禁用,true:启用
      */
@@ -39,7 +39,7 @@ public class ClientTokenSettingEntity extends BaseEntity<ClientTokenSettingEntit
     /**
      * 访问令牌持续时间(单位秒,默认 1800 秒)
      */
-    private Integer accessTokenDuration;
+    private Long accessTokenDuration;
     /**
      * 访问令牌格式
      */
@@ -55,7 +55,7 @@ public class ClientTokenSettingEntity extends BaseEntity<ClientTokenSettingEntit
     /**
      * 刷新令牌持续时间(单位秒,默认 3600 秒)
      */
-    private Integer refreshTokenDuration;
+    private Long refreshTokenDuration;
     /**
      * 签名算法
      */
