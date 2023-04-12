@@ -5,6 +5,7 @@ import com.maoatao.cas.core.bean.entity.ClientAuthenticationMethodEntity;
 import com.maoatao.cas.core.bean.param.clientauthenticationmethod.ClientAuthenticationMethodQueryParam;
 import com.maoatao.cas.core.bean.vo.ClientAuthenticationMethodVO;
 import com.maoatao.daedalus.data.service.DaedalusService;
+import java.util.List;
 
 /**
  * CAS 客户端身份验证方法
@@ -29,4 +30,12 @@ public interface ClientAuthenticationMethodService extends DaedalusService<Clien
      * @return CAS 客户端身份验证方法
      */
     ClientAuthenticationMethodVO details(Long id);
+
+    /**
+     * 通过id查询
+     *
+     * @param clientId CAS 客户端id
+     * @return CAS 客户端身份验证方法
+     */
+    List<ClientAuthenticationMethodEntity> listByClientId(String clientId);
 }

@@ -29,4 +29,12 @@ public interface ClientTokenSettingService extends DaedalusService<ClientTokenSe
      * @return CAS 客户端令牌设置
      */
     ClientTokenSettingVO details(Long id);
+
+    /**
+     * 通过id查询
+     *
+     * @param clientId CAS 客户端id
+     * @return CAS 客户端令牌设置
+     */
+    ClientTokenSettingEntity getByClientId(String clientId);
 }

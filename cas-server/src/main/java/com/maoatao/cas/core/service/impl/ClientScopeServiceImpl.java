@@ -10,6 +10,7 @@ import com.maoatao.cas.core.mapper.ClientScopeMapper;
 import com.maoatao.cas.core.service.ClientScopeService;
 import com.maoatao.daedalus.data.service.impl.DaedalusServiceImpl;
 import com.maoatao.daedalus.data.util.PageUtils;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,7 +21,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ClientScopeServiceImpl extends DaedalusServiceImpl<ClientScopeMapper, ClientScopeEntity> implements ClientScopeService {
-    
+
     @Override
     public Page<ClientScopeVO> page(ClientScopeQueryParam param) {
         ClientScopeEntity entity = BeanUtil.copyProperties(param, ClientScopeEntity.class);
@@ -29,7 +30,12 @@ public class ClientScopeServiceImpl extends DaedalusServiceImpl<ClientScopeMappe
     }
 
     @Override
-    public ClientScopeVO details(Long id){
+    public ClientScopeVO details(Long id) {
         return BeanUtil.toBean(super.getById(id), ClientScopeVO.class);
+    }
+
+    @Override
+    public List<ClientScopeEntity> listByClientId(String clientId) {
+        return super.list(Wrappers.<ClientScopeEntity>lambdaQuery().eq(ClientScopeEntity::getClientId, clientId));
     }
 }

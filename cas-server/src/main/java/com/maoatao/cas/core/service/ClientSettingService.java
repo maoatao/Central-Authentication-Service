@@ -29,4 +29,12 @@ public interface ClientSettingService extends DaedalusService<ClientSettingEntit
      * @return CAS 客户端设置
      */
     ClientSettingVO details(Long id);
+
+    /**
+     * 通过id查询
+     *
+     * @param clientId CAS 客户端id
+     * @return CAS 客户端设置
+     */
+    ClientSettingEntity getByClientId(String clientId);
 }

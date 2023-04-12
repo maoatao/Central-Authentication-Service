@@ -12,7 +12,6 @@ import org.springframework.security.config.annotation.web.configurers.oauth2.ser
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
-import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
@@ -50,15 +49,6 @@ public class CasServerConfig {
     }
 
     /**
-     * 客户端服务
-     */
-    @Bean
-    public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
-        // TODO: 2023-03-06 14:03:49 这个要改,改成自己的客户端表和服务
-        return new JdbcRegisteredClientRepository(jdbcTemplate);
-    }
-
-    /**
      * 生成令牌服务
      * <p>
      * 官方提供了内存和数据库储存授权信息,根据需要自己实现了redis储存令牌信息
@@ -74,6 +64,7 @@ public class CasServerConfig {
     @Bean
     public OAuth2AuthorizationConsentService authorizationConsentService(JdbcTemplate jdbcTemplate,
                                                                          RegisteredClientRepository registeredClientRepository) {
+        // TODO: LiYuanhao 2023-04-12 09:46:01 这个改为自己的表和服务
         return new JdbcOAuth2AuthorizationConsentService(jdbcTemplate, registeredClientRepository);
     }
 

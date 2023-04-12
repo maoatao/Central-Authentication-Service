@@ -25,6 +25,7 @@ public class DelegatingOperatorContextConverter implements ContextConverter {
         setConverters(converters);
     }
 
+    @Override
     public DaedalusOperatorContext convert(String token) throws SynaException {
         DaedalusOperatorContext result;
         int currentPosition = 0;

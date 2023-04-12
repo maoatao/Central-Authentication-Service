@@ -5,6 +5,7 @@ import com.maoatao.cas.core.bean.entity.ClientGrantTypeEntity;
 import com.maoatao.cas.core.bean.param.clientgranttype.ClientGrantTypeQueryParam;
 import com.maoatao.cas.core.bean.vo.ClientGrantTypeVO;
 import com.maoatao.daedalus.data.service.DaedalusService;
+import java.util.List;
 
 /**
  * CAS 客户端授权类型
@@ -29,4 +30,12 @@ public interface ClientGrantTypeService extends DaedalusService<ClientGrantTypeE
      * @return CAS 客户端授权类型
      */
     ClientGrantTypeVO details(Long id);
+
+    /**
+     * 通过id查询
+     *
+     * @param clientId CAS 客户端id
+     * @return CAS 客户端授权类型
+     */
+    List<ClientGrantTypeEntity> listByClientId(String clientId);
 }

@@ -26,8 +26,16 @@ public interface ClientService extends DaedalusService<ClientEntity>, Registered
     /**
      * 通过id查询
      *
-     * @param id CAS 客户端id
+     * @param id CAS 客户端主键id
      * @return CAS 客户端
      */
     ClientVO details(Long id);
+
+    /**
+     * 通过id查询
+     *
+     * @param clientId CAS 客户端id
+     * @return CAS 客户端
+     */
+    ClientEntity getByClientId(String clientId);
 }

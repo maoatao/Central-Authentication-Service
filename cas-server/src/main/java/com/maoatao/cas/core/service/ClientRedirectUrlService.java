@@ -5,6 +5,7 @@ import com.maoatao.cas.core.bean.entity.ClientRedirectUrlEntity;
 import com.maoatao.cas.core.bean.param.clientredirecturl.ClientRedirectUrlQueryParam;
 import com.maoatao.cas.core.bean.vo.ClientRedirectUrlVO;
 import com.maoatao.daedalus.data.service.DaedalusService;
+import java.util.List;
 
 /**
  * CAS 客户端重定向地址
@@ -29,4 +30,12 @@ public interface ClientRedirectUrlService extends DaedalusService<ClientRedirect
      * @return CAS 客户端重定向地址
      */
     ClientRedirectUrlVO details(Long id);
+
+    /**
+     * 通过id查询
+     *
+     * @param clientId CAS 客户端id
+     * @return CAS 客户端重定向地址
+     */
+    List<ClientRedirectUrlEntity> listByClientId(String clientId);
 }

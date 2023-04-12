@@ -10,6 +10,7 @@ import com.maoatao.cas.core.mapper.ClientAuthenticationMethodMapper;
 import com.maoatao.cas.core.service.ClientAuthenticationMethodService;
 import com.maoatao.daedalus.data.service.impl.DaedalusServiceImpl;
 import com.maoatao.daedalus.data.util.PageUtils;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,7 +21,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ClientAuthenticationMethodServiceImpl extends DaedalusServiceImpl<ClientAuthenticationMethodMapper, ClientAuthenticationMethodEntity> implements ClientAuthenticationMethodService {
-    
+
     @Override
     public Page<ClientAuthenticationMethodVO> page(ClientAuthenticationMethodQueryParam param) {
         ClientAuthenticationMethodEntity entity = BeanUtil.copyProperties(param, ClientAuthenticationMethodEntity.class);
@@ -29,7 +30,12 @@ public class ClientAuthenticationMethodServiceImpl extends DaedalusServiceImpl<C
     }
 
     @Override
-    public ClientAuthenticationMethodVO details(Long id){
+    public ClientAuthenticationMethodVO details(Long id) {
         return BeanUtil.toBean(super.getById(id), ClientAuthenticationMethodVO.class);
+    }
+
+    @Override
+    public List<ClientAuthenticationMethodEntity> listByClientId(String clientId) {
+        return super.list(Wrappers.<ClientAuthenticationMethodEntity>lambdaQuery().eq(ClientAuthenticationMethodEntity::getClientId, clientId));
     }
 }

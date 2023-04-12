@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ClientTokenSettingServiceImpl extends DaedalusServiceImpl<ClientTokenSettingMapper, ClientTokenSettingEntity> implements ClientTokenSettingService {
-    
+
     @Override
     public Page<ClientTokenSettingVO> page(ClientTokenSettingQueryParam param) {
         ClientTokenSettingEntity entity = BeanUtil.copyProperties(param, ClientTokenSettingEntity.class);
@@ -29,7 +29,12 @@ public class ClientTokenSettingServiceImpl extends DaedalusServiceImpl<ClientTok
     }
 
     @Override
-    public ClientTokenSettingVO details(Long id){
+    public ClientTokenSettingVO details(Long id) {
         return BeanUtil.toBean(super.getById(id), ClientTokenSettingVO.class);
+    }
+
+    @Override
+    public ClientTokenSettingEntity getByClientId(String clientId) {
+        return super.getOne(Wrappers.<ClientTokenSettingEntity>lambdaQuery().eq(ClientTokenSettingEntity::getClientId, clientId));
     }
 }

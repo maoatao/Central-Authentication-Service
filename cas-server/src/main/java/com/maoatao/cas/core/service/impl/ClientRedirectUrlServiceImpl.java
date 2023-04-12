@@ -10,6 +10,7 @@ import com.maoatao.cas.core.mapper.ClientRedirectUrlMapper;
 import com.maoatao.cas.core.service.ClientRedirectUrlService;
 import com.maoatao.daedalus.data.service.impl.DaedalusServiceImpl;
 import com.maoatao.daedalus.data.util.PageUtils;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,7 +21,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ClientRedirectUrlServiceImpl extends DaedalusServiceImpl<ClientRedirectUrlMapper, ClientRedirectUrlEntity> implements ClientRedirectUrlService {
-    
+
     @Override
     public Page<ClientRedirectUrlVO> page(ClientRedirectUrlQueryParam param) {
         ClientRedirectUrlEntity entity = BeanUtil.copyProperties(param, ClientRedirectUrlEntity.class);
@@ -29,7 +30,12 @@ public class ClientRedirectUrlServiceImpl extends DaedalusServiceImpl<ClientRedi
     }
 
     @Override
-    public ClientRedirectUrlVO details(Long id){
+    public ClientRedirectUrlVO details(Long id) {
         return BeanUtil.toBean(super.getById(id), ClientRedirectUrlVO.class);
+    }
+
+    @Override
+    public List<ClientRedirectUrlEntity> listByClientId(String clientId) {
+        return super.list(Wrappers.<ClientRedirectUrlEntity>lambdaQuery().eq(ClientRedirectUrlEntity::getClientId, clientId));
     }
 }

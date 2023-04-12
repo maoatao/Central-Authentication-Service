@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ClientSettingServiceImpl extends DaedalusServiceImpl<ClientSettingMapper, ClientSettingEntity> implements ClientSettingService {
-    
+
     @Override
     public Page<ClientSettingVO> page(ClientSettingQueryParam param) {
         ClientSettingEntity entity = BeanUtil.copyProperties(param, ClientSettingEntity.class);
@@ -29,7 +29,12 @@ public class ClientSettingServiceImpl extends DaedalusServiceImpl<ClientSettingM
     }
 
     @Override
-    public ClientSettingVO details(Long id){
+    public ClientSettingVO details(Long id) {
         return BeanUtil.toBean(super.getById(id), ClientSettingVO.class);
+    }
+
+    @Override
+    public ClientSettingEntity getByClientId(String clientId) {
+        return super.getOne(Wrappers.<ClientSettingEntity>lambdaQuery().eq(ClientSettingEntity::getClientId, clientId));
     }
 }

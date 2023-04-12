@@ -10,6 +10,7 @@ import com.maoatao.cas.core.mapper.ClientGrantTypeMapper;
 import com.maoatao.cas.core.service.ClientGrantTypeService;
 import com.maoatao.daedalus.data.service.impl.DaedalusServiceImpl;
 import com.maoatao.daedalus.data.util.PageUtils;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,7 +21,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ClientGrantTypeServiceImpl extends DaedalusServiceImpl<ClientGrantTypeMapper, ClientGrantTypeEntity> implements ClientGrantTypeService {
-    
+
     @Override
     public Page<ClientGrantTypeVO> page(ClientGrantTypeQueryParam param) {
         ClientGrantTypeEntity entity = BeanUtil.copyProperties(param, ClientGrantTypeEntity.class);
@@ -29,7 +30,12 @@ public class ClientGrantTypeServiceImpl extends DaedalusServiceImpl<ClientGrantT
     }
 
     @Override
-    public ClientGrantTypeVO details(Long id){
+    public ClientGrantTypeVO details(Long id) {
         return BeanUtil.toBean(super.getById(id), ClientGrantTypeVO.class);
+    }
+
+    @Override
+    public List<ClientGrantTypeEntity> listByClientId(String clientId) {
+        return super.list(Wrappers.<ClientGrantTypeEntity>lambdaQuery().eq(ClientGrantTypeEntity::getClientId, clientId));
     }
 }
