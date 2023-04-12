@@ -47,7 +47,7 @@ CREATE TABLE `t_cas_client_authentication_method`
 (
     `id`            bigint                                                  NOT NULL AUTO_INCREMENT COMMENT '主键id(自增)',
     `client_id`     varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '客户端 id',
-    `value`         varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci           DEFAULT NULL COMMENT '客户端对应设定的值',
+    `value`         varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '客户端对应设定的值',
     `created_by_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '创建人 ID',
     `created_date`  datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP (3) ON UPDATE CURRENT_TIMESTAMP (3) COMMENT '创建时间',
     `updated_by_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '更新人 ID',
@@ -64,7 +64,7 @@ CREATE TABLE `t_cas_client_grant_type`
 (
     `id`            bigint                                                  NOT NULL AUTO_INCREMENT COMMENT '主键id(自增)',
     `client_id`     varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '客户端 id',
-    `value`         varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci           DEFAULT NULL COMMENT '授权类型',
+    `value`         varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '授权类型',
     `created_by_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '创建人 ID',
     `created_date`  datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP (3) ON UPDATE CURRENT_TIMESTAMP (3) COMMENT '创建时间',
     `updated_by_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '更新人 ID',
@@ -79,14 +79,14 @@ CREATE TABLE `t_cas_client_grant_type`
 DROP TABLE IF EXISTS `t_cas_client_redirect_url`;
 CREATE TABLE `t_cas_client_redirect_url`
 (
-    `id`            bigint                                                  NOT NULL AUTO_INCREMENT COMMENT '主键id(自增)',
-    `client_id`     varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '客户端 id',
-    `value`         varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci         DEFAULT NULL COMMENT '重定向地址',
-    `created_by_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '创建人 ID',
+    `id`            bigint                                                   NOT NULL AUTO_INCREMENT COMMENT '主键id(自增)',
+    `client_id`     varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '客户端 id',
+    `value`         varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '重定向地址',
+    `created_by_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci   NOT NULL DEFAULT '' COMMENT '创建人 ID',
     `created_date`  datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP (3) ON UPDATE CURRENT_TIMESTAMP (3) COMMENT '创建时间',
-    `updated_by_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '更新人 ID',
+    `updated_by_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci   NOT NULL DEFAULT '' COMMENT '更新人 ID',
     `updated_date`  datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP (3) ON UPDATE CURRENT_TIMESTAMP (3) COMMENT '更新时间',
-    `deleted`       bit(1)                                                  NOT NULL DEFAULT b'0' COMMENT '是否删除;0:未删除,1:删除',
+    `deleted`       bit(1)                                                   NOT NULL DEFAULT b'0' COMMENT '是否删除;0:未删除,1:删除',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='CAS 客户端重定向地址';
 
@@ -98,7 +98,7 @@ CREATE TABLE `t_cas_client_scope`
 (
     `id`            bigint                                                  NOT NULL AUTO_INCREMENT COMMENT '主键id(自增)',
     `client_id`     varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '客户端 id',
-    `name`          varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci           DEFAULT NULL COMMENT '作用域',
+    `name`          varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '作用域',
     `description`   varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '描述',
     `created_by_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '创建人 ID',
     `created_date`  datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP (3) ON UPDATE CURRENT_TIMESTAMP (3) COMMENT '创建时间',
@@ -131,17 +131,17 @@ CREATE TABLE `t_cas_client_scope_permission`
 DROP TABLE IF EXISTS `t_cas_client_setting`;
 CREATE TABLE `t_cas_client_setting`
 (
-    `id`                            bigint                                                  NOT NULL AUTO_INCREMENT COMMENT '主键id(自增)',
-    `client_id`                     varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '客户端 id',
-    `require_proof_key`             bit(1)                                                  NOT NULL DEFAULT b'1' COMMENT '是否启用验证授权码参数(PKCE);0:禁用,1:启用',
-    `require_authorization_consent` bit(1)                                                  NOT NULL DEFAULT b'1' COMMENT '是否启用授权同意;0:禁用,1:启用',
-    `jwk_set_url`                   varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci         DEFAULT NULL COMMENT 'JWK 秘钥集 URL',
-    `signing_algorithm`             varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci           DEFAULT NULL COMMENT '签名算法',
-    `created_by_id`                 varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '创建人 ID',
+    `id`                            bigint                                                   NOT NULL AUTO_INCREMENT COMMENT '主键id(自增)',
+    `client_id`                     varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '客户端 id',
+    `require_proof_key`             bit(1)                                                   NOT NULL DEFAULT b'1' COMMENT '是否启用验证授权码参数(PKCE);0:禁用,1:启用',
+    `require_authorization_consent` bit(1)                                                   NOT NULL DEFAULT b'1' COMMENT '是否启用授权同意;0:禁用,1:启用',
+    `jwk_set_url`                   varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT 'JWK 秘钥集 URL',
+    `signing_algorithm`             varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci   NOT NULL DEFAULT '' COMMENT '签名算法',
+    `created_by_id`                 varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci   NOT NULL DEFAULT '' COMMENT '创建人 ID',
     `created_date`                  datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP (3) ON UPDATE CURRENT_TIMESTAMP (3) COMMENT '创建时间',
-    `updated_by_id`                 varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '更新人 ID',
+    `updated_by_id`                 varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci   NOT NULL DEFAULT '' COMMENT '更新人 ID',
     `updated_date`                  datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP (3) ON UPDATE CURRENT_TIMESTAMP (3) COMMENT '更新时间',
-    `deleted`                       bit(1)                                                  NOT NULL DEFAULT b'0' COMMENT '是否删除;0:未删除,1:删除',
+    `deleted`                       bit(1)                                                   NOT NULL DEFAULT b'0' COMMENT '是否删除;0:未删除,1:删除',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC COMMENT='CAS 客户端设置';
 
