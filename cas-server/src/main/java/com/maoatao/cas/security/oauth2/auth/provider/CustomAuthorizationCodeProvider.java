@@ -160,6 +160,7 @@ public final class CustomAuthorizationCodeProvider implements AuthenticationProv
                 .additionalParameters(authorizationCodeRequestAuthentication.getAdditionalParameters())
                 .build();
 
+        // TODO: LiYuanhao 2023-04-13 17:49:17 查询有效的授权同意
         OAuth2AuthorizationConsent currentAuthorizationConsent = this.authorizationConsentService.findById(
                 registeredClient.getId(), principal.getName());
 

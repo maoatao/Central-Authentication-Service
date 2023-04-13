@@ -37,7 +37,7 @@ Central Authentication Service (CAS 中央认证服务 OAuth2.1协议)
 | oauth2_authorization         | 授权信息  |
 | oauth2_authorization_consent | 授权同意  |
 | oauth2_registered_client     | 客户端信息 |
-| users                        | 用户   |
+| users                        | 用户    |
 
 ### 3. 添加测试数据的两种方法
 

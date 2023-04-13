@@ -130,6 +130,8 @@ public class ProviderConfig {
         return provider;
     }
 
+    // TODO: LiYuanhao 2023-04-13 17:56:04 OAuth2AuthorizationConsentAuthenticationProvider 自定义 同意 授权码生成
+
     /**
      * 自定义客户端注册提供者
      */

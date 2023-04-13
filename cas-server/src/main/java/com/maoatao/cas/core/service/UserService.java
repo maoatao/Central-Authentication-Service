@@ -35,6 +35,8 @@ public interface UserService extends DaedalusService<UserEntity> {
 
     /**
      * 通过用户名和用户详细信息
+     * <p>
+     * 与{@link org.springframework.security.core.userdetails.UserDetailsService#loadUserByUsername}不同,需要客户端id
      *
      * @param username 用户名
      * @param clientId 客户端 Id
