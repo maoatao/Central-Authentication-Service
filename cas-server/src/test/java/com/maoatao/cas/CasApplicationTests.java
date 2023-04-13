@@ -13,7 +13,7 @@ import com.maoatao.cas.core.bean.entity.RolePermissionEntity;
 import com.maoatao.cas.core.bean.entity.UserEntity;
 import com.maoatao.cas.core.param.GenerateAccessTokenParam;
 import com.maoatao.cas.core.param.GenerateAuthorizationCodeParam;
-import com.maoatao.cas.core.service.AuthorizationService;
+import com.maoatao.cas.security.service.CasAuthorizationService;
 import com.maoatao.cas.core.service.PermissionService;
 import com.maoatao.cas.core.service.RolePermissionService;
 import com.maoatao.cas.core.service.RoleService;
@@ -82,7 +82,7 @@ class CasApplicationTests {
     private RegisteredClientRepository registeredClientRepository;
 
     @Autowired
-    private AuthorizationService authorizationService;
+    private CasAuthorizationService casAuthorizationService;
 
     @Autowired
     private RoleService roleService;
@@ -314,7 +314,7 @@ class CasApplicationTests {
         generateAuthorizationCodeParam.setCodeChallenge("3vrxycun-VbyenvO5GiFOaOBazUBX_xcFElnqbl-TXA");
         // 非OAuth2原获取授权码接口,原版请求成功后跳转页面 get http://localhost:8080/oauth2/authorize
         // 根据需要自己新增了一个不需要鉴权,不跳转页面,post的请求授权码接口
-        String authorizationCode = authorizationService.generateAuthorizationCode(generateAuthorizationCodeParam);
+        String authorizationCode = casAuthorizationService.generateAuthorizationCode(generateAuthorizationCodeParam);
 
         Assert.assertTrue("授权码生成失败!", StrUtil.isNotBlank(authorizationCode));
         return authorizationCode;
@@ -357,7 +357,7 @@ class CasApplicationTests {
         param.setSecret(TEST_CLIENT_SECRET);
         param.setVerifier("eT3Zhtr7Tmz20-qpTk9zs8EWhN63qdZd8GWiq5-h67TrujxzIg0p_tPUfWH1dXQg278ZEiMcq9ehYPvbBehNe8f4VP4o8EOnFoQY7wVwjUyG_l0ksZUUuPWg5dWKAEth");
 
-        CasAccessToken accessToken = authorizationService.generateAccessToken(param);
+        CasAccessToken accessToken = casAuthorizationService.generateAccessToken(param);
 
         Assert.assertNotNull("授权码模式生成令牌请求失败!", accessToken);
         return accessToken;
@@ -374,7 +374,7 @@ class CasApplicationTests {
         param.setCode(refreshToken);
         param.setSecret(TEST_CLIENT_SECRET);
 
-        CasAccessToken accessToken = authorizationService.generateAccessToken(param);
+        CasAccessToken accessToken = casAuthorizationService.generateAccessToken(param);
 
         Assert.assertNotNull("刷新令牌模式生成令牌请求失败!", accessToken);
         return accessToken;
@@ -388,7 +388,7 @@ class CasApplicationTests {
         param.setType(AuthorizationGrantType.CLIENT_CREDENTIALS.getValue());
         param.setSecret(TEST_CLIENT_SECRET);
 
-        CasAccessToken accessToken = authorizationService.generateAccessToken(param);
+        CasAccessToken accessToken = casAuthorizationService.generateAccessToken(param);
 
         Assert.assertNotNull("客户端模式生成令牌请求失败!", accessToken);
         return accessToken;
@@ -396,7 +396,7 @@ class CasApplicationTests {
 
     private void mock_context_test() {
         // 构建上下文
-        Authentication principal = authorizationService.generateUserPrincipal(ClientUser.builder()
+        Authentication principal = casAuthorizationService.generateUserPrincipal(ClientUser.builder()
                 .clientId(TEST_CLIENT_ID)
                 .username(TEST_USER_NAME)
                 .password(TEST_USER_PASSWORD)

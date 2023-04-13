@@ -1,7 +1,8 @@
-package com.maoatao.cas.security.authorization;
+package com.maoatao.cas.security.service.impl;
 
 import cn.hutool.core.collection.IterUtil;
 import cn.hutool.core.util.StrUtil;
+import com.maoatao.cas.security.service.CustomAuthorizationService;
 import com.maoatao.daedalus.data.util.RedisUtils;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
@@ -11,6 +12,7 @@ import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationCode;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
+import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.time.Instant;
@@ -23,12 +25,19 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 自定义Redis储存授权码(源码未提供授权码的redis储存
+ * 自定义Redis储存授权码(源码未提供授权码的redis储存)
  *
  * @author MaoAtao
  * @date 2022-02-17 18:28:59
  */
-public class RedisAuthorizationService implements CustomAuthorizationService {
+@Service
+public class RedisAuthorizationServiceImpl implements CustomAuthorizationService {
+
+    /**
+     * redis key CAS前缀
+     */
+    private static final String REDIS_KEY_CAS = "CAS:";
+
     /**
      * redis key Authorization前缀
      */
@@ -70,16 +79,6 @@ public class RedisAuthorizationService implements CustomAuthorizationService {
      * 并非客户端详情中令牌配置的令牌时间,而是储存到redis中计算储存时间使用的默认时间
      */
     private static final long DEFAULT_EXPIRATION_SECONDS = 300;
-
-    private final String prefix;
-
-    public RedisAuthorizationService() {
-        this(StrUtil.EMPTY);
-    }
-
-    public RedisAuthorizationService(String prefix) {
-        this.prefix = prefix;
-    }
 
     @Override
     public void save(OAuth2Authorization authorization) {
@@ -149,7 +148,7 @@ public class RedisAuthorizationService implements CustomAuthorizationService {
         if (IterUtil.isNotEmpty(keys)) {
             keys.forEach(key -> authorizations.add(getAuthorization(
                     // 删除前缀
-                    key.replaceAll(this.prefix + REDIS_KEY_PRINCIPAL + principalName + RedisUtils.REDIS_KEY, ""))));
+                    key.replaceAll(REDIS_KEY_CAS + REDIS_KEY_PRINCIPAL + principalName + RedisUtils.REDIS_KEY, ""))));
         }
         return authorizations;
     }
@@ -284,7 +283,7 @@ public class RedisAuthorizationService implements CustomAuthorizationService {
      * @return 在redis储存的key
      */
     private String getAuthorizationKey(String id) {
-        return this.prefix + REDIS_KEY_AUTHORIZATION + id;
+        return REDIS_KEY_CAS + REDIS_KEY_AUTHORIZATION + id;
     }
 
     /**
@@ -294,7 +293,7 @@ public class RedisAuthorizationService implements CustomAuthorizationService {
      * @return 在redis储存的key
      */
     private String getCodeKey(String id) {
-        return this.prefix + REDIS_KEY_CODE + id;
+        return REDIS_KEY_CAS + REDIS_KEY_CODE + id;
     }
 
     /**
@@ -304,7 +303,7 @@ public class RedisAuthorizationService implements CustomAuthorizationService {
      * @return 在redis储存的key
      */
     private String getAccessTokenKey(String id) {
-        return this.prefix + REDIS_KEY_ACCESS_TOKEN + id;
+        return REDIS_KEY_CAS + REDIS_KEY_ACCESS_TOKEN + id;
     }
 
     /**
@@ -314,7 +313,7 @@ public class RedisAuthorizationService implements CustomAuthorizationService {
      * @return 在redis储存的key
      */
     private String getRefreshTokenKey(String id) {
-        return this.prefix + REDIS_KEY_REFRESH_TOKEN + id;
+        return REDIS_KEY_CAS + REDIS_KEY_REFRESH_TOKEN + id;
     }
 
     /**
@@ -324,7 +323,7 @@ public class RedisAuthorizationService implements CustomAuthorizationService {
      * @return 在redis储存的key
      */
     private String getOidcTokenKey(String id) {
-        return this.prefix + REDIS_KEY_OIDC + id;
+        return REDIS_KEY_CAS + REDIS_KEY_OIDC + id;
     }
 
     /**
@@ -334,7 +333,7 @@ public class RedisAuthorizationService implements CustomAuthorizationService {
      * @return 在redis储存的key
      */
     private String getPrincipalKey(String id) {
-        return this.prefix + REDIS_KEY_PRINCIPAL + id;
+        return REDIS_KEY_CAS + REDIS_KEY_PRINCIPAL + id;
     }
 
     /**
@@ -344,7 +343,7 @@ public class RedisAuthorizationService implements CustomAuthorizationService {
      * @return 在redis储存的key
      */
     private String getStateKey(String id) {
-        return this.prefix + REDIS_KEY_STATE + id;
+        return REDIS_KEY_CAS + REDIS_KEY_STATE + id;
     }
 
     /**

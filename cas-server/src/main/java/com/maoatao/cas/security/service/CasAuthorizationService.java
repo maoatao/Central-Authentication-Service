@@ -1,4 +1,4 @@
-package com.maoatao.cas.core.service;
+package com.maoatao.cas.security.service;
 
 import com.maoatao.cas.common.authentication.CasAccessToken;
 import com.maoatao.cas.common.authentication.CasAuthorization;
@@ -9,12 +9,12 @@ import com.maoatao.cas.security.bean.ClientUser;
 import org.springframework.security.core.Authentication;
 
 /**
- * 自定义授权接口
+ * CAS授权接口
  *
  * @author MaoAtao
  * @date 2022-10-23 17:16:39
  */
-public interface AuthorizationService {
+public interface CasAuthorizationService {
 
     /**
      * 生成授权码

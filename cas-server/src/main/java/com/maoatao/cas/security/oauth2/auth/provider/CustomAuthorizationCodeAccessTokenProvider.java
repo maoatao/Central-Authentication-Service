@@ -1,6 +1,6 @@
 package com.maoatao.cas.security.oauth2.auth.provider;
 
-import com.maoatao.cas.security.authorization.CustomAuthorizationService;
+import com.maoatao.cas.security.service.CustomAuthorizationService;
 import com.maoatao.cas.util.AuthorizationUtils;
 import com.maoatao.cas.util.TokenSettingUtils;
 import org.springframework.security.authentication.AuthenticationProvider;

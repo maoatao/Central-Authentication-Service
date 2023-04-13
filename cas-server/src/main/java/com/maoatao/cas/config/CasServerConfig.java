@@ -1,7 +1,6 @@
 package com.maoatao.cas.config;
 
 import com.maoatao.cas.security.authorization.CasServerSettings;
-import com.maoatao.cas.security.authorization.RedisAuthorizationService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -11,7 +10,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
-import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
@@ -27,8 +25,6 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 @Configuration
 @EnableWebSecurity
 public class CasServerConfig {
-
-    private static final String OAUTH2_REDIS_KEY_PREFIX = "OAuth2:";
 
     /**
      * 配置授权服务
@@ -46,16 +42,6 @@ public class CasServerConfig {
                 .and()
                 .apply(configurer);
         return http.build();
-    }
-
-    /**
-     * 生成令牌服务
-     * <p>
-     * 官方提供了内存和数据库储存授权信息,根据需要自己实现了redis储存令牌信息
-     */
-    @Bean
-    public OAuth2AuthorizationService oAuth2AuthorizationService() {
-        return new RedisAuthorizationService(OAUTH2_REDIS_KEY_PREFIX);
     }
 
     /**

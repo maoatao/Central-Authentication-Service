@@ -3,7 +3,7 @@ package com.maoatao.cas.core.controller;
 import com.maoatao.cas.common.authentication.CasAccessToken;
 import com.maoatao.cas.common.authentication.CasAuthorization;
 import com.maoatao.cas.core.param.GenerateAccessTokenParam;
-import com.maoatao.cas.core.service.AuthorizationService;
+import com.maoatao.cas.security.service.CasAuthorizationService;
 import com.maoatao.daedalus.web.annotation.ResponseHandle;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AccessTokenController {
 
     @Autowired
-    private AuthorizationService authorizationService;
+    private CasAuthorizationService casAuthorizationService;
 
     /**
      * 生成令牌
@@ -40,7 +40,7 @@ public class AccessTokenController {
     @PostMapping
     @Operation(summary = "generateAccessToken", description = "生成令牌")
     public CasAccessToken generateAccessToken(@RequestBody GenerateAccessTokenParam param) {
-        return authorizationService.generateAccessToken(param);
+        return casAuthorizationService.generateAccessToken(param);
     }
 
     /**
@@ -52,7 +52,7 @@ public class AccessTokenController {
     @DeleteMapping
     @Operation(summary = "revokeAccessToken", description = "吊销令牌")
     public boolean revokeAccessToken(@RequestHeader(value = "Authorization") String accessToken) {
-        return authorizationService.revokeAccessToken(accessToken);
+        return casAuthorizationService.revokeAccessToken(accessToken);
     }
 
     /**
@@ -64,6 +64,6 @@ public class AccessTokenController {
     @GetMapping
     @Operation(summary = "getAuthorizationInfo", description = "查询授权信息")
     public CasAuthorization getAuthorizationInfo(@RequestHeader(value = "Authorization") String accessToken) {
-        return authorizationService.getAuthorizationInfo(accessToken);
+        return casAuthorizationService.getAuthorizationInfo(accessToken);
     }
 }

@@ -1,7 +1,7 @@
 package com.maoatao.cas.security.filter;
 
 import cn.hutool.core.util.StrUtil;
-import com.maoatao.cas.core.service.AuthorizationService;
+import com.maoatao.cas.security.service.CasAuthorizationService;
 import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.util.FilterUtils;
 import com.maoatao.synapse.lang.exception.SynaException;
@@ -53,18 +53,18 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
 
     private final OAuth2AuthorizationService oAuth2AuthorizationService;
 
-    private final AuthorizationService authorizationService;
+    private final CasAuthorizationService casAuthorizationService;
 
     private final HandlerExceptionResolver handlerExceptionResolver;
 
     public TokenAuthenticationFilter(OAuth2AuthorizationService oAuth2AuthorizationService,
-                                     AuthorizationService authorizationService,
+                                     CasAuthorizationService casAuthorizationService,
                                      HandlerExceptionResolver handlerExceptionResolver) {
         SynaAssert.notNull(oAuth2AuthorizationService, "oAuth2AuthorizationService cannot be null");
-        SynaAssert.notNull(authorizationService, "authorizationService cannot be null");
+        SynaAssert.notNull(casAuthorizationService, "casAuthorizationService cannot be null");
         SynaAssert.notNull(handlerExceptionResolver, "handlerExceptionResolver cannot be null");
         this.oAuth2AuthorizationService = oAuth2AuthorizationService;
-        this.authorizationService = authorizationService;
+        this.casAuthorizationService = casAuthorizationService;
         this.handlerExceptionResolver = handlerExceptionResolver;
     }
 
@@ -76,7 +76,7 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
     private void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             try {
-                // doTokenFilter(request);
+                doTokenFilter(request);
             } catch (SynaException e) {
                 // 拦截异常,屏蔽异常信息,这里统一返回未授权响应
                 log.error("鉴权拦截异常", e);
@@ -111,7 +111,7 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
             return;
         }
         // 根据 token 生成已授权的主体
-        Optional.ofNullable(authorizationService.generateUserPrincipal(clientUser))
+        Optional.ofNullable(casAuthorizationService.generateUserPrincipal(clientUser))
                 .ifPresent(principal -> SecurityContextHolder.getContext().setAuthentication(principal));
     }
 

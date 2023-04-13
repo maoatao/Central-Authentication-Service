@@ -1,4 +1,4 @@
-package com.maoatao.cas.core.service.impl;
+package com.maoatao.cas.security.service.impl;
 
 import com.maoatao.cas.common.authentication.CasAccessToken;
 import com.maoatao.cas.common.authentication.CasAuthorization;
@@ -6,12 +6,12 @@ import com.maoatao.cas.common.authentication.DefaultAccessToken;
 import com.maoatao.cas.common.authentication.DefaultAuthorization;
 import com.maoatao.cas.core.param.GenerateAccessTokenParam;
 import com.maoatao.cas.security.authorization.CustomUserAuthenticationProvider;
-import com.maoatao.cas.core.service.AuthorizationService;
 import com.maoatao.cas.security.constant.GrantType;
 import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.security.bean.CustomUserDetails;
 import com.maoatao.cas.security.filter.TokenAuthenticationFilter;
 import com.maoatao.cas.core.param.GenerateAuthorizationCodeParam;
+import com.maoatao.cas.security.service.CasAuthorizationService;
 import com.maoatao.daedalus.web.util.ServletUtils;
 import com.maoatao.synapse.lang.exception.SynaException;
 import com.maoatao.synapse.lang.util.SynaAssert;
@@ -56,14 +56,14 @@ import java.security.Principal;
 import java.util.Set;
 
 /**
- * 自定义授权接口实现
+ * CAS授权接口实现
  *
  * @author MaoAtao
  * @date 2022-10-23 17:22:26
  */
 @Slf4j
 @Service
-public class AuthorizationServiceImpl implements AuthorizationService {
+public class CasAuthorizationServiceImpl implements CasAuthorizationService {
 
     @Autowired
     private RegisteredClientRepository registeredClientRepository;

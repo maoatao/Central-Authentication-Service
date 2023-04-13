@@ -1,6 +1,6 @@
 package com.maoatao.cas.core.controller;
 
-import com.maoatao.cas.core.service.AuthorizationService;
+import com.maoatao.cas.security.service.CasAuthorizationService;
 import com.maoatao.cas.core.param.GenerateAuthorizationCodeParam;
 import com.maoatao.daedalus.web.annotation.ResponseHandle;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthorizationCodeController {
 
     @Autowired
-    private AuthorizationService authorizationService;
+    private CasAuthorizationService casAuthorizationService;
 
     /**
      * 生成授权码
@@ -35,6 +35,6 @@ public class AuthorizationCodeController {
     @PostMapping
     @Operation(summary = "generateAuthorizationCode", description = "生成授权码")
     public String generateAuthorizationCode(@RequestBody GenerateAuthorizationCodeParam param) {
-        return authorizationService.generateAuthorizationCode(param);
+        return casAuthorizationService.generateAuthorizationCode(param);
     }
 }
