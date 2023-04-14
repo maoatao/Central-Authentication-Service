@@ -37,7 +37,7 @@ public class ClientScopePermissionVO extends BaseVO {
      * 用户id
      */
     @Schema(description = "用户id")
-    private Integer scopeId;
+    private Long scopeId;
     /**
      * 权限id
      */

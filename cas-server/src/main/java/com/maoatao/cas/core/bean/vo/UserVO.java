@@ -39,9 +39,9 @@ public class UserVO extends BaseVO {
     @Schema(description = "CAS 全局唯一id")
     private String openId;
     /**
-     * OAuth2 客户端id
+     * 客户端 id
      */
-    @Schema(description = "OAuth2 客户端id")
+    @Schema(description = "客户端 id")
     private String clientId;
     /**
      * 用户名

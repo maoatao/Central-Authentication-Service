@@ -25,7 +25,7 @@ public class RoleEntity extends BaseEntity<RoleEntity> {
     private static final long serialVersionUID = -3594168978855315116L;
 
     /**
-     * OAuth2 客户端id
+     * 客户端 id
      */
     private String clientId;
     /**

@@ -30,10 +30,10 @@ public class PermissionSaveParam extends BaseSaveParam {
     private static final long serialVersionUID = -7267509369397971146L;
 
     /**
-     * OAuth2 客户端id
+     * 客户端 id
      */
     @NotNull(message = "clientId 不能为空")
-    @Schema(description = "OAuth2 客户端id")
+    @Schema(description = "客户端 id")
     private String clientId;
     /**
      * 权限名

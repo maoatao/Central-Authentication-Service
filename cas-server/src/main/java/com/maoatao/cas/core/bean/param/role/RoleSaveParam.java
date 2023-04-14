@@ -30,10 +30,10 @@ public class RoleSaveParam extends BaseSaveParam {
     private static final long serialVersionUID = -7583503371831493726L;
 
     /**
-     * OAuth2 客户端id
+     * 客户端 id
      */
     @NotNull(message = "clientId 不能为空")
-    @Schema(description = "OAuth2 客户端id")
+    @Schema(description = "客户端 id")
     private String clientId;
     /**
      * 角色名

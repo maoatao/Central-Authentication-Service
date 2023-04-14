@@ -27,10 +27,10 @@ public class PermissionParam extends BasePaginationParam {
     @Schema(description = "主键id(自增)")
     private Long id;
     /**
-     * OAuth2 客户端id
+     * 客户端 id
      */
     @NotNull(message = "注册客户端id不能为空")
-    @Schema(description = "OAuth2 客户端id")
+    @Schema(description = "客户端 id")
     private String clientId;
     /**
      * 权限名

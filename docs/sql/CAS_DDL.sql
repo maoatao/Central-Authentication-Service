@@ -115,8 +115,8 @@ DROP TABLE IF EXISTS `t_cas_client_scope_permission`;
 CREATE TABLE `t_cas_client_scope_permission`
 (
     `id`            bigint                                                 NOT NULL AUTO_INCREMENT COMMENT '主键id(自增)',
-    `scope_id`      int                                                    NOT NULL COMMENT '用户id',
-    `permission_id` int                                                    NOT NULL COMMENT '权限id',
+    `scope_id`      bigint                                                 NOT NULL COMMENT '用户id',
+    `permission_id` bigint                                                 NOT NULL COMMENT '权限id',
     `created_by_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '创建人 ID',
     `created_date`  datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP (3) ON UPDATE CURRENT_TIMESTAMP (3) COMMENT '创建时间',
     `updated_by_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '更新人 ID',
@@ -124,6 +124,23 @@ CREATE TABLE `t_cas_client_scope_permission`
     `deleted`       bit(1)                                                 NOT NULL DEFAULT b'0' COMMENT '是否删除;0:未删除,1:删除',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC COMMENT='CAS 作用域权限关系';
+
+-- ----------------------------
+-- Table structure for t_cas_client_scope_user
+-- ----------------------------
+DROP TABLE IF EXISTS `t_cas_client_scope_user`;
+CREATE TABLE `t_cas_client_scope_user`
+(
+    `id`            bigint                                                  NOT NULL AUTO_INCREMENT COMMENT '主键id(自增)',
+    `user_id`       bigint                                                  NOT NULL COMMENT '用户id',
+    `client_id`     varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '客户端 id',
+    `created_by_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '创建人 ID',
+    `created_date`  datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP (3) ON UPDATE CURRENT_TIMESTAMP (3) COMMENT '创建时间',
+    `updated_by_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '更新人 ID',
+    `updated_date`  datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP (3) ON UPDATE CURRENT_TIMESTAMP (3) COMMENT '更新时间',
+    `deleted`       bit(1)                                                  NOT NULL DEFAULT b'0' COMMENT '是否删除;0:未删除,1:删除',
+    PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC COMMENT='CAS 客户端用户关系';
 
 -- ----------------------------
 -- Table structure for t_cas_client_setting
@@ -176,7 +193,7 @@ DROP TABLE IF EXISTS `t_cas_permission`;
 CREATE TABLE `t_cas_permission`
 (
     `id`            bigint                                                  NOT NULL AUTO_INCREMENT COMMENT '主键id(自增)',
-    `client_id`     varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT 'OAuth2 客户端id',
+    `client_id`     varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '客户端 id',
     `name`          varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '权限名',
     `description`   varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci          DEFAULT '' COMMENT '描述',
     `created_by_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '创建人 ID',
@@ -194,7 +211,7 @@ DROP TABLE IF EXISTS `t_cas_role`;
 CREATE TABLE `t_cas_role`
 (
     `id`            bigint                                                  NOT NULL AUTO_INCREMENT COMMENT '主键id(自增)',
-    `client_id`     varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT 'OAuth2 客户端id',
+    `client_id`     varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '客户端 id',
     `name`          varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '角色名',
     `description`   varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '描述',
     `created_by_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '创建人 ID',
@@ -230,7 +247,7 @@ CREATE TABLE `t_cas_user`
 (
     `id`            bigint                                                  NOT NULL AUTO_INCREMENT COMMENT '主键id(自增)',
     `open_id`       varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT 'CAS 全局唯一id',
-    `client_id`     varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT 'OAuth2 客户端id',
+    `client_id`     varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '客户端 id',
     `name`          varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '用户名',
     `password`      varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '密码',
     `created_by_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '创建人 ID',

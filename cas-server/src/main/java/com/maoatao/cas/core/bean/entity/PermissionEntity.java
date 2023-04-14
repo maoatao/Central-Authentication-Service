@@ -25,7 +25,7 @@ public class PermissionEntity extends BaseEntity<PermissionEntity> {
     private static final long serialVersionUID = 7406719167001417076L;
 
     /**
-     * OAuth2 客户端id
+     * 客户端 id
      */
     private String clientId;
     /**

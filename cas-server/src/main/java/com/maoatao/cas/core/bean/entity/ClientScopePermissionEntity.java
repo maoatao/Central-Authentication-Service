@@ -27,7 +27,7 @@ public class ClientScopePermissionEntity extends BaseEntity<ClientScopePermissio
     /**
      * 用户id
      */
-    private Integer scopeId;
+    private Long scopeId;
     /**
      * 权限id
      */

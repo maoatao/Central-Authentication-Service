@@ -29,7 +29,7 @@ public class UserEntity extends BaseEntity<UserEntity> {
      */
     private String openId;
     /**
-     * OAuth2 客户端id
+     * 客户端 id
      */
     private String clientId;
     /**

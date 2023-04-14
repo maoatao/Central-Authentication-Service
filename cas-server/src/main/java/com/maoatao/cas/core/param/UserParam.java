@@ -36,10 +36,10 @@ public class UserParam extends BasePaginationParam {
     @Schema(description = "CAS 全局唯一id")
     private String openId;
     /**
-     * OAuth2 客户端id
+     * 客户端 id
      */
     @NotNull(message = "注册客户端id不能为空")
-    @Schema(description = "OAuth2 客户端id")
+    @Schema(description = "客户端 id")
     private String clientId;
     /**
      * 用户名
