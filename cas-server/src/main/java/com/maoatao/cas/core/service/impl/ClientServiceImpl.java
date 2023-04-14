@@ -298,7 +298,7 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
                 ))
                 .clientSettings(clientSettingsBuilder.build())
                 .tokenSettings(tokenSettingsBuilder.build());
-        // TODO: LiYuanhao 2023-04-12 11:10:45 添加自定义设置(令牌值的格式)
+        // TODO: MaoAtao 2023-04-12 11:10:45 添加自定义设置(令牌值的格式)
 
         return registeredClientBuilder.build();
     }

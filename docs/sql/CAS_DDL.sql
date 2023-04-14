@@ -123,7 +123,7 @@ CREATE TABLE `t_cas_client_scope_permission`
     `updated_date`  datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP (3) ON UPDATE CURRENT_TIMESTAMP (3) COMMENT '更新时间',
     `deleted`       bit(1)                                                 NOT NULL DEFAULT b'0' COMMENT '是否删除;0:未删除,1:删除',
     PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC COMMENT='CAS 角色权限关系';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC COMMENT='CAS 作用域权限关系';
 
 -- ----------------------------
 -- Table structure for t_cas_client_setting

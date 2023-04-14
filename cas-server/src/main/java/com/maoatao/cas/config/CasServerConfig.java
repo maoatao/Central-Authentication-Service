@@ -50,7 +50,7 @@ public class CasServerConfig {
     @Bean
     public OAuth2AuthorizationConsentService authorizationConsentService(JdbcTemplate jdbcTemplate,
                                                                          RegisteredClientRepository registeredClientRepository) {
-        // TODO: LiYuanhao 2023-04-12 09:46:01 这个改为自己的表和服务
+        // TODO: MaoAtao 2023-04-12 09:46:01 这个改为自己的表和服务
         return new JdbcOAuth2AuthorizationConsentService(jdbcTemplate, registeredClientRepository);
     }
 
