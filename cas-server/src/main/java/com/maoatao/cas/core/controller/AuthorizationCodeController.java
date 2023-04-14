@@ -1,7 +1,7 @@
 package com.maoatao.cas.core.controller;
 
 import com.maoatao.cas.security.service.CasAuthorizationService;
-import com.maoatao.cas.core.param.GenerateAuthorizationCodeParam;
+import com.maoatao.cas.core.bean.param.authorization.GenerateAuthorizationCodeParam;
 import com.maoatao.daedalus.web.annotation.ResponseHandle;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;

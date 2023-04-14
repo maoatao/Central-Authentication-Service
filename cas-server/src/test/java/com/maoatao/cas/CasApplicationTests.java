@@ -11,8 +11,9 @@ import com.maoatao.cas.core.bean.entity.PermissionEntity;
 import com.maoatao.cas.core.bean.entity.RoleEntity;
 import com.maoatao.cas.core.bean.entity.RolePermissionEntity;
 import com.maoatao.cas.core.bean.entity.UserEntity;
-import com.maoatao.cas.core.param.GenerateAccessTokenParam;
-import com.maoatao.cas.core.param.GenerateAuthorizationCodeParam;
+import com.maoatao.cas.core.bean.param.accesstoken.GenerateAccessTokenParam;
+import com.maoatao.cas.core.bean.param.authorization.GenerateAuthorizationCodeParam;
+import com.maoatao.cas.core.bean.param.user.UserSaveParam;
 import com.maoatao.cas.security.service.CasAuthorizationService;
 import com.maoatao.cas.core.service.PermissionService;
 import com.maoatao.cas.core.service.RolePermissionService;
@@ -21,7 +22,6 @@ import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.util.FilterUtils;
 import com.maoatao.cas.util.IdUtils;
-import com.maoatao.cas.core.param.UserParam;
 import com.maoatao.synapse.lang.util.SynaStrings;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -62,7 +62,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 
@@ -286,13 +285,13 @@ class CasApplicationTests {
      */
     @Test
     void save_user_test() {
-        UserParam param = new UserParam();
+        UserSaveParam param = new UserSaveParam();
         param.setOpenId(IdUtils.nextUserOpenId());
         param.setClientId(TEST_CLIENT_ID);
         param.setName(TEST_USER_NAME);
         param.setPassword(TEST_USER_PASSWORD);
         // 角色前缀同步骤 2 说明
-        param.setRoles(Collections.singletonList(TEST_ROLE_NAME));
+        param.setRoles(Set.of(TEST_ROLE_NAME));
         UserEntity userEntity = userService.getById(userService.save(param));
         Assert.assertNotNull("用户创建失败", userEntity);
     }

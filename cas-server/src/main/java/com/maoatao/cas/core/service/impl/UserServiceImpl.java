@@ -6,6 +6,8 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.core.bean.param.user.UserQueryParam;
+import com.maoatao.cas.core.bean.param.user.UserSaveParam;
+import com.maoatao.cas.core.bean.param.user.UserUpdateParam;
 import com.maoatao.cas.core.bean.vo.UserVO;
 import com.maoatao.cas.core.bean.entity.PermissionEntity;
 import com.maoatao.cas.core.bean.entity.RoleEntity;
@@ -17,7 +19,6 @@ import com.maoatao.cas.core.service.UserRoleService;
 import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.security.bean.CustomUserDetails;
 import com.maoatao.cas.util.IdUtils;
-import com.maoatao.cas.core.param.UserParam;
 import com.maoatao.daedalus.data.service.impl.DaedalusServiceImpl;
 import com.maoatao.daedalus.data.util.PageUtils;
 import com.maoatao.synapse.lang.util.SynaAssert;
@@ -67,7 +68,7 @@ public class UserServiceImpl extends DaedalusServiceImpl<UserMapper, UserEntity>
     }
 
     @Override
-    public UserVO details(Long id){
+    public UserVO details(Long id) {
         return BeanUtil.toBean(super.getById(id), UserVO.class);
     }
 
@@ -82,34 +83,31 @@ public class UserServiceImpl extends DaedalusServiceImpl<UserMapper, UserEntity>
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public long save(UserParam param) {
+    public long save(UserSaveParam param) {
         checkClient(param.getClientId());
         checkUserName(param.getName(), param.getClientId());
-        param.setId(null);
         param.setOpenId(IdUtils.nextUserOpenId());
         UserEntity user = BeanUtil.copyProperties(param, UserEntity.class);
         user.setPassword(passwordEncoder.encode(param.getPassword()));
         SynaAssert.isTrue(save(user), "新增用户失败!");
         SynaAssert.notNull(user.getId(), "新增用户失败:用户 ID 为空!");
         SynaAssert.isTrue(
-                userRoleService.updateUserRole(getAndCheckRoleIds(param.getRoles(), param.getClientId()), user.getId()),
+                userRoleService.updateUserRole(getAndCheckRoleIds(param.getRoles().stream().toList(), param.getClientId()), user.getId()),
                 "新用户绑定角色失败!"
         );
         return user.getId();
     }
 
     @Override
-    public boolean update(UserParam param) {
+    public boolean update(UserUpdateParam param) {
         checkClient(param.getClientId());
         UserEntity existed = getAndCheckUser(param.getName(), param.getClientId());
         UserEntity user = BeanUtil.copyProperties(param, UserEntity.class);
         user.setId(existed.getId());
-        if (!existed.getClientId().equals(param.getClientId())) {
-            checkUserName(param.getName(), param.getClientId());
-        }
+        checkUserName(param.getName(), param.getClientId());
         SynaAssert.isTrue(updateById(user), "更新用户失败!");
         SynaAssert.isTrue(
-                userRoleService.updateUserRole(getAndCheckRoleIds(param.getRoles(), param.getClientId()), existed.getId()),
+                userRoleService.updateUserRole(getAndCheckRoleIds(param.getRoles().stream().toList(), param.getClientId()), existed.getId()),
                 "更新用户绑定角色失败!"
         );
         return true;

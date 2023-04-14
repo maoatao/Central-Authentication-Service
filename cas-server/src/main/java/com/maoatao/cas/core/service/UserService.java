@@ -2,9 +2,10 @@ package com.maoatao.cas.core.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.core.bean.param.user.UserQueryParam;
+import com.maoatao.cas.core.bean.param.user.UserSaveParam;
+import com.maoatao.cas.core.bean.param.user.UserUpdateParam;
 import com.maoatao.cas.core.bean.vo.UserVO;
 import com.maoatao.cas.core.bean.entity.UserEntity;
-import com.maoatao.cas.core.param.UserParam;
 import com.maoatao.daedalus.data.service.DaedalusService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -51,7 +52,7 @@ public interface UserService extends DaedalusService<UserEntity> {
      * @param param 参数
      * @return 新增成功返回主键 id
      */
-    long save(UserParam param);
+    long save(UserSaveParam param);
 
     /**
      * 更新
@@ -59,7 +60,7 @@ public interface UserService extends DaedalusService<UserEntity> {
      * @param param 参数
      * @return 更新成功返回true
      */
-    boolean update(UserParam param);
+    boolean update(UserUpdateParam param);
 
     /**
      * 删除用户

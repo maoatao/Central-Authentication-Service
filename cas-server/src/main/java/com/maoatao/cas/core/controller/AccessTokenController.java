@@ -2,7 +2,7 @@ package com.maoatao.cas.core.controller;
 
 import com.maoatao.cas.common.authentication.CasAccessToken;
 import com.maoatao.cas.common.authentication.CasAuthorization;
-import com.maoatao.cas.core.param.GenerateAccessTokenParam;
+import com.maoatao.cas.core.bean.param.accesstoken.GenerateAccessTokenParam;
 import com.maoatao.cas.security.service.CasAuthorizationService;
 import com.maoatao.daedalus.web.annotation.ResponseHandle;
 import io.swagger.v3.oas.annotations.Operation;

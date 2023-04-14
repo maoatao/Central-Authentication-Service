@@ -1,4 +1,4 @@
-package com.maoatao.cas.core.param;
+package com.maoatao.cas.core.bean.param.accesstoken;
 
 import com.maoatao.synapse.core.bean.base.BaseParam;
 import io.swagger.v3.oas.annotations.media.Schema;

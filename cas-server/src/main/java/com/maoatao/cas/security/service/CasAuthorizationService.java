@@ -2,8 +2,8 @@ package com.maoatao.cas.security.service;
 
 import com.maoatao.cas.common.authentication.CasAccessToken;
 import com.maoatao.cas.common.authentication.CasAuthorization;
-import com.maoatao.cas.core.param.GenerateAccessTokenParam;
-import com.maoatao.cas.core.param.GenerateAuthorizationCodeParam;
+import com.maoatao.cas.core.bean.param.accesstoken.GenerateAccessTokenParam;
+import com.maoatao.cas.core.bean.param.authorization.GenerateAuthorizationCodeParam;
 import com.maoatao.cas.security.authorization.CustomUserAuthenticationProvider;
 import com.maoatao.cas.security.bean.ClientUser;
 import org.springframework.security.core.Authentication;

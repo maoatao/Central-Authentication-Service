@@ -4,6 +4,7 @@ import com.maoatao.synapse.core.bean.base.BaseSaveParam;
 import com.maoatao.synapse.lang.util.SynaDates;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import java.util.Set;
 import lombok.Data;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -53,6 +54,13 @@ public class UserSaveParam extends BaseSaveParam {
     @NotNull(message = "password 不能为空")
     @Schema(description = "密码")
     private String password;
+
+    /**
+     * 角色名称集合
+     */
+    @Schema(description = "角色名称集合")
+    Set<String> roles;
+
     /**
      * 创建人 ID
      */
