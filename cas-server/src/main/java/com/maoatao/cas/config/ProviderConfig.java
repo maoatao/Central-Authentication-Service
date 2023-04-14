@@ -4,6 +4,7 @@ import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.security.authorization.CustomUserAuthenticationProvider;
 import com.maoatao.cas.security.oauth2.auth.provider.CustomAuthorizationCodeAccessTokenProvider;
 import com.maoatao.cas.security.oauth2.auth.provider.CustomAuthorizationCodeProvider;
+import com.maoatao.cas.security.oauth2.auth.provider.CustomAuthorizationConsentProvider;
 import com.maoatao.cas.security.oauth2.auth.provider.CustomClientCredentialsTokenProvider;
 import com.maoatao.cas.security.oauth2.auth.provider.CustomRefreshTokenProvider;
 import com.maoatao.cas.security.oauth2.odic.CustomClientRegistrationProvider;
@@ -33,15 +34,17 @@ public class ProviderConfig {
     /**
      * OAuth2 授权服务器配置程序(给原生接口使用的配置)
      *
-     * @param authorizationCodeProvider  授权码提供者
-     * @param clientRegistrationProvider 客户端注册提供者
-     * @param accessTokenProvider        授权码模式 生成访问令牌
-     * @param refreshTokenProvider       刷新令牌模式 生成访问令牌
-     * @param clientTokenProvider        客户端模式 生成访问令牌
+     * @param authorizationCodeProvider    授权码提供者(无需授权同意)
+     * @param authorizationConsentProvider 授权码提供者(需授权同意)
+     * @param clientRegistrationProvider   客户端注册提供者
+     * @param accessTokenProvider          授权码模式 生成访问令牌
+     * @param refreshTokenProvider         刷新令牌模式 生成访问令牌
+     * @param clientTokenProvider          客户端模式 生成访问令牌
      */
     @Bean
     public OAuth2AuthorizationServerConfigurer oAuth2AuthorizationServerConfigurer(
             CustomAuthorizationCodeProvider authorizationCodeProvider,
+            CustomAuthorizationConsentProvider authorizationConsentProvider,
             CustomClientRegistrationProvider clientRegistrationProvider,
             CustomAuthorizationCodeAccessTokenProvider accessTokenProvider,
             CustomRefreshTokenProvider refreshTokenProvider,
@@ -49,6 +52,7 @@ public class ProviderConfig {
         OAuth2AuthorizationServerConfigurer oAuth2AuthorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
         oAuth2AuthorizationServerConfigurer.authorizationEndpoint(endpoint -> endpoint
                 .authenticationProvider(authorizationCodeProvider)
+                .authenticationProvider(authorizationConsentProvider)
                 .authenticationProvider(clientRegistrationProvider)
                 .authenticationProvider(refreshTokenProvider)
                 .authenticationProvider(accessTokenProvider)
@@ -114,9 +118,8 @@ public class ProviderConfig {
         return new CustomClientCredentialsTokenProvider(oAuth2AuthorizationService, oAuth2TokenGenerator);
     }
 
-
     /**
-     * 授权码提供者(自定义授权码生成器)
+     * 无需授权同意,授权码提供者(自定义授权码生成器)
      */
     @Bean
     public CustomAuthorizationCodeProvider customAuthorizationCodeProvider(RegisteredClientRepository registeredClientRepository,
@@ -130,7 +133,20 @@ public class ProviderConfig {
         return provider;
     }
 
-    // TODO: LiYuanhao 2023-04-13 17:56:04 OAuth2AuthorizationConsentAuthenticationProvider 自定义 同意 授权码生成
+    /**
+     * 同意授权后,授权码提供者(自定义授权码生成器)
+     */
+    @Bean
+    public CustomAuthorizationConsentProvider customAuthorizationConsentProvider(RegisteredClientRepository registeredClientRepository,
+                                                                                 OAuth2AuthorizationService oAuth2AuthorizationService,
+                                                                                 OAuth2AuthorizationConsentService oAuth2AuthorizationConsentService,
+                                                                                 OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator) {
+        CustomAuthorizationConsentProvider provider =
+                new CustomAuthorizationConsentProvider(registeredClientRepository, oAuth2AuthorizationService, oAuth2AuthorizationConsentService);
+        // 配置自定义授权码生成器
+        provider.setAuthorizationCodeGenerator(oAuth2TokenGenerator);
+        return provider;
+    }
 
     /**
      * 自定义客户端注册提供者
