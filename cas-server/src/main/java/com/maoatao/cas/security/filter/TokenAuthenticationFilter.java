@@ -4,8 +4,11 @@ import cn.hutool.core.util.StrUtil;
 import com.maoatao.cas.security.service.CasAuthorizationService;
 import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.util.FilterUtils;
+import com.maoatao.daedalus.core.context.DefalutOperatorContext;
+import com.maoatao.daedalus.core.context.OperatorContextHolder;
 import com.maoatao.synapse.lang.exception.SynaException;
 import com.maoatao.synapse.lang.util.SynaAssert;
+import com.maoatao.synapse.lang.util.SynaSafes;
 import com.maoatao.synapse.lang.util.SynaStrings;
 import com.maoatao.daedalus.web.response.HttpResponseStatus;
 import jakarta.servlet.http.HttpServletResponse;
@@ -122,14 +125,27 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
         if (authorization == null || authorization.getAccessToken() == null || !authorization.getAccessToken().isActive()) {
             return;
         }
-        // TODO: 2023-03-15 16:27:29 自定义 context 区分客户端和其他令牌,方便人机,机机接口鉴权
-        setContext(authorization);
+        setSecurityContext(authorization);
+        setOperatorContext(token);
     }
 
-    private void setContext(OAuth2Authorization authorization) {
+    private void setSecurityContext(OAuth2Authorization authorization) {
         Authentication principal = authorization.getAttribute(Principal.class.getName());
         if (principal != null && principal.isAuthenticated()) {
             SecurityContextHolder.getContext().setAuthentication(principal);
         }
+    }
+
+    private void setOperatorContext(String token) {
+        Optional.ofNullable(casAuthorizationService.getAuthorizationInfo(token))
+                .ifPresent(authorization -> OperatorContextHolder.setContext(DefalutOperatorContext.builder()
+                        .operatorId(authorization.getOpenId())
+                        .operatorName(authorization.getUser())
+                        .clientId(authorization.getClientId())
+                        .roles(SynaSafes.of(authorization.getRoles()))
+                        .permissions(SynaSafes.of(authorization.getPermissions()))
+                        .expiresAt(authorization.getExpiresAt())
+                        .clientCredentials(authorization.isClientCredentials())
+                        .build()));
     }
 }
