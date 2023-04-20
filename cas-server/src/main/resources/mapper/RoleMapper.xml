@@ -16,10 +16,10 @@
 
     <select id="getRoleByUser" resultMap="roleMap">
         SELECT b.`name`, b.`client_id`
-        FROM `t_cas_user_role` a,
+        FROM `t_cas_client_user_role` a,
              `t_cas_role` b
         WHERE a.`role_id` = b.`id`
           AND b.`deleted` = b'0'
-          AND a.`user_id` = #{userId};
+          AND a.`client_user_id` = #{userId};
     </select>
 </mapper>

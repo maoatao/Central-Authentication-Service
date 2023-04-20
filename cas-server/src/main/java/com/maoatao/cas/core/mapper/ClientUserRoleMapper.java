@@ -2,7 +2,7 @@ package com.maoatao.cas.core.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
-import com.maoatao.cas.core.bean.entity.UserRoleEntity;
+import com.maoatao.cas.core.bean.entity.ClientUserRoleEntity;
 
 /**
  * 用户角色关系
@@ -11,5 +11,5 @@ import com.maoatao.cas.core.bean.entity.UserRoleEntity;
  * @date 2022-12-12 14:18:22
  */
 @Mapper
-public interface UserRoleMapper extends BaseMapper<UserRoleEntity> {
+public interface ClientUserRoleMapper extends BaseMapper<ClientUserRoleEntity> {
 }

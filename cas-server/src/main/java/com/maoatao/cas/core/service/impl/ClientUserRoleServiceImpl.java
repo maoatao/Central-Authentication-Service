@@ -4,11 +4,11 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.IterUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.maoatao.cas.core.bean.param.userrole.UserRoleQueryParam;
+import com.maoatao.cas.core.bean.param.clientuserrole.ClientUserRoleQueryParam;
 import com.maoatao.cas.core.bean.vo.UserRoleVO;
-import com.maoatao.cas.core.bean.entity.UserRoleEntity;
-import com.maoatao.cas.core.mapper.UserRoleMapper;
-import com.maoatao.cas.core.service.UserRoleService;
+import com.maoatao.cas.core.bean.entity.ClientUserRoleEntity;
+import com.maoatao.cas.core.mapper.ClientUserRoleMapper;
+import com.maoatao.cas.core.service.ClientUserRoleService;
 import com.maoatao.daedalus.data.service.impl.DaedalusServiceImpl;
 import com.maoatao.daedalus.data.util.PageUtils;
 import com.maoatao.synapse.lang.util.SynaAssert;
@@ -24,12 +24,12 @@ import java.util.List;
  * @date 2022-12-12 14:18:22
  */
 @Service
-public class UserRoleServiceImpl extends DaedalusServiceImpl<UserRoleMapper, UserRoleEntity> implements UserRoleService {
+public class ClientUserRoleServiceImpl extends DaedalusServiceImpl<ClientUserRoleMapper, ClientUserRoleEntity> implements ClientUserRoleService {
 
     @Override
-    public Page<UserRoleVO> page(UserRoleQueryParam param) {
-        UserRoleEntity entity = BeanUtil.copyProperties(param, UserRoleEntity.class);
-        Page<UserRoleEntity> page = super.page(PageUtils.convert(param), Wrappers.query(entity));
+    public Page<UserRoleVO> page(ClientUserRoleQueryParam param) {
+        ClientUserRoleEntity entity = BeanUtil.copyProperties(param, ClientUserRoleEntity.class);
+        Page<ClientUserRoleEntity> page = super.page(PageUtils.convert(param), Wrappers.query(entity));
         return PageUtils.convert(page, UserRoleVO.class);
     }
 
@@ -42,11 +42,11 @@ public class UserRoleServiceImpl extends DaedalusServiceImpl<UserRoleMapper, Use
     @Transactional(rollbackFor = Exception.class)
     public boolean updateUserRole(List<Long> roleIds, long userId) {
         // 查询已有,排除已有,列出新增和删除
-        List<Long> existed = list(Wrappers.<UserRoleEntity>lambdaQuery().eq(UserRoleEntity::getUserId, userId))
+        List<Long> existed = list(Wrappers.<ClientUserRoleEntity>lambdaQuery().eq(ClientUserRoleEntity::getUserId, userId))
                 .stream()
-                .map(UserRoleEntity::getRoleId).toList();
+                .map(ClientUserRoleEntity::getRoleId).toList();
         if (IterUtil.isEmpty(roleIds) && IterUtil.isNotEmpty(existed)) {
-            return remove(Wrappers.<UserRoleEntity>lambdaQuery().eq(UserRoleEntity::getUserId, userId));
+            return remove(Wrappers.<ClientUserRoleEntity>lambdaQuery().eq(ClientUserRoleEntity::getUserId, userId));
         }
         // 已有不在入参为删除(已有-交集)
         List<Long> preDelete = existed.stream().filter(o -> !roleIds.contains(o)).toList();
@@ -56,8 +56,8 @@ public class UserRoleServiceImpl extends DaedalusServiceImpl<UserRoleMapper, Use
             SynaAssert.isTrue(removeBatchByIds(preDelete), "删除用户角色关系失败!");
         }
         if (IterUtil.isNotEmpty(preAdd)) {
-            List<UserRoleEntity> newUserRoles = preAdd.stream()
-                    .map(o -> UserRoleEntity.builder().userId(userId).roleId(o).build())
+            List<ClientUserRoleEntity> newUserRoles = preAdd.stream()
+                    .map(o -> ClientUserRoleEntity.builder().userId(userId).roleId(o).build())
                     .toList();
             SynaAssert.isTrue(saveBatch(newUserRoles), "新增用户角色关系失败!");
         }

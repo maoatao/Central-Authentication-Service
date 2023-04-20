@@ -1,9 +1,9 @@
 package com.maoatao.cas.core.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.maoatao.cas.core.bean.param.userrole.UserRoleQueryParam;
+import com.maoatao.cas.core.bean.param.clientuserrole.ClientUserRoleQueryParam;
 import com.maoatao.cas.core.bean.vo.UserRoleVO;
-import com.maoatao.cas.core.bean.entity.UserRoleEntity;
+import com.maoatao.cas.core.bean.entity.ClientUserRoleEntity;
 import com.maoatao.daedalus.data.service.DaedalusService;
 
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
  * @author MaoAtao
  * @date 2022-12-12 14:18:22
  */
-public interface UserRoleService extends DaedalusService<UserRoleEntity> {
+public interface ClientUserRoleService extends DaedalusService<ClientUserRoleEntity> {
 
     /**
      * 分页
@@ -22,13 +22,13 @@ public interface UserRoleService extends DaedalusService<UserRoleEntity> {
      * @param param 参数
      * @return 分页
      */
-    Page<UserRoleVO> page(UserRoleQueryParam param);
+    Page<UserRoleVO> page(ClientUserRoleQueryParam param);
 
     /**
      * 通过id查询
      *
-     * @param id CAS 用户角色关系id
-     * @return CAS 用户角色关系
+     * @param id CAS 客户端用户角色关系id
+     * @return CAS 客户端用户角色关系
      */
     UserRoleVO details(Long id);
 

@@ -1,4 +1,4 @@
-package com.maoatao.cas.core.bean.param.user;
+package com.maoatao.cas.core.bean.param.clientuser;
 
 import com.maoatao.synapse.core.bean.base.BaseSaveParam;
 import com.maoatao.synapse.lang.util.SynaDates;
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
- * CAS 用户
+ * CAS 客户端用户
  *
  * @author MaoAtao
  * @date 2023-04-07 21:23:37
@@ -24,8 +24,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = true)
-@Schema(description = "新增CAS 用户参数")
-public class UserSaveParam extends BaseSaveParam {
+@Schema(description = "新增CAS 客户端用户参数")
+public class ClientUserSaveParam extends BaseSaveParam {
 
     @Serial
     private static final long serialVersionUID = 6428461007070791258L;
@@ -95,5 +95,5 @@ public class UserSaveParam extends BaseSaveParam {
     private Boolean deleted;
 
     @Tolerate
-    public UserSaveParam() {}
+    public ClientUserSaveParam() {}
 }

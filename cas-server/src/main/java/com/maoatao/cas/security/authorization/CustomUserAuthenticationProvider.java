@@ -1,6 +1,6 @@
 package com.maoatao.cas.security.authorization;
 
-import com.maoatao.cas.core.service.UserService;
+import com.maoatao.cas.core.service.ClientUserService;
 import com.maoatao.synapse.lang.util.SynaStrings;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -44,12 +44,12 @@ public class CustomUserAuthenticationProvider extends AbstractUserDetailsAuthent
      */
     private volatile String userNotFoundEncodedPassword;
 
-    private final UserService userService;
+    private final ClientUserService clientUserService;
 
     private UserDetailsPasswordService userDetailsPasswordService;
 
-    public CustomUserAuthenticationProvider(UserService userService) {
-        this.userService = userService;
+    public CustomUserAuthenticationProvider(ClientUserService clientUserService) {
+        this.clientUserService = clientUserService;
         setPasswordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder());
     }
 
@@ -72,7 +72,7 @@ public class CustomUserAuthenticationProvider extends AbstractUserDetailsAuthent
 
     @Override
     protected void doAfterPropertiesSet() {
-        Assert.notNull(this.userService, "A UserDetailsService must be set");
+        Assert.notNull(this.clientUserService, "A clientUserService must be set");
     }
 
     /**
@@ -86,10 +86,10 @@ public class CustomUserAuthenticationProvider extends AbstractUserDetailsAuthent
             // 上游构建 AuthorizationService generatePrincipal 时, details 设定为 clientId
             // 通过用户名和客户端 id 查询一个用户
             String clientId = Optional.ofNullable(authentication.getDetails()).orElse(SynaStrings.EMPTY).toString();
-            UserDetails loadedUser = this.getUserService().getUserDetails(username, clientId);
+            UserDetails loadedUser = this.getClientUserService().getUserDetails(username, clientId);
             if (loadedUser == null) {
                 throw new InternalAuthenticationServiceException(
-                        "UserDetailsService returned null, which is an interface contract violation");
+                        "clientUserService returned null, which is an interface contract violation");
             }
             return loadedUser;
         } catch (UsernameNotFoundException ex) {
@@ -146,8 +146,8 @@ public class CustomUserAuthenticationProvider extends AbstractUserDetailsAuthent
         return this.passwordEncoder;
     }
 
-    protected UserService getUserService() {
-        return this.userService;
+    protected ClientUserService getClientUserService() {
+        return this.clientUserService;
     }
 
     public void setUserDetailsPasswordService(UserDetailsPasswordService userDetailsPasswordService) {

@@ -10,15 +10,15 @@ import com.maoatao.cas.config.CasServerConfig;
 import com.maoatao.cas.core.bean.entity.PermissionEntity;
 import com.maoatao.cas.core.bean.entity.RoleEntity;
 import com.maoatao.cas.core.bean.entity.RolePermissionEntity;
-import com.maoatao.cas.core.bean.entity.UserEntity;
+import com.maoatao.cas.core.bean.entity.ClientUserEntity;
 import com.maoatao.cas.core.bean.param.accesstoken.GenerateAccessTokenParam;
 import com.maoatao.cas.core.bean.param.authorization.GenerateAuthorizationCodeParam;
-import com.maoatao.cas.core.bean.param.user.UserSaveParam;
+import com.maoatao.cas.core.bean.param.clientuser.ClientUserSaveParam;
 import com.maoatao.cas.security.service.CasAuthorizationService;
 import com.maoatao.cas.core.service.PermissionService;
 import com.maoatao.cas.core.service.RolePermissionService;
 import com.maoatao.cas.core.service.RoleService;
-import com.maoatao.cas.core.service.UserService;
+import com.maoatao.cas.core.service.ClientUserService;
 import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.util.FilterUtils;
 import com.maoatao.cas.util.IdUtils;
@@ -75,7 +75,7 @@ class CasApplicationTests {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private UserService userService;
+    private ClientUserService clientUserService;
 
     @Autowired
     private RegisteredClientRepository registeredClientRepository;
@@ -285,15 +285,15 @@ class CasApplicationTests {
      */
     @Test
     void save_user_test() {
-        UserSaveParam param = new UserSaveParam();
+        ClientUserSaveParam param = new ClientUserSaveParam();
         param.setOpenId(IdUtils.nextUserOpenId());
         param.setClientId(TEST_CLIENT_ID);
         param.setName(TEST_USER_NAME);
         param.setPassword(TEST_USER_PASSWORD);
         // 角色前缀同步骤 2 说明
         param.setRoles(Set.of(TEST_ROLE_NAME));
-        UserEntity userEntity = userService.getById(userService.save(param));
-        Assert.assertNotNull("用户创建失败", userEntity);
+        ClientUserEntity clientUserEntity = clientUserService.getById(clientUserService.save(param));
+        Assert.assertNotNull("用户创建失败", clientUserEntity);
     }
 
     //------------------------------------------------ 初始化测试数据 结束 ------------------------------------------------

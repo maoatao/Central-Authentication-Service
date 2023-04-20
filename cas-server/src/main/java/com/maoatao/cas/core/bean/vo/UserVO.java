@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
- * CAS 用户
+ * CAS 客户端用户
  *
  * @author MaoAtao
  * @date 2023-04-07 21:23:37
@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = true)
-@Schema(description = "CAS 用户数据")
+@Schema(description = "CAS 客户端用户数据")
 public class UserVO extends BaseVO {
 
     @Serial

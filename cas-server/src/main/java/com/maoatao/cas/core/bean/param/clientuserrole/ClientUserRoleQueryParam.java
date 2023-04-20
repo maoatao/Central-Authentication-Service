@@ -1,4 +1,4 @@
-package com.maoatao.cas.core.bean.param.userrole;
+package com.maoatao.cas.core.bean.param.clientuserrole;
 
 import com.maoatao.daedalus.web.bean.param.BasePaginationParam;
 import com.maoatao.synapse.lang.util.SynaDates;
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
- * CAS 用户角色关系
+ * CAS 客户端用户角色关系
  *
  * @author MaoAtao
  * @date 2023-04-07 21:23:37
@@ -23,8 +23,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = true)
-@Schema(description = "查询CAS 用户角色关系参数")
-public class UserRoleQueryParam extends BasePaginationParam {
+@Schema(description = "查询CAS 客户端用户角色关系参数")
+public class ClientUserRoleQueryParam extends BasePaginationParam {
 
     @Serial
     private static final long serialVersionUID = 8634930874534587933L;
@@ -81,5 +81,5 @@ public class UserRoleQueryParam extends BasePaginationParam {
     private Boolean deleted;
 
     @Tolerate
-    public UserRoleQueryParam() {}
+    public ClientUserRoleQueryParam() {}
 }

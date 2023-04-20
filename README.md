@@ -41,11 +41,12 @@ Central Authentication Service (CAS 中央认证服务 OAuth2.1协议)
 | t_cas_client_scope_permission      | CAS 作用域权限关系   |
 | t_cas_client_setting               | CAS 客户端设置     |
 | t_cas_client_token_setting         | CAS 客户端令牌设置   |
+| t_cas_client_user                  | CAS 客户端用户     |
+| t_cas_client_user_role             | CAS 客户端用户角色关系 |
 | t_cas_permission                   | CAS 权限        |
 | t_cas_role                         | CAS 角色        |
 | t_cas_role_permission              | CAS 角色权限关系    |
 | t_cas_user                         | CAS 用户        |
-| t_cas_user_role                    | CAS 用户角色关系    |
 
 ### 3. 添加测试数据的两种方法
 

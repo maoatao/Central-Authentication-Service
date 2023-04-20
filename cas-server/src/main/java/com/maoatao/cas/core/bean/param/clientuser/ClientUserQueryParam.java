@@ -1,6 +1,6 @@
-package com.maoatao.cas.core.bean.param.userrole;
+package com.maoatao.cas.core.bean.param.clientuser;
 
-import com.maoatao.synapse.core.bean.base.BaseSaveParam;
+import com.maoatao.daedalus.web.bean.param.BasePaginationParam;
 import com.maoatao.synapse.lang.util.SynaDates;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
- * CAS 用户角色关系
+ * CAS 客户端用户
  *
  * @author MaoAtao
  * @date 2023-04-07 21:23:37
@@ -23,24 +23,42 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = true)
-@Schema(description = "新增CAS 用户角色关系参数")
-public class UserRoleSaveParam extends BaseSaveParam {
+@Schema(description = "查询CAS 客户端用户参数")
+public class ClientUserQueryParam extends BasePaginationParam {
 
     @Serial
-    private static final long serialVersionUID = 8638404423152721929L;
+    private static final long serialVersionUID = -5359208169352138387L;
 
     /**
-     * 用户id
+     * 主键id(自增)
      */
-    @NotNull(message = "userId 不能为空")
-    @Schema(description = "用户id")
-    private Integer userId;
+    @NotNull(message = "id 不能为空")
+    @Schema(description = "主键id(自增)")
+    private Long id;
     /**
-     * 用户id
+     * CAS 全局唯一id
      */
-    @NotNull(message = "roleId 不能为空")
-    @Schema(description = "用户id")
-    private Long roleId;
+    @NotNull(message = "openId 不能为空")
+    @Schema(description = "CAS 全局唯一id")
+    private String openId;
+    /**
+     * 客户端 id
+     */
+    @NotNull(message = "clientId 不能为空")
+    @Schema(description = "客户端 id")
+    private String clientId;
+    /**
+     * 用户名
+     */
+    @NotNull(message = "name 不能为空")
+    @Schema(description = "用户名")
+    private String name;
+    /**
+     * 密码
+     */
+    @NotNull(message = "password 不能为空")
+    @Schema(description = "密码")
+    private String password;
     /**
      * 创建人 ID
      */
@@ -75,5 +93,5 @@ public class UserRoleSaveParam extends BaseSaveParam {
     private Boolean deleted;
 
     @Tolerate
-    public UserRoleSaveParam() {}
+    public ClientUserQueryParam() {}
 }

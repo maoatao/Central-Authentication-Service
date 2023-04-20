@@ -1,11 +1,11 @@
 package com.maoatao.cas.core.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.maoatao.cas.core.bean.param.user.UserQueryParam;
-import com.maoatao.cas.core.bean.param.user.UserSaveParam;
-import com.maoatao.cas.core.bean.param.user.UserUpdateParam;
+import com.maoatao.cas.core.bean.param.clientuser.ClientUserQueryParam;
+import com.maoatao.cas.core.bean.param.clientuser.ClientUserSaveParam;
+import com.maoatao.cas.core.bean.param.clientuser.ClientUserUpdateParam;
 import com.maoatao.cas.core.bean.vo.UserVO;
-import com.maoatao.cas.core.bean.entity.UserEntity;
+import com.maoatao.cas.core.bean.entity.ClientUserEntity;
 import com.maoatao.daedalus.data.service.DaedalusService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,7 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
  * @author MaoAtao
  * @date 2022-03-11 16:13:35
  */
-public interface UserService extends DaedalusService<UserEntity> {
+public interface ClientUserService extends DaedalusService<ClientUserEntity> {
 
     /**
      * 分页
@@ -24,13 +24,13 @@ public interface UserService extends DaedalusService<UserEntity> {
      * @param param 参数
      * @return 分页
      */
-    Page<UserVO> page(UserQueryParam param);
+    Page<UserVO> page(ClientUserQueryParam param);
 
     /**
      * 通过id查询
      *
-     * @param id CAS 用户id
-     * @return CAS 用户
+     * @param id CAS 客户端用户id
+     * @return CAS 客户端用户
      */
     UserVO details(Long id);
 
@@ -52,7 +52,7 @@ public interface UserService extends DaedalusService<UserEntity> {
      * @param param 参数
      * @return 新增成功返回主键 id
      */
-    long save(UserSaveParam param);
+    long save(ClientUserSaveParam param);
 
     /**
      * 更新
@@ -60,7 +60,7 @@ public interface UserService extends DaedalusService<UserEntity> {
      * @param param 参数
      * @return 更新成功返回true
      */
-    boolean update(UserUpdateParam param);
+    boolean update(ClientUserUpdateParam param);
 
     /**
      * 删除用户
@@ -98,5 +98,5 @@ public interface UserService extends DaedalusService<UserEntity> {
      * @param clientId 客户端 id
      * @return 用户不存在返回 null
      */
-    UserEntity getByNameAndClient(String name, String clientId);
+    ClientUserEntity getByNameAndClient(String name, String clientId);
 }

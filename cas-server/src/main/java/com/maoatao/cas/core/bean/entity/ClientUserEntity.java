@@ -10,16 +10,16 @@ import lombok.experimental.Tolerate;
 import java.io.Serial;
 
 /**
- * CAS 用户
+ * CAS 客户端用户
  *
  * @author MaoAtao
  * @date 2023-04-07 21:42:38
  */
 @Data
 @Builder
-@TableName("t_cas_user")
+@TableName("t_cas_client_user")
 @EqualsAndHashCode(callSuper = true)
-public class UserEntity extends BaseEntity<UserEntity> {
+public class ClientUserEntity extends BaseEntity<ClientUserEntity> {
 
     @Serial
     private static final long serialVersionUID = -8037953378905637409L;
@@ -27,20 +27,20 @@ public class UserEntity extends BaseEntity<UserEntity> {
     /**
      * CAS 全局唯一id
      */
-    private String openId;
+    private String userOpenId;
     /**
      * 客户端 id
      */
     private String clientId;
     /**
-     * 用户名
+     * 登录名
      */
-    private String name;
+    private String loginName;
     /**
      * 密码
      */
     private String password;
 
     @Tolerate
-    public UserEntity() {}
+    public ClientUserEntity() {}
 }

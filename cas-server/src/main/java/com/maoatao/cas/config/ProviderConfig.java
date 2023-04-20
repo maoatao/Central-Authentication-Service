@@ -1,6 +1,6 @@
 package com.maoatao.cas.config;
 
-import com.maoatao.cas.core.service.UserService;
+import com.maoatao.cas.core.service.ClientUserService;
 import com.maoatao.cas.security.authorization.CustomUserAuthenticationProvider;
 import com.maoatao.cas.security.oauth2.auth.provider.CustomAuthorizationCodeAccessTokenProvider;
 import com.maoatao.cas.security.oauth2.auth.provider.CustomAuthorizationCodeProvider;
@@ -87,8 +87,8 @@ public class ProviderConfig {
      * 自定义查询用户,通过用户名称和客户端 id 查询一个用户.提供多客户端同名用户身份验证
      */
     @Bean
-    public CustomUserAuthenticationProvider customUserAuthenticationProvider(UserService userService) {
-        return new CustomUserAuthenticationProvider(userService);
+    public CustomUserAuthenticationProvider customUserAuthenticationProvider(ClientUserService clientUserService) {
+        return new CustomUserAuthenticationProvider(clientUserService);
     }
 
     /**

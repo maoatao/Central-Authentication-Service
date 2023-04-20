@@ -1,7 +1,7 @@
 package com.maoatao.cas.core.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.maoatao.cas.core.bean.entity.UserEntity;
+import com.maoatao.cas.core.bean.entity.ClientUserEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -11,5 +11,5 @@ import org.apache.ibatis.annotations.Mapper;
  * @date 2022-03-12 20:11:12
  */
 @Mapper
-public interface UserMapper extends BaseMapper<UserEntity> {
+public interface ClientUserMapper extends BaseMapper<ClientUserEntity> {
 }

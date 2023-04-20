@@ -72,14 +72,14 @@ VALUES (1, 1, 1);
 -- ----------------------------
 -- 步骤 5 创建用户
 -- ----------------------------
-INSERT INTO `cas`.`t_cas_user` (`id`, `open_id`, `client_id`, `name`, `password`)
+INSERT INTO `cas`.`t_cas_client_user` (`id`, `open_id`, `client_id`, `name`, `password`)
 VALUES (1, 'UO640ada346f505467dc399155', 'test-client', 'user',
         '{bcrypt}$2a$10$stcBm3H1qfgEOqeIhJHDbeiEfas/XXE5trPJPncUcRGozT.hejzzO');
 
 -- ----------------------------
 -- 步骤 6 绑定用户和角色
 -- ----------------------------
-INSERT INTO `cas`.`t_cas_user_role` (`id`, `user_id`, `role_id`)
+INSERT INTO `cas`.`t_cas_client_user_role` (`id`, `client_user_id`, `role_id`)
 VALUES (1, 1, 1);
 
 COMMIT;
