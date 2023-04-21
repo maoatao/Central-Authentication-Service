@@ -17,12 +17,13 @@ import com.maoatao.cas.core.service.PermissionService;
 import com.maoatao.cas.core.service.RoleService;
 import com.maoatao.cas.core.service.ClientUserRoleService;
 import com.maoatao.cas.core.service.ClientUserService;
+import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.security.bean.CustomUserDetails;
-import com.maoatao.cas.util.IdUtils;
 import com.maoatao.daedalus.data.service.impl.DaedalusServiceImpl;
 import com.maoatao.daedalus.data.util.PageUtils;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import com.maoatao.synapse.lang.util.SynaStrings;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -37,7 +38,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * 用户
+ * 客户端用户
  *
  * @author: MaoAtao
  * @create: 2022-03-11 16:13:35
@@ -60,6 +61,9 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private UserService userService;
+
     @Override
     public Page<ClientUserVO> page(ClientUserQueryParam param) {
         ClientUserEntity entity = BeanUtil.copyProperties(param, ClientUserEntity.class);
@@ -76,7 +80,7 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
     public UserDetails getUserDetails(String username, String clientId) throws UsernameNotFoundException {
         ClientUserEntity existed = getByNameAndClient(username, clientId);
         if (existed == null) {
-            throw new UsernameNotFoundException(SynaStrings.format("用户 {} 不存在!", username));
+            throw new UsernameNotFoundException(SynaStrings.format("客户端用户 {} 不存在!", username));
         }
         return buildUserDetails(existed);
     }
@@ -86,16 +90,14 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
     public long save(ClientUserSaveParam param) {
         checkClient(param.getClientId());
         checkUserName(param.getName(), param.getClientId());
-        param.setUserOpenId(IdUtils.nextUserOpenId());
-        ClientUserEntity user = BeanUtil.copyProperties(param, ClientUserEntity.class);
-        user.setPassword(passwordEncoder.encode(param.getPassword()));
-        SynaAssert.isTrue(save(user), "新增用户失败!");
-        SynaAssert.notNull(user.getId(), "新增用户失败:用户 ID 为空!");
+        ClientUserEntity clientUserEntity = BeanUtil.copyProperties(param, ClientUserEntity.class);
+        clientUserEntity.setPassword(passwordEncoder.encode(param.getPassword()));
+        SynaAssert.isTrue(save(clientUserEntity), "新增客户端用户失败!");
         SynaAssert.isTrue(
-                clientUserRoleService.updateUserRole(getAndCheckRoleIds(param.getRoles().stream().toList(), param.getClientId()), user.getId()),
-                "新用户绑定角色失败!"
+                clientUserRoleService.updateUserRole(getAndCheckRoleIds(param.getRoles().stream().toList(), param.getClientId()), clientUserEntity.getId()),
+                "新客户端用户绑定角色失败!"
         );
-        return user.getId();
+        return clientUserEntity.getId();
     }
 
     @Override
@@ -105,10 +107,10 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
         ClientUserEntity user = BeanUtil.copyProperties(param, ClientUserEntity.class);
         user.setId(existed.getId());
         checkUserName(param.getName(), param.getClientId());
-        SynaAssert.isTrue(updateById(user), "更新用户失败!");
+        SynaAssert.isTrue(updateById(user), "更新客户端用户失败!");
         SynaAssert.isTrue(
                 clientUserRoleService.updateUserRole(getAndCheckRoleIds(param.getRoles().stream().toList(), param.getClientId()), existed.getId()),
-                "更新用户绑定角色失败!"
+                "更新客户端用户绑定角色失败!"
         );
         return true;
     }
@@ -117,8 +119,8 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
     public boolean remove(String username, String clientId) {
         checkClient(clientId);
         ClientUserEntity existed = getAndCheckUser(username, clientId);
-        SynaAssert.isTrue(removeById(existed), "删除用户失败!");
-        SynaAssert.isTrue(clientUserRoleService.updateUserRole(null, existed.getId()), "删除用户解绑角色失败!");
+        SynaAssert.isTrue(removeById(existed), "删除客户端用户失败!");
+        SynaAssert.isTrue(clientUserRoleService.updateUserRole(null, existed.getId()), "删除客户端用户解绑角色失败!");
         return true;
     }
 
@@ -168,18 +170,18 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
      *
      * @param username 用户名称
      * @param clientId 客户端 id
-     * @return 用户
+     * @return 客户端用户
      */
     private ClientUserEntity getAndCheckUser(String username, String clientId) {
         ClientUserEntity existed = getByNameAndClient(username, clientId);
-        SynaAssert.notNull(existed, "用户 {} 不存在!", username);
+        SynaAssert.notNull(existed, "客户端用户 {} 不存在!", username);
         return existed;
     }
 
     /**
      * 获取并检查角色ID
      * <p>
-     * 给用户新增角色时,这些角色必须已存在
+     * 给客户端用户新增角色时,这些角色必须已存在
      *
      * @param roleNames 角色名称集合
      * @param clientId  客户端 id
@@ -200,7 +202,6 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
 
     private UserDetails buildUserDetails(ClientUserEntity clientUserEntity) {
         CustomUserDetails.CustomUserDetailsBuilder customUserDetailsBuilder = CustomUserDetails.builder()
-                .openId(clientUserEntity.getUserOpenId())
                 .clientId(clientUserEntity.getClientId())
                 .username(clientUserEntity.getLoginName())
                 .password(clientUserEntity.getPassword())
@@ -208,6 +209,8 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
                 .accountNonExpired(true)
                 .accountNonLocked(true)
                 .credentialsNonExpired(true);
+        Optional.ofNullable(userService.getById(clientUserEntity.getUserId()))
+                .ifPresent(userEntity -> customUserDetailsBuilder.openId(userEntity.getOpenId()));
         List<PermissionEntity> permissionEntities = permissionService.listByUser(clientUserEntity.getId());
         if (IterUtil.isNotEmpty(permissionEntities)) {
             customUserDetailsBuilder.permissions(permissionEntities.stream()

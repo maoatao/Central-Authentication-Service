@@ -1,10 +1,9 @@
-package com.maoatao.cas.core.bean.param.clientuser;
+package com.maoatao.cas.core.bean.param.user;
 
-import com.maoatao.synapse.core.bean.base.BaseUpdateParam;
+import com.maoatao.daedalus.web.bean.param.BasePaginationParam;
 import com.maoatao.synapse.lang.util.SynaDates;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import java.util.Set;
 import lombok.Data;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -16,19 +15,19 @@ import java.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
- * CAS 客户端用户
+ * CAS 用户
  *
  * @author MaoAtao
- * @date 2023-04-07 21:23:37
+ * @date 2023-04-21 16:09:13
  */
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = true)
-@Schema(description = "新增CAS 客户端用户参数")
-public class ClientUserUpdateParam extends BaseUpdateParam {
+@Schema(description = "查询CAS 用户参数")
+public class UserQueryParam extends BasePaginationParam {
 
     @Serial
-    private static final long serialVersionUID = -2003618959733752300L;
+    private static final long serialVersionUID = -4386605265609963211L;
 
     /**
      * 主键id(自增)
@@ -37,17 +36,11 @@ public class ClientUserUpdateParam extends BaseUpdateParam {
     @Schema(description = "主键id(自增)")
     private Long id;
     /**
-     * 用户 id
+     * CAS 全局唯一id
      */
-    @NotNull(message = "userId 不能为空")
-    @Schema(description = "用户 id")
-    private Long userId;
-    /**
-     * 客户端 id
-     */
-    @NotNull(message = "clientId 不能为空")
-    @Schema(description = "客户端 id")
-    private String clientId;
+    @NotNull(message = "openId 不能为空")
+    @Schema(description = "CAS 全局唯一id")
+    private String openId;
     /**
      * 用户名
      */
@@ -55,18 +48,11 @@ public class ClientUserUpdateParam extends BaseUpdateParam {
     @Schema(description = "用户名")
     private String name;
     /**
-     * 密码
+     * 描述
      */
-    @NotNull(message = "password 不能为空")
-    @Schema(description = "密码")
-    private String password;
-
-    /**
-     * 角色名称集合
-     */
-    @Schema(description = "角色名称集合")
-    Set<String> roles;
-
+    @NotNull(message = "description 不能为空")
+    @Schema(description = "描述")
+    private String description;
     /**
      * 创建人 ID
      */
@@ -101,5 +87,5 @@ public class ClientUserUpdateParam extends BaseUpdateParam {
     private Boolean deleted;
 
     @Tolerate
-    public ClientUserUpdateParam() {}
+    public UserQueryParam() {}
 }

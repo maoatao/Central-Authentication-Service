@@ -36,11 +36,11 @@ public class ClientUserQueryParam extends BasePaginationParam {
     @Schema(description = "主键id(自增)")
     private Long id;
     /**
-     * CAS 全局唯一id
+     * 用户 id
      */
-    @NotNull(message = "openId 不能为空")
-    @Schema(description = "CAS 全局唯一id")
-    private String userOpenId;
+    @NotNull(message = "userId 不能为空")
+    @Schema(description = "用户 id")
+    private Long userId;
     /**
      * 客户端 id
      */

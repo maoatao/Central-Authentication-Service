@@ -25,9 +25,9 @@ public class ClientUserEntity extends BaseEntity<ClientUserEntity> {
     private static final long serialVersionUID = -8037953378905637409L;
 
     /**
-     * CAS 全局唯一id
+     * 用户 id
      */
-    private String userOpenId;
+    private Long userId;
     /**
      * 客户端 id
      */
