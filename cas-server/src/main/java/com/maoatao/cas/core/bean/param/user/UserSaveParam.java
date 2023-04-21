@@ -28,12 +28,6 @@ public class UserSaveParam extends BaseSaveParam {
 
     @Serial
     private static final long serialVersionUID = -4214025455088807356L;
-
-    /**
-     * 主键id(自增)
-     */
-    @NotNull(message = "id 不能为空")
-    @Schema(description = "主键id(自增)")
     /**
      * CAS 全局唯一id
      */
