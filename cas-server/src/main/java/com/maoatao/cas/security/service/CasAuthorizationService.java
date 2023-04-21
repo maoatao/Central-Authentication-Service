@@ -57,4 +57,13 @@ public interface CasAuthorizationService {
      * @return 用户主体
      */
     Authentication generateUserPrincipal(ClientUser clientUser);
+
+    /**
+     * 通过客户端获取经过授权客户端主体
+     *
+     * @param clientId 客户端 ID
+     * @param secret   客户端密码
+     * @return 客户端主体
+     */
+    Authentication generateClientPrincipal(String clientId, String secret);
 }

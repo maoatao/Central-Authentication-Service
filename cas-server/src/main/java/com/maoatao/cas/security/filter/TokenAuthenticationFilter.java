@@ -1,6 +1,7 @@
 package com.maoatao.cas.security.filter;
 
 import cn.hutool.core.util.StrUtil;
+import com.maoatao.cas.security.bean.BasicAuthentication;
 import com.maoatao.cas.security.service.CasAuthorizationService;
 import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.util.FilterUtils;
@@ -14,6 +15,7 @@ import com.maoatao.daedalus.web.response.HttpResponseStatus;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
@@ -115,6 +117,18 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
         }
         // 根据 token 生成已授权的主体
         Optional.ofNullable(casAuthorizationService.generateUserPrincipal(clientUser))
+                .ifPresent(principal -> SecurityContextHolder.getContext().setAuthentication(principal));
+    }
+
+    private void doBasicAuthFilter(String token) {
+        // 去掉令牌前缀
+        token = token.replace(TOKEM_TYPE_BASIC, SynaStrings.EMPTY).trim();
+        BasicAuthentication basicAuthentication = FilterUtils.buildBasicAuthentication(token);
+        if (basicAuthentication == null) {
+            return;
+        }
+        // 根据 token 生成已授权的主体
+        Optional.ofNullable(casAuthorizationService.generateClientPrincipal(basicAuthentication.username(), basicAuthentication.password()))
                 .ifPresent(principal -> SecurityContextHolder.getContext().setAuthentication(principal));
     }
 

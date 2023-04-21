@@ -2,6 +2,7 @@ package com.maoatao.cas.util;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.IterUtil;
+import com.maoatao.cas.security.bean.BasicAuthentication;
 import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.security.authorization.CustomAuthorizationServerContext;
 import com.maoatao.synapse.lang.exception.SynaException;
@@ -34,10 +35,15 @@ public final class FilterUtils {
      * Basic 令牌参数分隔符
      */
     private static final String BASIC_TOKEN_PARAMETERS_DELIMITER = ":";
+
     /**
      * Basic 令牌参数个数
      */
     private static final int BASIC_TOKEN_PARAMETERS_NUM = 3;
+    /**
+     * Basic 令牌参数个数
+     */
+    private static final int BASIC_AUTHENTICATION_PARAMETERS_NUM = 2;
 
     /**
      * 通过令牌构建用户详情
@@ -49,6 +55,20 @@ public final class FilterUtils {
         String[] values = SynaSafes.of(Base64.decodeStr(token)).split(BASIC_TOKEN_PARAMETERS_DELIMITER);
         if (values.length == BASIC_TOKEN_PARAMETERS_NUM) {
             return ClientUser.builder().clientId(values[0]).username(values[1]).password(values[2]).build();
+        }
+        return null;
+    }
+
+    /**
+     * 通过令牌构建基本身份验证
+     *
+     * @param token Basic 令牌(username:password)
+     * @return 基本身份验证
+     */
+    public static BasicAuthentication buildBasicAuthentication(String token) {
+        String[] values = SynaSafes.of(Base64.decodeStr(token)).split(BASIC_TOKEN_PARAMETERS_DELIMITER);
+        if (values.length == BASIC_AUTHENTICATION_PARAMETERS_NUM) {
+            return BasicAuthentication.builder().username(values[0]).password(values[1]).build();
         }
         return null;
     }

@@ -170,14 +170,8 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
         return generateUserPrincipal(clientUser.clientId(), clientUser.username(), clientUser.password());
     }
 
-    /**
-     * 通过客户端获取经过授权客户端主体
-     *
-     * @param clientId 客户端 ID
-     * @param secret   客户端密码
-     * @return 客户端主体
-     */
-    private Authentication generateClientPrincipal(String clientId, String secret) {
+    @Override
+    public Authentication generateClientPrincipal(String clientId, String secret) {
         RegisteredClient registeredClient = registeredClientRepository.findByClientId(clientId);
         // 构建客户端身份验证
         Authentication clientAuthentication = new OAuth2ClientAuthenticationToken(registeredClient, ClientAuthenticationMethod.CLIENT_SECRET_BASIC, secret);
