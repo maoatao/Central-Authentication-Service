@@ -33,7 +33,7 @@ import java.util.List;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/clientredirecturl")
+@RequestMapping("/client/redirect/url")
 @Tag(name = "ClientRedirectUrlController", description = "CAS 客户端重定向地址管理")
 public class ClientRedirectUrlController {
 

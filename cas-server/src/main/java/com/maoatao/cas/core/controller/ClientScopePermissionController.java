@@ -33,7 +33,7 @@ import java.util.List;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/clientscopepermission")
+@RequestMapping("/client/scope/permission")
 @Tag(name = "ClientScopePermissionController", description = "CAS 角色权限关系管理")
 public class ClientScopePermissionController {
 

@@ -33,7 +33,7 @@ import java.util.List;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/clientgranttype")
+@RequestMapping("/client/grant/type")
 @Tag(name = "ClientGrantTypeController", description = "CAS 客户端授权类型管理")
 public class ClientGrantTypeController {
 
