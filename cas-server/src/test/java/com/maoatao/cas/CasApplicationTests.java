@@ -14,6 +14,8 @@ import com.maoatao.cas.core.bean.entity.ClientUserEntity;
 import com.maoatao.cas.core.bean.param.accesstoken.GenerateAccessTokenParam;
 import com.maoatao.cas.core.bean.param.authorization.GenerateAuthorizationCodeParam;
 import com.maoatao.cas.core.bean.param.clientuser.ClientUserSaveParam;
+import com.maoatao.cas.core.bean.param.user.UserSaveParam;
+import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.security.service.CasAuthorizationService;
 import com.maoatao.cas.core.service.PermissionService;
 import com.maoatao.cas.core.service.RolePermissionService;
@@ -73,6 +75,9 @@ class CasApplicationTests {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private ClientUserService clientUserService;
@@ -285,8 +290,9 @@ class CasApplicationTests {
      */
     @Test
     void save_user_test() {
+        UserSaveParam userSaveParam = UserSaveParam.builder().name(TEST_USER_NAME).openId(IdUtils.nextUserOpenId()).build();
         ClientUserSaveParam param = new ClientUserSaveParam();
-        param.setUserId(1L);
+        param.setUserId(userService.save(userSaveParam));
         param.setClientId(TEST_CLIENT_ID);
         param.setName(TEST_USER_NAME);
         param.setPassword(TEST_USER_PASSWORD);
