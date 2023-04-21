@@ -36,11 +36,11 @@ public class ClientUserRoleQueryParam extends BasePaginationParam {
     @Schema(description = "主键id(自增)")
     private Long id;
     /**
-     * 用户id
+     * 客户端用户id
      */
-    @NotNull(message = "userId 不能为空")
-    @Schema(description = "用户id")
-    private Integer userId;
+    @NotNull(message = "clientUserId 不能为空")
+    @Schema(description = "客户端用户id")
+    private Long clientUserId;
     /**
      * 用户id
      */

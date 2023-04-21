@@ -2,7 +2,7 @@ package com.maoatao.cas.core.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.common.annotation.CasAuth;
-import com.maoatao.cas.core.bean.vo.UserVO;
+import com.maoatao.cas.core.bean.vo.ClientUserVO;
 import com.maoatao.cas.core.bean.param.clientuser.ClientUserQueryParam;
 import com.maoatao.cas.core.bean.param.clientuser.ClientUserSaveParam;
 import com.maoatao.cas.core.bean.param.clientuser.ClientUserUpdateParam;
@@ -50,7 +50,7 @@ public class ClientUserController {
     @CasAuth("cas_client_user_get")
     @Operation(summary = "getPage", description = "分页查询CAS 客户端用户列表")
     @OperationLog(type = OperationType.QUERY, content = "分页查询CAS 客户端用户", moduleName = "cas")
-    public Page<UserVO> page(@Validated ClientUserQueryParam param) {
+    public Page<ClientUserVO> page(@Validated ClientUserQueryParam param) {
         return clientUserService.page(param);
     }
 
@@ -64,7 +64,7 @@ public class ClientUserController {
     @CasAuth("cas_client_user_get")
     @Operation(summary = "details", description = "通过id查询CAS 客户端用户")
     @OperationLog(type = OperationType.QUERY, content = "查询CAS 客户端用户", moduleName = "cas")
-    public UserVO details(@PathVariable @Parameter(name = "id", description = "CAS 客户端用户id") Long id) {
+    public ClientUserVO details(@PathVariable @Parameter(name = "id", description = "CAS 客户端用户id") Long id) {
         return clientUserService.details(id);
     }
 

@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
- * CAS 客户端用户角色关系
+ * CAS 客户端用户
  *
  * @author MaoAtao
  * @date 2023-04-07 21:23:37
@@ -22,11 +22,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = true)
-@Schema(description = "CAS 客户端用户角色关系数据")
-public class UserRoleVO extends BaseVO {
+@Schema(description = "CAS 客户端用户数据")
+public class ClientUserVO extends BaseVO {
 
     @Serial
-    private static final long serialVersionUID = -1333381255301268715L;
+    private static final long serialVersionUID = -5329514812879368846L;
 
     /**
      * 主键id(自增)
@@ -34,15 +34,25 @@ public class UserRoleVO extends BaseVO {
     @Schema(description = "主键id(自增)")
     private Long id;
     /**
-     * 用户id
+     * CAS 全局唯一id
      */
-    @Schema(description = "用户id")
-    private Integer userId;
+    @Schema(description = "CAS 全局唯一id")
+    private String userOpenId;
     /**
-     * 用户id
+     * 客户端 id
      */
-    @Schema(description = "用户id")
-    private Long roleId;
+    @Schema(description = "客户端 id")
+    private String clientId;
+    /**
+     * 用户名
+     */
+    @Schema(description = "用户名")
+    private String name;
+    /**
+     * 密码
+     */
+    @Schema(description = "密码")
+    private String password;
     /**
      * 创建人 ID
      */
@@ -72,5 +82,5 @@ public class UserRoleVO extends BaseVO {
     private Boolean deleted;
 
     @Tolerate
-    public UserRoleVO() {}
+    public ClientUserVO() {}
 }

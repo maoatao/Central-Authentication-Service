@@ -30,11 +30,11 @@ public class ClientUserRoleSaveParam extends BaseSaveParam {
     private static final long serialVersionUID = 8638404423152721929L;
 
     /**
-     * 用户id
+     * 客户端用户id
      */
-    @NotNull(message = "userId 不能为空")
-    @Schema(description = "用户id")
-    private Integer userId;
+    @NotNull(message = "clientUserId 不能为空")
+    @Schema(description = "客户端用户id")
+    private Long clientUserId;
     /**
      * 用户id
      */

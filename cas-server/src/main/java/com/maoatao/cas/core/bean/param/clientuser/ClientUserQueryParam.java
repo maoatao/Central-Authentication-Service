@@ -40,7 +40,7 @@ public class ClientUserQueryParam extends BasePaginationParam {
      */
     @NotNull(message = "openId 不能为空")
     @Schema(description = "CAS 全局唯一id")
-    private String openId;
+    private String userOpenId;
     /**
      * 客户端 id
      */

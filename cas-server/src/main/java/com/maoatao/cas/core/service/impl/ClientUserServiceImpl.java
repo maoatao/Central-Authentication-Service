@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.core.bean.param.clientuser.ClientUserQueryParam;
 import com.maoatao.cas.core.bean.param.clientuser.ClientUserSaveParam;
 import com.maoatao.cas.core.bean.param.clientuser.ClientUserUpdateParam;
-import com.maoatao.cas.core.bean.vo.UserVO;
+import com.maoatao.cas.core.bean.vo.ClientUserVO;
 import com.maoatao.cas.core.bean.entity.PermissionEntity;
 import com.maoatao.cas.core.bean.entity.RoleEntity;
 import com.maoatao.cas.core.bean.entity.ClientUserEntity;
@@ -61,15 +61,15 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public Page<UserVO> page(ClientUserQueryParam param) {
+    public Page<ClientUserVO> page(ClientUserQueryParam param) {
         ClientUserEntity entity = BeanUtil.copyProperties(param, ClientUserEntity.class);
         Page<ClientUserEntity> page = super.page(PageUtils.convert(param), Wrappers.query(entity));
-        return PageUtils.convert(page, UserVO.class);
+        return PageUtils.convert(page, ClientUserVO.class);
     }
 
     @Override
-    public UserVO details(Long id) {
-        return BeanUtil.toBean(super.getById(id), UserVO.class);
+    public ClientUserVO details(Long id) {
+        return BeanUtil.toBean(super.getById(id), ClientUserVO.class);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
     public long save(ClientUserSaveParam param) {
         checkClient(param.getClientId());
         checkUserName(param.getName(), param.getClientId());
-        param.setOpenId(IdUtils.nextUserOpenId());
+        param.setUserOpenId(IdUtils.nextUserOpenId());
         ClientUserEntity user = BeanUtil.copyProperties(param, ClientUserEntity.class);
         user.setPassword(passwordEncoder.encode(param.getPassword()));
         SynaAssert.isTrue(save(user), "新增用户失败!");

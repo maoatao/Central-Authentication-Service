@@ -27,7 +27,7 @@ public class ClientUserRoleEntity extends BaseEntity<ClientUserRoleEntity> {
     /**
      * 用户id
      */
-    private Long userId;
+    private Long clientUserId;
     /**
      * 用户id
      */

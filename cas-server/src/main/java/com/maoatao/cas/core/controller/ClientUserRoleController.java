@@ -2,7 +2,7 @@ package com.maoatao.cas.core.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.common.annotation.CasAuth;
-import com.maoatao.cas.core.bean.vo.UserRoleVO;
+import com.maoatao.cas.core.bean.vo.ClientUserRoleVO;
 import com.maoatao.cas.core.bean.param.clientuserrole.ClientUserRoleQueryParam;
 import com.maoatao.cas.core.bean.param.clientuserrole.ClientUserRoleSaveParam;
 import com.maoatao.cas.core.bean.param.clientuserrole.ClientUserRoleUpdateParam;
@@ -50,7 +50,7 @@ public class ClientUserRoleController {
     @CasAuth("cas_client_user_role_get")
     @Operation(summary = "getPage", description = "分页查询CAS 客户端用户角色关系列表")
     @OperationLog(type = OperationType.QUERY, content = "分页查询CAS 客户端用户角色关系", moduleName = "cas")
-    public Page<UserRoleVO> page(@Validated ClientUserRoleQueryParam param) {
+    public Page<ClientUserRoleVO> page(@Validated ClientUserRoleQueryParam param) {
         return clientUserRoleService.page(param);
     }
 
@@ -64,7 +64,7 @@ public class ClientUserRoleController {
     @CasAuth("cas_client_user_role_get")
     @Operation(summary = "details", description = "通过id查询CAS 客户端用户角色关系")
     @OperationLog(type = OperationType.QUERY, content = "查询CAS 客户端用户角色关系", moduleName = "cas")
-    public UserRoleVO details(@PathVariable @Parameter(name = "id", description = "CAS 客户端用户角色关系id") Long id) {
+    public ClientUserRoleVO details(@PathVariable @Parameter(name = "id", description = "CAS 客户端用户角色关系id") Long id) {
         return clientUserRoleService.details(id);
     }
 

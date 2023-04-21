@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.core.bean.param.clientuser.ClientUserQueryParam;
 import com.maoatao.cas.core.bean.param.clientuser.ClientUserSaveParam;
 import com.maoatao.cas.core.bean.param.clientuser.ClientUserUpdateParam;
-import com.maoatao.cas.core.bean.vo.UserVO;
+import com.maoatao.cas.core.bean.vo.ClientUserVO;
 import com.maoatao.cas.core.bean.entity.ClientUserEntity;
 import com.maoatao.daedalus.data.service.DaedalusService;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,7 +24,7 @@ public interface ClientUserService extends DaedalusService<ClientUserEntity> {
      * @param param 参数
      * @return 分页
      */
-    Page<UserVO> page(ClientUserQueryParam param);
+    Page<ClientUserVO> page(ClientUserQueryParam param);
 
     /**
      * 通过id查询
@@ -32,7 +32,7 @@ public interface ClientUserService extends DaedalusService<ClientUserEntity> {
      * @param id CAS 客户端用户id
      * @return CAS 客户端用户
      */
-    UserVO details(Long id);
+    ClientUserVO details(Long id);
 
     /**
      * 通过用户名和用户详细信息
