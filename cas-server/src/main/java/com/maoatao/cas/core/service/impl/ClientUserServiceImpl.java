@@ -89,7 +89,7 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
     @Transactional(rollbackFor = Exception.class)
     public long save(ClientUserSaveParam param) {
         checkClient(param.getClientId());
-        checkUserName(param.getName(), param.getClientId());
+        checkUserName(param.getLoginName(), param.getClientId());
         ClientUserEntity clientUserEntity = BeanUtil.copyProperties(param, ClientUserEntity.class);
         clientUserEntity.setPassword(passwordEncoder.encode(param.getPassword()));
         SynaAssert.isTrue(save(clientUserEntity), "新增客户端用户失败!");
@@ -103,10 +103,10 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
     @Override
     public boolean update(ClientUserUpdateParam param) {
         checkClient(param.getClientId());
-        ClientUserEntity existed = getAndCheckUser(param.getName(), param.getClientId());
+        ClientUserEntity existed = getAndCheckUser(param.getLoginName(), param.getClientId());
         ClientUserEntity user = BeanUtil.copyProperties(param, ClientUserEntity.class);
         user.setId(existed.getId());
-        checkUserName(param.getName(), param.getClientId());
+        checkUserName(param.getLoginName(), param.getClientId());
         SynaAssert.isTrue(updateById(user), "更新客户端用户失败!");
         SynaAssert.isTrue(
                 clientUserRoleService.updateUserRole(getAndCheckRoleIds(param.getRoles().stream().toList(), param.getClientId()), existed.getId()),

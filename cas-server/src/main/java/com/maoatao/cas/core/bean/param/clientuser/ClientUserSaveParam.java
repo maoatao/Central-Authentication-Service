@@ -43,11 +43,11 @@ public class ClientUserSaveParam extends BaseSaveParam {
     @Schema(description = "客户端 id")
     private String clientId;
     /**
-     * 用户名
+     * 登录名
      */
-    @NotNull(message = "name 不能为空")
-    @Schema(description = "用户名")
-    private String name;
+    @NotNull(message = "loginName 不能为空")
+    @Schema(description = "登录名")
+    private String loginName;
     /**
      * 密码
      */

@@ -55,7 +55,8 @@ VALUES (1, 'test-client', 3600, b'0', 1800, 'reference', '', b'1', 3600, 'RS256'
 -- 步骤 2 创建权限
 -- ----------------------------
 INSERT INTO `cas`.`t_cas_permission`(`id`, `client_id`, `name`)
-VALUES (1, 'test-client', 'PERMISSION_TEST');
+VALUES (1, 'test-client', 'PERMISSION_TEST_ADD'),
+       (2, 'test-client', 'PERMISSION_TEST_GET');
 
 -- ----------------------------
 -- 步骤 3 创建角色
@@ -67,20 +68,34 @@ VALUES (1, 'test-client', 'ROLE_TEST');
 -- 步骤 4 绑定角色和权限
 -- ----------------------------
 INSERT INTO `cas`.`t_cas_role_permission` (`id`, `role_id`, `permission_id`)
-VALUES (1, 1, 1);
+VALUES (1, 1, 1),
+       (2, 1, 2);
 
 -- ----------------------------
 -- 步骤 5 创建用户
 -- ----------------------------
-INSERT INTO `cas`.`t_cas_client_user` (`id`, `open_id`, `client_id`, `name`, `password`)
-VALUES (1, 'UO640ada346f505467dc399155', 'test-client', 'user',
+INSERT INTO `cas`.`t_cas_user` (`id`, `open_id`)
+VALUES (1, 'UO640ada346f505467dc399155');
+
+-- ----------------------------
+-- 步骤 6 创建客户端用户
+-- ----------------------------
+INSERT INTO `cas`.`t_cas_client_user` (`id`, `user_id`, `client_id`, `login_name`, `password`)
+VALUES (1, 1, 'test-client', 'user',
         '{bcrypt}$2a$10$stcBm3H1qfgEOqeIhJHDbeiEfas/XXE5trPJPncUcRGozT.hejzzO');
 
 -- ----------------------------
--- 步骤 6 绑定用户和角色
+-- 步骤 7 绑定用户和角色
 -- ----------------------------
 INSERT INTO `cas`.`t_cas_client_user_role` (`id`, `client_user_id`, `role_id`)
 VALUES (1, 1, 1);
+
+-- ----------------------------
+-- 步骤 8 绑定作用域和权限
+-- ----------------------------
+INSERT INTO `cas`.`t_cas_client_scope_permission`(`id`, `scope_id`, `permission_id`)
+VALUES (1, 1, 1),
+       (2, 2, 2);
 
 COMMIT;
 

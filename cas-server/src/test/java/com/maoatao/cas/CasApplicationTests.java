@@ -6,7 +6,8 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.jwt.JWT;
 import cn.hutool.jwt.JWTUtil;
 import com.maoatao.cas.common.authentication.CasAccessToken;
-import com.maoatao.cas.config.CasServerConfig;
+import com.maoatao.cas.core.bean.entity.ClientScopeEntity;
+import com.maoatao.cas.core.bean.entity.ClientScopePermissionEntity;
 import com.maoatao.cas.core.bean.entity.PermissionEntity;
 import com.maoatao.cas.core.bean.entity.RoleEntity;
 import com.maoatao.cas.core.bean.entity.RolePermissionEntity;
@@ -15,16 +16,19 @@ import com.maoatao.cas.core.bean.param.accesstoken.GenerateAccessTokenParam;
 import com.maoatao.cas.core.bean.param.authorization.GenerateAuthorizationCodeParam;
 import com.maoatao.cas.core.bean.param.clientuser.ClientUserSaveParam;
 import com.maoatao.cas.core.bean.param.user.UserSaveParam;
+import com.maoatao.cas.core.service.ClientScopePermissionService;
+import com.maoatao.cas.core.service.ClientScopeService;
 import com.maoatao.cas.core.service.UserService;
 import com.maoatao.cas.security.service.CasAuthorizationService;
 import com.maoatao.cas.core.service.PermissionService;
 import com.maoatao.cas.core.service.RolePermissionService;
 import com.maoatao.cas.core.service.RoleService;
 import com.maoatao.cas.core.service.ClientUserService;
-import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.util.FilterUtils;
 import com.maoatao.cas.util.IdUtils;
+import com.maoatao.synapse.lang.exception.SynaException;
 import com.maoatao.synapse.lang.util.SynaStrings;
+import java.util.List;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
@@ -98,6 +102,12 @@ class CasApplicationTests {
     private RolePermissionService rolePermissionService;
 
     @Autowired
+    private ClientScopeService clientScopeService;
+
+    @Autowired
+    private ClientScopePermissionService clientScopePermissionService;
+
+    @Autowired
     private AuthorizationServerSettings authorizationServerSettings;
 
     @Autowired
@@ -115,13 +125,21 @@ class CasApplicationTests {
      */
     private static final String TEST_CLIENT_SECRET = "123456";
     /**
-     * 客户端密码
+     * 客户端重定向地址
      */
     private static final String TEST_CLIENT_REDIRECT_URI = "https://cn.bing.com";
     /**
+     * 客户端作用域 test.read
+     */
+    private static final String TEST_CLIENT_SCOPE_TEST_READ = "test.read";
+    /**
+     * 客户端作用域 test.write
+     */
+    private static final String TEST_CLIENT_SCOPE_TEST_WRITE = "test.write";
+    /**
      * 客户端授权范围
      */
-    private static final Set<String> TEST_CLIENT_SCOPES = Set.of("test.read", "test.write");
+    private static final Set<String> TEST_CLIENT_SCOPES = Set.of(TEST_CLIENT_SCOPE_TEST_READ, TEST_CLIENT_SCOPE_TEST_WRITE);
     /**
      * 角色名称
      * <p>
@@ -130,9 +148,13 @@ class CasApplicationTests {
      */
     private static final String TEST_ROLE_NAME = "ROLE_TEST";
     /**
-     * 权限名称
+     * TEST GET 权限名称
      */
-    private static final String TEST_PERMISSION_NAME = "PERMISSION_TEST";
+    private static final String PERMISSION_TEST_GET_NAME = "PERMISSION_TEST_GET";
+    /**
+     * TEST ADD 权限名称
+     */
+    private static final String PERMISSION_TEST_ADD_NAME = "PERMISSION_TEST_ADD";
     /**
      * 用户名称
      */
@@ -162,13 +184,14 @@ class CasApplicationTests {
         // 1.先创建客户端 save_client_test
         save_client_test();
         // 2.通过客户端 id 新增角色和权限 save_role_permission_test
-        save_role_permission_test();
+        save_scope_role_permission_test();
         // 3.通过客户端 id 新增用户 save_user_test
         save_user_test();
         System.out.println("----------------------------------------------------");
         System.out.println(SynaStrings.format("已成功创建客户端: {}", TEST_CLIENT_ID));
+        System.out.println(SynaStrings.format("已成功创建作用域: {}", TEST_CLIENT_SCOPES));
         System.out.println(SynaStrings.format("已成功创建角　色: {}", TEST_ROLE_NAME));
-        System.out.println(SynaStrings.format("已成功创建权　限: {}", TEST_PERMISSION_NAME));
+        System.out.println(SynaStrings.format("已成功创建权　限: {} {}", PERMISSION_TEST_GET_NAME, PERMISSION_TEST_ADD_NAME));
         System.out.println(SynaStrings.format("已成功创建用　户: {} 密码 {}", TEST_USER_NAME, TEST_USER_PASSWORD));
         System.out.println("----------------------------------------------------");
     }
@@ -264,23 +287,39 @@ class CasApplicationTests {
     /**
      * 初始化测试数据 步骤 2
      * <p>
-     * 新增角色权限并绑定关系
+     * 新增作用域、角色和权限并绑定关系
      */
     @Test
-    void save_role_permission_test() {
+    void save_scope_role_permission_test() {
         RoleEntity roleEntity = RoleEntity.builder().clientId(TEST_CLIENT_ID)
                 .name(TEST_ROLE_NAME)
                 .build();
         Assert.assertTrue("角色创建失败", roleService.save(roleEntity));
-        PermissionEntity permissionEntity = PermissionEntity.builder()
-                .clientId(TEST_CLIENT_ID)
-                .name(TEST_PERMISSION_NAME)
-                .build();
-        Assert.assertTrue("权限创建失败", permissionService.save(permissionEntity));
-        Assert.assertTrue("角色权限关系绑定失败", rolePermissionService.save(RolePermissionEntity.builder()
-                .roleId(roleEntity.getId())
-                .permissionId(permissionEntity.getId())
-                .build()));
+        PermissionEntity permissionTestAdd = PermissionEntity.builder().clientId(TEST_CLIENT_ID).name(PERMISSION_TEST_ADD_NAME).build();
+        PermissionEntity permissionTestGet = PermissionEntity.builder().clientId(TEST_CLIENT_ID).name(PERMISSION_TEST_GET_NAME).build();
+        List<PermissionEntity> permissionEntities = List.of(permissionTestAdd, permissionTestGet);
+        Assert.assertTrue("权限创建失败", permissionService.saveBatch(permissionEntities));
+        List<RolePermissionEntity> rolePermissionEntities = permissionEntities.stream()
+                .map(permissionEntity -> RolePermissionEntity.builder()
+                        .roleId(roleEntity.getId())
+                        .permissionId(permissionEntity.getId())
+                        .build())
+                .toList();
+        Assert.assertTrue("角色权限关系绑定失败", rolePermissionService.saveBatch(rolePermissionEntities));
+        List<ClientScopeEntity> clientScopeEntities = clientScopeService.listByClientId(TEST_CLIENT_ID);
+        ClientScopeEntity scopeTestRead = clientScopeEntities.stream()
+                .filter(clientScopeEntity -> TEST_CLIENT_SCOPE_TEST_READ.equals(clientScopeEntity.getName()))
+                .findFirst()
+                .orElseThrow(() -> new SynaException(SynaStrings.format("作用域 {} 不存在", TEST_CLIENT_SCOPE_TEST_READ)));
+        ClientScopeEntity scopeTestWrite = clientScopeEntities.stream()
+                .filter(clientScopeEntity -> TEST_CLIENT_SCOPE_TEST_WRITE.equals(clientScopeEntity.getName()))
+                .findFirst()
+                .orElseThrow(() -> new SynaException(SynaStrings.format("作用域 {} 不存在", TEST_CLIENT_SCOPE_TEST_READ)));
+        List<ClientScopePermissionEntity> clientScopePermissionEntities = List.of(
+                ClientScopePermissionEntity.builder().scopeId(scopeTestWrite.getId()).permissionId(permissionTestAdd.getId()).build(),
+                ClientScopePermissionEntity.builder().scopeId(scopeTestRead.getId()).permissionId(permissionTestGet.getId()).build()
+        );
+        Assert.assertTrue("作用域权限关系绑定失败", clientScopePermissionService.saveBatch(clientScopePermissionEntities));
     }
 
     /**
@@ -294,7 +333,7 @@ class CasApplicationTests {
         ClientUserSaveParam param = new ClientUserSaveParam();
         param.setUserId(userService.save(userSaveParam));
         param.setClientId(TEST_CLIENT_ID);
-        param.setName(TEST_USER_NAME);
+        param.setLoginName(TEST_USER_NAME);
         param.setPassword(TEST_USER_PASSWORD);
         // 角色前缀同步骤 2 说明
         param.setRoles(Set.of(TEST_ROLE_NAME));
