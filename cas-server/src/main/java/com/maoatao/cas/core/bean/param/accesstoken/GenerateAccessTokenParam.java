@@ -24,12 +24,6 @@ public class GenerateAccessTokenParam extends BaseParam {
     @Serial
     private static final long serialVersionUID = -7286826147280035652L;
     /**
-     * 注册客户端密码
-     */
-    @NotNull(message = "注册客户端密码不能为空")
-    @Schema(description = "注册客户端密码")
-    private String secret;
-    /**
      * 授权类型
      */
     @NotNull(message = "授权类型不能为空")

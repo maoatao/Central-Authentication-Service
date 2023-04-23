@@ -176,7 +176,7 @@ class CasApplicationTests {
     /**
      * 测试步骤 2
      * <p>
-     * 条件:服务配置正确的redis连接(默认使用redis来储存授权信息,详情{@link CasServerConfig#oAuth2AuthorizationService })
+     * 条件:服务配置正确的redis连接(默认使用redis来储存授权信息,详情{@link com.maoatao.cas.security.service.impl.RedisAuthorizationServiceImpl })
      * <p>
      * 创建一个授权码,并使用该授权码请求令牌
      * <p>
@@ -313,6 +313,8 @@ class CasApplicationTests {
      */
     private String generate_authorization_code_test() {
         GenerateAuthorizationCodeParam generateAuthorizationCodeParam = new GenerateAuthorizationCodeParam();
+        generateAuthorizationCodeParam.setUsername(TEST_USER_NAME);
+        generateAuthorizationCodeParam.setPassword(TEST_USER_PASSWORD);
         // scopes需要在客户端的范围内
         generateAuthorizationCodeParam.setScopes(TEST_CLIENT_SCOPES);
         generateAuthorizationCodeParam.setCodeChallengeMethod("S256");
@@ -359,7 +361,6 @@ class CasApplicationTests {
         GenerateAccessTokenParam param = new GenerateAccessTokenParam();
         param.setType(AuthorizationGrantType.AUTHORIZATION_CODE.getValue());
         param.setCode(authorizationCode);
-        param.setSecret(TEST_CLIENT_SECRET);
         param.setVerifier("eT3Zhtr7Tmz20-qpTk9zs8EWhN63qdZd8GWiq5-h67TrujxzIg0p_tPUfWH1dXQg278ZEiMcq9ehYPvbBehNe8f4VP4o8EOnFoQY7wVwjUyG_l0ksZUUuPWg5dWKAEth");
 
         CasAccessToken accessToken = casAuthorizationService.generateAccessToken(param);
@@ -377,7 +378,6 @@ class CasApplicationTests {
         GenerateAccessTokenParam param = new GenerateAccessTokenParam();
         param.setType(AuthorizationGrantType.REFRESH_TOKEN.getValue());
         param.setCode(refreshToken);
-        param.setSecret(TEST_CLIENT_SECRET);
 
         CasAccessToken accessToken = casAuthorizationService.generateAccessToken(param);
 
@@ -391,7 +391,6 @@ class CasApplicationTests {
     private CasAccessToken generate_token_by_client_test() {
         GenerateAccessTokenParam param = new GenerateAccessTokenParam();
         param.setType(AuthorizationGrantType.CLIENT_CREDENTIALS.getValue());
-        param.setSecret(TEST_CLIENT_SECRET);
 
         CasAccessToken accessToken = casAuthorizationService.generateAccessToken(param);
 
@@ -401,12 +400,7 @@ class CasApplicationTests {
 
     private void mock_context_test() {
         // 构建上下文
-        Authentication principal = casAuthorizationService.generateUserPrincipal(ClientUser.builder()
-                .clientId(TEST_CLIENT_ID)
-                .username(TEST_USER_NAME)
-                .password(TEST_USER_PASSWORD)
-                .build()
-        );
+        Authentication principal = casAuthorizationService.generateClientPrincipal(TEST_CLIENT_ID, TEST_CLIENT_SECRET);
         SecurityContextHolder.getContext().setAuthentication(principal);
         AuthorizationServerContext authorizationServerContext = FilterUtils.buildAuthorizationServerContext(authorizationServerSettings, new MockHttpServletRequest());
         AuthorizationServerContextHolder.setContext(authorizationServerContext);

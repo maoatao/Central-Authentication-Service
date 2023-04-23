@@ -80,13 +80,12 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
 
     @Override
     public String generateAuthorizationCode(GenerateAuthorizationCodeParam param) {
-        Authentication principal = getUserAuthentication();
-        CustomUserDetails userDetails = (CustomUserDetails) principal.getPrincipal();
-        RegisteredClient registeredClient = getRegisteredClient(userDetails.getClientId());
-        checkParams(param, registeredClient);
-        OAuth2TokenContext tokenContext = buildTokenContext(param.getScopes(), registeredClient, principal);
+        OAuth2ClientAuthenticationToken clientAuthentication = getClientAuthentication();
+        checkParams(param, clientAuthentication.getRegisteredClient());
+        Authentication principal = generateUserPrincipal(clientAuthentication.getRegisteredClient().getClientId(), param.getUsername(), param.getPassword());
+        OAuth2TokenContext tokenContext = buildTokenContext(param.getScopes(), clientAuthentication.getRegisteredClient(), principal);
         OAuth2AuthorizationCode authorizationCode = buildAuthorizationCode(tokenContext);
-        saveAuthorization(param, registeredClient, principal, authorizationCode);
+        saveAuthorization(param, clientAuthentication.getRegisteredClient(), principal, authorizationCode);
         return authorizationCode.getTokenValue();
     }
 
@@ -100,8 +99,7 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
      */
     @Override
     public CasAccessToken generateAccessToken(GenerateAccessTokenParam param) {
-        CustomUserDetails userDetails = getUserDetails();
-        Authentication clientAuthentication = generateClientPrincipal(userDetails.getClientId(), param.getSecret());
+        OAuth2ClientAuthenticationToken clientAuthentication = getClientAuthentication();
         return switch (param.getType()) {
             case GrantType.AUTHORIZATION_CODE -> buildAccessTokenByCode(param.getCode(), clientAuthentication);
             case GrantType.REFRESH_TOKEN -> buildAccessTokenByRefresh(param.getCode(), clientAuthentication);
@@ -139,7 +137,7 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
             // 客户端令牌
             return DefaultAuthorization.builder()
                     .user(client.getRegisteredClient().getClientName())
-                    // 将 openid 和 客户端 id 设置为一致用于鉴权时辨别人机接口和机机接口
+                    // 将 openid 和 客户端 id 设置为一致
                     .openId(client.getRegisteredClient().getClientId())
                     .clientId(client.getRegisteredClient().getClientId())
                     .permissions(Set.of())
@@ -186,21 +184,6 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
     }
 
     /**
-     * 获取用户详情
-     * <p>
-     * 这个值需要在拦截器中生成(正常情况下这个值生成失败拦截器不会放行)
-     * <p>
-     * {@link this#generateUserPrincipal(ClientUser)}该方法反过来,从上下文中获取
-     *
-     * @return 用户详情
-     */
-    private CustomUserDetails getUserDetails() {
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        SynaAssert.notNull(usernamePasswordAuthenticationToken, "从用户主体获取失败!");
-        return (CustomUserDetails) usernamePasswordAuthenticationToken.getPrincipal();
-    }
-
-    /**
      * 构建身份验证
      * <p>
      * {@link CustomUserAuthenticationProvider}
@@ -234,23 +217,6 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
      */
     private OAuth2Authorization findByAccessToken(String accessToken) {
         return oAuth2AuthorizationService.findByToken(removeBearerPrefix(accessToken), OAuth2TokenType.ACCESS_TOKEN);
-    }
-
-    /**
-     * 通过客户端id获取客户端
-     *
-     * @param clientId 客户端id
-     * @return 客户端
-     */
-    private RegisteredClient getRegisteredClient(String clientId) {
-        RegisteredClient registeredClient = registeredClientRepository.findByClientId(clientId);
-        if (registeredClient == null) {
-            throw new SynaException("无效的客户端!");
-        }
-        if (!registeredClient.getAuthorizationGrantTypes().contains(AuthorizationGrantType.AUTHORIZATION_CODE)) {
-            throw new SynaException("无效的授权类型!");
-        }
-        return registeredClient;
     }
 
     /**
@@ -456,15 +422,15 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
     }
 
     /**
-     * 从上下文获取用户授权主体
+     * 从上下文获取客户端授权主体
      * <p>
      * 设置主体位置 {@link TokenAuthenticationFilter}
      *
-     * @return 用户授权主体
+     * @return 客户端授权主体
      */
-    private Authentication getUserAuthentication() {
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        SynaAssert.notNull(usernamePasswordAuthenticationToken, "从用户主体获取失败!");
-        return usernamePasswordAuthenticationToken;
+    private OAuth2ClientAuthenticationToken getClientAuthentication() {
+        OAuth2ClientAuthenticationToken oAuth2ClientAuthenticationToken = (OAuth2ClientAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        SynaAssert.notNull(oAuth2ClientAuthenticationToken, "客户端授权主体获取失败!");
+        return oAuth2ClientAuthenticationToken;
     }
 }

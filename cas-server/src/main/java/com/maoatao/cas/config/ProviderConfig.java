@@ -1,6 +1,7 @@
 package com.maoatao.cas.config;
 
 import com.maoatao.cas.core.service.ClientUserService;
+import com.maoatao.cas.security.authorization.CustomClientSecretAuthenticationProvider;
 import com.maoatao.cas.security.authorization.CustomUserAuthenticationProvider;
 import com.maoatao.cas.security.oauth2.auth.provider.CustomAuthorizationCodeAccessTokenProvider;
 import com.maoatao.cas.security.oauth2.auth.provider.CustomAuthorizationCodeProvider;
@@ -73,7 +74,7 @@ public class ProviderConfig {
     @Bean
     public AuthenticationManager authenticationManager(
             CustomUserAuthenticationProvider userAuthenticationProvider,
-            ClientSecretAuthenticationProvider clientAuthenticationProvider,
+            CustomClientSecretAuthenticationProvider clientAuthenticationProvider,
             CustomAuthorizationCodeAccessTokenProvider accessTokenProvider,
             CustomRefreshTokenProvider refreshTokenProvider,
             CustomClientCredentialsTokenProvider clientTokenProvider) {
@@ -82,7 +83,7 @@ public class ProviderConfig {
     }
 
     /**
-     * 用户详细信息身份验证提供程序
+     * 用户信息身份验证提供程序
      * <p>
      * 自定义查询用户,通过用户名称和客户端 id 查询一个用户.提供多客户端同名用户身份验证
      */
@@ -95,9 +96,9 @@ public class ProviderConfig {
      * 客户端身份验证提供程序
      */
     @Bean
-    public ClientSecretAuthenticationProvider clientSecretAuthenticationProvider(RegisteredClientRepository registeredClientRepository,
+    public CustomClientSecretAuthenticationProvider customClientSecretAuthenticationProvider(RegisteredClientRepository registeredClientRepository,
                                                                                  OAuth2AuthorizationService oAuth2AuthorizationService) {
-        return new ClientSecretAuthenticationProvider(registeredClientRepository, oAuth2AuthorizationService);
+        return new CustomClientSecretAuthenticationProvider(registeredClientRepository, oAuth2AuthorizationService);
     }
 
     /**
