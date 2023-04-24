@@ -43,4 +43,9 @@ public class GenerateAccessTokenParam extends BaseParam {
      */
     @Schema(description = "授权码,刷新令牌")
     private String code;
+    /**
+     * 重定向URL
+     */
+    @Schema(description = "重定向URL")
+    private String redirectUrl;
 }

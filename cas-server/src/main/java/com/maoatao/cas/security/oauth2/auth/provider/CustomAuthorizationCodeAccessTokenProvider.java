@@ -3,6 +3,7 @@ package com.maoatao.cas.security.oauth2.auth.provider;
 import com.maoatao.cas.security.service.CustomAuthorizationService;
 import com.maoatao.cas.util.AuthorizationUtils;
 import com.maoatao.cas.util.TokenSettingUtils;
+import com.maoatao.synapse.lang.exception.SynaException;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
@@ -109,7 +110,7 @@ public class CustomAuthorizationCodeAccessTokenProvider implements Authenticatio
 
         if (StringUtils.hasText(authorizationRequest.getRedirectUri()) &&
                 !authorizationRequest.getRedirectUri().equals(authorizationCodeAuthentication.getRedirectUri())) {
-            throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_GRANT);
+            throw new SynaException("无效的重定向地址!");
         }
 
         if (!authorizationCode.isActive()) {

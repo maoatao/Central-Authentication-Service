@@ -44,7 +44,6 @@ public class GenerateAuthorizationCodeParam extends BaseParam {
     /**
      * 授权范围
      */
-    @NotNull(message = "授权范围不能为空")
     @Schema(description = "授权范围")
     private Map<String, Set<String>> scopes;
     /**

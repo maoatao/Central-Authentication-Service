@@ -19,7 +19,6 @@ import com.maoatao.daedalus.web.util.ServletUtils;
 import com.maoatao.synapse.lang.exception.SynaException;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import com.maoatao.synapse.lang.util.SynaDates;
-import com.maoatao.synapse.lang.util.SynaSafes;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -112,7 +111,7 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
     public CasAccessToken generateAccessToken(GenerateAccessTokenParam param) {
         OAuth2ClientAuthenticationToken clientAuthentication = getClientAuthentication();
         return switch (param.getType()) {
-            case GrantType.AUTHORIZATION_CODE -> buildAccessTokenByCode(param.getCode(), clientAuthentication);
+            case GrantType.AUTHORIZATION_CODE -> buildAccessTokenByCode(param, clientAuthentication);
             case GrantType.REFRESH_TOKEN -> buildAccessTokenByRefresh(param.getCode(), clientAuthentication);
             case GrantType.CLIENT_CREDENTIALS -> buildAccessTokenByClient(clientAuthentication);
             default -> throw new UnsupportedOperationException("不支持的授权类型!");
@@ -376,12 +375,12 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
      * <p>
      * 构建授权码认证源码{@link OAuth2AuthorizationCodeAuthenticationConverter#convert}
      *
-     * @param code   授权码
+     * @param param  授权码
      * @param client 客户端身份验证
      * @return 访问令牌
      */
-    private CasAccessToken buildAccessTokenByCode(String code, OAuth2ClientAuthenticationToken client) {
-        return buildAccessToken(new OAuth2AuthorizationCodeAuthenticationToken(code, client, null, null));
+    private CasAccessToken buildAccessTokenByCode(GenerateAccessTokenParam param, OAuth2ClientAuthenticationToken client) {
+        return buildAccessToken(new OAuth2AuthorizationCodeAuthenticationToken(param.getCode(), client, param.getRedirectUrl(), client.getAdditionalParameters()));
     }
 
     /**
@@ -394,7 +393,7 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
      * @return 访问令牌
      */
     private CasAccessToken buildAccessTokenByRefresh(String refreshToken, OAuth2ClientAuthenticationToken client) {
-        return buildAccessToken(new OAuth2RefreshTokenAuthenticationToken(refreshToken, client, null, null));
+        return buildAccessToken(new OAuth2RefreshTokenAuthenticationToken(refreshToken, client, null, client.getAdditionalParameters()));
     }
 
     /**
@@ -406,7 +405,7 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
      * @return 访问令牌
      */
     private CasAccessToken buildAccessTokenByClient(OAuth2ClientAuthenticationToken client) {
-        return buildAccessToken(new OAuth2ClientCredentialsAuthenticationToken(client, null, null));
+        return buildAccessToken(new OAuth2ClientCredentialsAuthenticationToken(client, null, client.getAdditionalParameters()));
     }
 
     /**
