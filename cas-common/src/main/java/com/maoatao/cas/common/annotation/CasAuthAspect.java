@@ -62,8 +62,7 @@ public class CasAuthAspect {
         Set<String> methodAuths = getAnnotationValues(methodAnnotation);
         if (methodAnnotation != null) {
             if (IterUtil.isNotEmpty(methodAuths)) {
-                isAuthentication.set(anyAuthMatch(methodAuths, SynaSafes.of(OperatorContextHolder.getContext().getPermissions())) ||
-                        anyAuthMatch(methodAuths, SynaSafes.of(OperatorContextHolder.getContext().getRoles())));
+                isAuthentication.set(anyAuthMatch(methodAuths, SynaSafes.of(OperatorContextHolder.getContext().getPermissions())));
                 isHci.set(true);
             } else {
                 // 有注解,没权限值 就是机机接口
@@ -77,8 +76,7 @@ public class CasAuthAspect {
         Set<String> classAuths = getAnnotationValues(classAnnotation);
         if (!isAuthentication.get() && classAnnotation != null) {
             if (IterUtil.isNotEmpty(classAuths)) {
-                isAuthentication.set(anyAuthMatch(classAuths, SynaSafes.of(OperatorContextHolder.getContext().getPermissions())) ||
-                        anyAuthMatch(classAuths, SynaSafes.of(OperatorContextHolder.getContext().getRoles())));
+                isAuthentication.set(anyAuthMatch(classAuths, SynaSafes.of(OperatorContextHolder.getContext().getPermissions())));
                 isHci.set(true);
             } else {
                 isHci.set(false);

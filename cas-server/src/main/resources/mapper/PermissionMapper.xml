@@ -14,7 +14,7 @@
         <result property="deleted" column="deleted"/>
     </resultMap>
 
-    <select id="getPermissionByUser" resultMap="permissionMap">
+    <select id="listByClientUser" resultMap="permissionMap">
         SELECT c.`name`, c.`client_id`
         FROM `t_cas_client_user_role` a,
              `t_cas_role_permission` b,
@@ -23,5 +23,17 @@
           AND b.`permission_id` = c.`id`
           AND c.`deleted` = b'0'
           AND a.`client_user_id` = #{userId};
+    </select>
+
+    <select id="listByClientScopes" resultMap="permissionMap">
+        SELECT b.`name`, b.`client_id`
+        FROM `t_cas_client_scope_permission` a,
+        `t_cas_permission` b
+        WHERE a.`permission_id` = b.`id`
+        AND b.`deleted` = b'0'
+        AND a.`scope_id` in
+        <foreach collection="scopes" item="scope" index="index" open="(" close=")" separator=",">
+            #{scope}
+        </foreach>
     </select>
 </mapper>

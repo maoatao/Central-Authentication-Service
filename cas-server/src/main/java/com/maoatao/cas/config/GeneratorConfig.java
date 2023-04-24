@@ -104,7 +104,6 @@ public class GeneratorConfig {
                         if (authentication.getPrincipal() instanceof CustomUserDetails customUserDetails) {
                             claims.claim("openId", customUserDetails.getOpenId());
                             claims.claim("permissions", customUserDetails.getPermissions());
-                            claims.claim("roles", customUserDetails.getRoles());
                             claims.claim("clientCredentials", false);
                         }
                     }

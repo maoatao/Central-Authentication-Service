@@ -67,7 +67,7 @@ public class CasServerConfig {
      */
     @Bean
     public CasServerSettings casServerSettings() {
-        return CasServerSettings.builder().build();
+        return CasServerSettings.builder().appKey("test-client").build();
     }
 }
 

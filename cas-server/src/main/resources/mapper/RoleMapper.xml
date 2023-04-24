@@ -14,7 +14,7 @@
         <result property="deleted" column="deleted"/>
     </resultMap>
 
-    <select id="getRoleByUser" resultMap="roleMap">
+    <select id="listByClientUser" resultMap="roleMap">
         SELECT b.`name`, b.`client_id`
         FROM `t_cas_client_user_role` a,
              `t_cas_role` b

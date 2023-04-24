@@ -1,5 +1,6 @@
 package com.maoatao.cas.security.filter;
 
+import com.maoatao.cas.security.bean.ClientDetails;
 import com.maoatao.synapse.lang.util.SynaSafes;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -38,7 +39,7 @@ public class ClientUserAuthenticationFilter extends UsernamePasswordAuthenticati
         String clientId = SynaSafes.of(obtainClientId(request));
         UsernamePasswordAuthenticationToken authRequest = UsernamePasswordAuthenticationToken.unauthenticated(username,
                 password);
-        authRequest.setDetails(clientId);
+        authRequest.setDetails(ClientDetails.builder().clientId(clientId).build());
         return this.getAuthenticationManager().authenticate(authRequest);
     }
 

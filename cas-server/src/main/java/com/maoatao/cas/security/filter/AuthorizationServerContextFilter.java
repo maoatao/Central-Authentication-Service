@@ -42,7 +42,7 @@ public class AuthorizationServerContextFilter extends GenericFilterBean {
             throws ServletException, IOException {
         // TODO: 2023-03-09 16:35:16 特定请求执行
         try {
-            AuthorizationServerContext authorizationServerContext = FilterUtils.buildAuthorizationServerContext(authorizationServerSettings, request);
+            AuthorizationServerContext authorizationServerContext = FilterUtils.buildAuthorizationServerContext(this.authorizationServerSettings, request);
             AuthorizationServerContextHolder.setContext(authorizationServerContext);
             filterChain.doFilter(request, response);
         } finally {

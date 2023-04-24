@@ -48,7 +48,7 @@ public class RoleServiceImpl extends DaedalusServiceImpl<RoleMapper, RoleEntity>
     }
 
     @Override
-    public List<RoleEntity> listByUser(Long userId) {
-        return getBaseMapper().getRoleByUser(userId);
+    public List<RoleEntity> listByClientUser(Long userId) {
+        return getBaseMapper().listByClientUser(userId);
     }
 }

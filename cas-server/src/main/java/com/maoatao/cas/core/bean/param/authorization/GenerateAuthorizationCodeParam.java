@@ -3,6 +3,9 @@ package com.maoatao.cas.core.bean.param.authorization;
 import com.maoatao.synapse.core.bean.base.BaseParam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.security.oauth2.core.endpoint.PkceParameterNames;
@@ -43,7 +46,7 @@ public class GenerateAuthorizationCodeParam extends BaseParam {
      */
     @NotNull(message = "授权范围不能为空")
     @Schema(description = "授权范围")
-    private Set<String> scopes;
+    private Map<String, Set<String>> scopes;
     /**
      * PKCE协议额外参数:校验方法
      * <p>
@@ -64,5 +67,15 @@ public class GenerateAuthorizationCodeParam extends BaseParam {
         additionalParameters.put(PkceParameterNames.CODE_CHALLENGE_METHOD, getCodeChallengeMethod());
         additionalParameters.put(PkceParameterNames.CODE_CHALLENGE, getCodeChallenge());
         return additionalParameters;
+    }
+
+    public Set<String> getClientScopes() {
+        if (scopes == null) {
+            return new HashSet<>();
+        }
+        return scopes.entrySet().stream()
+                .map(entry -> entry.getValue().stream().map(scope -> scope.concat(" [").concat(entry.getKey()).concat("]")).toList())
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
     }
 }

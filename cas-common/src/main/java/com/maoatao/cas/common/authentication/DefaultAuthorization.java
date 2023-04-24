@@ -3,6 +3,7 @@ package com.maoatao.cas.common.authentication;
 import com.maoatao.synapse.core.bean.base.BaseBean;
 import java.io.Serial;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,17 +34,9 @@ public class DefaultAuthorization extends BaseBean implements CasAuthorization {
      */
     private String openId;
     /**
-     * 客户端 ID
-     */
-    private String clientId;
-    /**
-     * 角色集
-     */
-    private Set<String> roles;
-    /**
      * 权限集
      */
-    private Set<String> permissions;
+    private Map<String, Set<String>> permissions;
     /**
      * 过期时间
      */

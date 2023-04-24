@@ -2,10 +2,12 @@ package com.maoatao.cas.openapi.converter;
 
 import cn.hutool.jwt.JWTUtil;
 import com.maoatao.cas.common.authentication.CasJwt;
+import com.maoatao.cas.openapi.authentication.CasClientSettings;
 import com.maoatao.cas.openapi.context.JwtOperatorContext;
 import com.maoatao.daedalus.core.context.DaedalusOperatorContext;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import com.maoatao.synapse.lang.util.SynaDates;
+import com.maoatao.synapse.lang.util.SynaSafes;
 
 /**
  * Jwt 上下文转换者
@@ -14,6 +16,14 @@ import com.maoatao.synapse.lang.util.SynaDates;
  * @date 2023-03-26 13:31:27
  */
 public class JwtOperatorContextConverter implements ContextConverter {
+
+    private final String appKey;
+
+    public JwtOperatorContextConverter(String appKey) {
+        SynaAssert.notNull(appKey, "appKey cannot be null");
+        this.appKey = appKey;
+    }
+
     @Override
     public DaedalusOperatorContext convert(String token) {
         SynaAssert.notNull(token, "token为空,不能转换为Jwt上下文!");
@@ -24,8 +34,7 @@ public class JwtOperatorContextConverter implements ContextConverter {
                     .operatorId(jwt.getOpenId())
                     .operatorName(jwt.getSub())
                     .clientId(jwt.getAud())
-                    .roles(jwt.getRoles())
-                    .permissions(jwt.getPermissions())
+                    .permissions(SynaSafes.of(SynaSafes.of(jwt.getPermissions()).get(this.appKey)))
                     .expiresAt(SynaDates.of(1000L * Long.parseLong(jwt.getExp())))
                     .issuedAt(SynaDates.of(1000L * Long.parseLong(jwt.getIat())))
                     .issuer(jwt.getIss())

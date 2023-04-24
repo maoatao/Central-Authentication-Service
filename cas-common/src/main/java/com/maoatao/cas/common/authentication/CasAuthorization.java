@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.maoatao.synapse.lang.util.SynaDates;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -29,25 +30,11 @@ public interface CasAuthorization extends Serializable {
     String getOpenId();
 
     /**
-     * 获取客户端 ID
-     *
-     * @return 客户端 ID
-     */
-    String getClientId();
-
-    /**
-     * 获取角色列表
-     *
-     * @return 角色列表
-     */
-    Set<String> getRoles();
-
-    /**
      * 获取权限列表
      *
-     * @return 权限列表
+     * @return 权限集 客户端id -> 权限集合
      */
-    Set<String> getPermissions();
+    Map<String, Set<String>> getPermissions();
 
     /**
      * 获取过期时间

@@ -2,6 +2,7 @@ package com.maoatao.cas.security.authorization;
 
 import com.maoatao.cas.common.keygen.CasStringKeyGenerator;
 import com.maoatao.cas.common.keygen.UUIDGenerator;
+import com.maoatao.synapse.lang.util.SynaAssert;
 import java.util.Optional;
 import java.util.function.Supplier;
 import lombok.Getter;
@@ -16,6 +17,10 @@ import lombok.Getter;
 public class CasServerSettings {
 
     /**
+     * app key (app的客户端id)
+     */
+    private final String appKey;
+    /**
      * 访问令牌 令牌值生成器
      */
     private final CasStringKeyGenerator accessTokenGenerator;
@@ -28,9 +33,11 @@ public class CasServerSettings {
      */
     private final CasStringKeyGenerator authorizationCodeGenerator;
 
-    public CasServerSettings(CasStringKeyGenerator accessTokenGenerator,
+    public CasServerSettings(String appKey,
+                             CasStringKeyGenerator accessTokenGenerator,
                              CasStringKeyGenerator refreshTokenGenerator,
                              CasStringKeyGenerator authorizationCodeGenerator) {
+        this.appKey = appKey;
         this.accessTokenGenerator = accessTokenGenerator;
         this.refreshTokenGenerator = refreshTokenGenerator;
         this.authorizationCodeGenerator = authorizationCodeGenerator;
@@ -42,6 +49,8 @@ public class CasServerSettings {
 
     public static class CasServerSettingsBuilder {
 
+        private String appKey;
+
         private Supplier<CasStringKeyGenerator> accessTokenGenerator;
 
         private Supplier<CasStringKeyGenerator> refreshTokenGenerator;
@@ -49,6 +58,11 @@ public class CasServerSettings {
         private Supplier<CasStringKeyGenerator> authorizationCodeGenerator;
 
         private CasServerSettingsBuilder() {
+        }
+
+        public CasServerSettingsBuilder appKey(String appKey) {
+            this.appKey = appKey;
+            return this;
         }
 
         public CasServerSettingsBuilder accessTokenGenerator(Supplier<CasStringKeyGenerator> accessTokenGenerator) {
@@ -67,8 +81,10 @@ public class CasServerSettings {
         }
 
         public CasServerSettings build() {
+            SynaAssert.notEmpty(this.appKey, "App Key 不能为空!");
             // 默认 UUID 风格
             return new CasServerSettings(
+                    this.appKey,
                     Optional.ofNullable(this.accessTokenGenerator).orElse(UUIDGenerator::new).get(),
                     Optional.ofNullable(this.refreshTokenGenerator).orElse(UUIDGenerator::new).get(),
                     Optional.ofNullable(this.authorizationCodeGenerator).orElse(UUIDGenerator::new).get()

@@ -20,5 +20,5 @@ public interface RoleMapper extends BaseMapper<RoleEntity> {
      * @param userId 用户ID
      * @return 角色列表
      */
-    List<RoleEntity> getRoleByUser(Long userId);
+    List<RoleEntity> listByClientUser(Long userId);
 }

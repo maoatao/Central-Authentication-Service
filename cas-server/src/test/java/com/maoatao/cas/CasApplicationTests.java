@@ -29,6 +29,7 @@ import com.maoatao.cas.util.IdUtils;
 import com.maoatao.synapse.lang.exception.SynaException;
 import com.maoatao.synapse.lang.util.SynaStrings;
 import java.util.List;
+import java.util.Map;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
@@ -355,7 +356,7 @@ class CasApplicationTests {
         generateAuthorizationCodeParam.setUsername(TEST_USER_NAME);
         generateAuthorizationCodeParam.setPassword(TEST_USER_PASSWORD);
         // scopes需要在客户端的范围内
-        generateAuthorizationCodeParam.setScopes(TEST_CLIENT_SCOPES);
+        generateAuthorizationCodeParam.setScopes(Map.of(TEST_CLIENT_ID, TEST_CLIENT_SCOPES));
         generateAuthorizationCodeParam.setCodeChallengeMethod("S256");
         generateAuthorizationCodeParam.setCodeChallenge("3vrxycun-VbyenvO5GiFOaOBazUBX_xcFElnqbl-TXA");
         // 非OAuth2原获取授权码接口,原版请求成功后跳转页面 get http://localhost:8080/oauth2/authorize

@@ -3,6 +3,7 @@ package com.maoatao.cas.security.oauth2.auth.provider;
 import com.maoatao.cas.security.service.CustomAuthorizationService;
 import com.maoatao.cas.util.AuthorizationUtils;
 import com.maoatao.cas.util.TokenSettingUtils;
+import com.maoatao.synapse.lang.util.SynaAssert;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -90,9 +91,7 @@ public class CustomAuthorizationCodeAccessTokenProvider implements Authenticatio
 
         OAuth2Authorization authorization = this.authorizationService.findByToken(
                 authorizationCodeAuthentication.getCode(), AUTHORIZATION_CODE_TOKEN_TYPE);
-        if (authorization == null) {
-            throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_GRANT);
-        }
+        SynaAssert.notNull(authorization, "授权码不存在!");
         OAuth2Authorization.Token<OAuth2AuthorizationCode> authorizationCode =
                 authorization.getToken(OAuth2AuthorizationCode.class);
 

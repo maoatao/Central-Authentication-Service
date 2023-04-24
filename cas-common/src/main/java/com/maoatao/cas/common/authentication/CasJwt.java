@@ -2,6 +2,8 @@ package com.maoatao.cas.common.authentication;
 
 import com.maoatao.synapse.core.bean.base.BaseBean;
 import java.io.Serial;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import lombok.Builder;
 import lombok.Data;
@@ -56,11 +58,7 @@ public class CasJwt extends BaseBean {
     /**
      * 权限
      */
-    private Set<String> permissions;
-    /**
-     * 角色
-     */
-    private Set<String> roles;
+    private Map<String, Set<String>> permissions;
     /**
      * 客户端凭据
      */

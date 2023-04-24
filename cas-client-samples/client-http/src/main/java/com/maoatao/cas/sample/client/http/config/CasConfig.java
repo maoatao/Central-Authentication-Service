@@ -16,9 +16,10 @@ import org.springframework.context.annotation.Configuration;
 public class CasConfig {
 
     @Bean
-    public CasClientSettings casClientSettings(CasAuthorizationService casAuthorizationService) {
+    public CasClientSettings casClientSettings(CasClientSettings casClientSettings,
+                                               CasAuthorizationService casAuthorizationService) {
         return CasClientSettings.builder()
-                .contextConverter(new DefaultOperatorContextConverter(casAuthorizationService))
+                .contextConverter(new DefaultOperatorContextConverter(casClientSettings, casAuthorizationService))
                 .build();
     }
 }

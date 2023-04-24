@@ -36,10 +36,6 @@ public class JwtOperatorContext extends BaseBean implements DaedalusOperatorCont
      */
     private final String clientId;
     /**
-     * 角色集
-     */
-    private final Set<String> roles;
-    /**
      * 权限集
      */
     private final Set<String> permissions;

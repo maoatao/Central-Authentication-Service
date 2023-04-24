@@ -2,6 +2,7 @@ package com.maoatao.cas.common.authentication;
 
 import com.maoatao.synapse.core.bean.base.BaseBean;
 import java.io.Serial;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,7 +26,7 @@ public class CasPermission extends BaseBean {
     /**
      * 权限名
      */
-    private String permission;
+    private List<String> permissions;
     /**
      * 客户端 ID
      */

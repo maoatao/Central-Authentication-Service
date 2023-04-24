@@ -1,6 +1,7 @@
 package com.maoatao.cas.security.filter;
 
 import cn.hutool.core.util.StrUtil;
+import com.maoatao.cas.security.authorization.CasServerSettings;
 import com.maoatao.cas.security.bean.BasicAuthentication;
 import com.maoatao.cas.security.service.CasAuthorizationService;
 import com.maoatao.cas.util.FilterUtils;
@@ -54,18 +55,23 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
             .antMatchers(HttpMethod.POST, "/code", "/token")
             .build();
 
+    private final CasServerSettings casServerSettings;
+
     private final OAuth2AuthorizationService oAuth2AuthorizationService;
 
     private final CasAuthorizationService casAuthorizationService;
 
     private final HandlerExceptionResolver handlerExceptionResolver;
 
-    public TokenAuthenticationFilter(OAuth2AuthorizationService oAuth2AuthorizationService,
+    public TokenAuthenticationFilter(CasServerSettings casServerSettings,
+                                     OAuth2AuthorizationService oAuth2AuthorizationService,
                                      CasAuthorizationService casAuthorizationService,
                                      HandlerExceptionResolver handlerExceptionResolver) {
+        SynaAssert.notNull(casServerSettings, "casServerSettings cannot be null");
         SynaAssert.notNull(oAuth2AuthorizationService, "oAuth2AuthorizationService cannot be null");
         SynaAssert.notNull(casAuthorizationService, "casAuthorizationService cannot be null");
         SynaAssert.notNull(handlerExceptionResolver, "handlerExceptionResolver cannot be null");
+        this.casServerSettings = casServerSettings;
         this.oAuth2AuthorizationService = oAuth2AuthorizationService;
         this.casAuthorizationService = casAuthorizationService;
         this.handlerExceptionResolver = handlerExceptionResolver;
@@ -83,7 +89,7 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
             } catch (SynaException e) {
                 // 拦截异常,屏蔽异常信息,这里统一返回未授权响应
                 log.error("鉴权拦截异常", e);
-                handlerExceptionResolver.resolveException(request, response, null, new SynaException(HttpResponseStatus.UNAUTHORIZED));
+                this.handlerExceptionResolver.resolveException(request, response, null, new SynaException(HttpResponseStatus.UNAUTHORIZED));
                 return;
             }
             filterChain.doFilter(request, response);
@@ -114,14 +120,14 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
             return;
         }
         // 根据 token 生成已授权的主体
-        Optional.ofNullable(casAuthorizationService.generateClientPrincipal(basicAuthentication.username(), basicAuthentication.password()))
+        Optional.ofNullable(this.casAuthorizationService.generateClientPrincipal(basicAuthentication.username(), basicAuthentication.password()))
                 .ifPresent(principal -> SecurityContextHolder.getContext().setAuthentication(principal));
     }
 
     private void doBearerTokenFilter(String token) {
         // 去掉令牌前缀
         token = token.replace(TOKEM_TYPE_BEARER, SynaStrings.EMPTY).trim();
-        OAuth2Authorization authorization = oAuth2AuthorizationService.findByToken(token, OAuth2TokenType.ACCESS_TOKEN);
+        OAuth2Authorization authorization = this.oAuth2AuthorizationService.findByToken(token, OAuth2TokenType.ACCESS_TOKEN);
         if (authorization == null || authorization.getAccessToken() == null || !authorization.getAccessToken().isActive()) {
             return;
         }
@@ -137,13 +143,11 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
     }
 
     private void setOperatorContext(String token) {
-        Optional.ofNullable(casAuthorizationService.getAuthorizationInfo(token))
+        Optional.ofNullable(this.casAuthorizationService.getAuthorizationInfo(token))
                 .ifPresent(authorization -> OperatorContextHolder.setContext(DefalutOperatorContext.builder()
                         .operatorId(authorization.getOpenId())
                         .operatorName(authorization.getUser())
-                        .clientId(authorization.getClientId())
-                        .roles(SynaSafes.of(authorization.getRoles()))
-                        .permissions(SynaSafes.of(authorization.getPermissions()))
+                        .permissions(SynaSafes.of(SynaSafes.of(authorization.getPermissions()).get(this.casServerSettings.getAppKey())))
                         .expiresAt(authorization.getExpiresAt())
                         .clientCredentials(authorization.isClientCredentials())
                         .build()));

@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
 public @interface CasAuth {
 
     /**
-     * 角色或权限,默认为空(机机接口)
+     * 权限名称,默认为空(机机接口)
      * <p>
      * 人机接口必填
      */

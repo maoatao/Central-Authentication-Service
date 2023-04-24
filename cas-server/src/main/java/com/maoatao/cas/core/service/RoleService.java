@@ -47,5 +47,5 @@ public interface RoleService extends DaedalusService<RoleEntity> {
      * @param userId 用户ID
      * @return 角色列表
      */
-    List<RoleEntity> listByUser(Long userId);
+    List<RoleEntity> listByClientUser(Long userId);
 }

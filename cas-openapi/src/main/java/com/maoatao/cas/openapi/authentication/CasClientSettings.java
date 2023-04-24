@@ -4,6 +4,7 @@ import cn.hutool.core.collection.IterUtil;
 import com.maoatao.cas.openapi.converter.ContextConverter;
 import com.maoatao.cas.openapi.converter.JwtOperatorContextConverter;
 import com.maoatao.cas.openapi.matcher.CasRequestMatcher;
+import com.maoatao.synapse.lang.util.SynaAssert;
 import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
@@ -18,6 +19,10 @@ import lombok.Getter;
 public class CasClientSettings {
 
     /**
+     * app key (app的客户端id)
+     */
+    private final String appKey;
+    /**
      * 上下文转换者
      */
     private final ContextConverter contextConverter;
@@ -27,7 +32,8 @@ public class CasClientSettings {
      */
     private final List<CasRequestMatcher> permitMatchers;
 
-    private CasClientSettings(ContextConverter contextConverter, List<CasRequestMatcher> permitMatchers) {
+    private CasClientSettings(String appKey, ContextConverter contextConverter, List<CasRequestMatcher> permitMatchers) {
+        this.appKey = appKey;
         this.contextConverter = contextConverter;
         this.permitMatchers = permitMatchers;
     }
@@ -37,10 +43,16 @@ public class CasClientSettings {
     }
 
     public static class CasClientSettingsBuilder {
+        private String appKey;
         private ContextConverter contextConverter;
         private List<CasRequestMatcher> permitMatchers;
 
         private CasClientSettingsBuilder() {
+        }
+
+        public CasClientSettingsBuilder appKey(String appKey) {
+            this.appKey = appKey;
+            return this;
         }
 
         public CasClientSettingsBuilder contextConverter(ContextConverter contextConverter) {
@@ -54,11 +66,12 @@ public class CasClientSettings {
         }
 
         public CasClientSettings build() {
+            SynaAssert.notEmpty(this.appKey, "App Key 不能为空!");
             // 默认 jwt 转换者,无放行请求
             return new CasClientSettings(
-                    Objects.requireNonNullElseGet(this.contextConverter, JwtOperatorContextConverter::new),
-                    IterUtil.isEmpty(this.permitMatchers) ? CasRequestMatcher.builder().build() : this.permitMatchers
-            );
+                    this.appKey,
+                    Objects.requireNonNullElse(this.contextConverter, new JwtOperatorContextConverter(this.appKey)),
+                    IterUtil.isEmpty(this.permitMatchers) ? CasRequestMatcher.builder().build() : this.permitMatchers);
         }
     }
 }

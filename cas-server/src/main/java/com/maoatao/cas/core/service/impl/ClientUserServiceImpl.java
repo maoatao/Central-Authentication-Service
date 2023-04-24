@@ -2,9 +2,11 @@ package com.maoatao.cas.core.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.IterUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.maoatao.cas.core.bean.entity.ClientScopeEntity;
 import com.maoatao.cas.core.bean.param.clientuser.ClientUserQueryParam;
 import com.maoatao.cas.core.bean.param.clientuser.ClientUserSaveParam;
 import com.maoatao.cas.core.bean.param.clientuser.ClientUserUpdateParam;
@@ -13,17 +15,21 @@ import com.maoatao.cas.core.bean.entity.PermissionEntity;
 import com.maoatao.cas.core.bean.entity.RoleEntity;
 import com.maoatao.cas.core.bean.entity.ClientUserEntity;
 import com.maoatao.cas.core.mapper.ClientUserMapper;
+import com.maoatao.cas.core.service.ClientScopeService;
 import com.maoatao.cas.core.service.PermissionService;
 import com.maoatao.cas.core.service.RoleService;
 import com.maoatao.cas.core.service.ClientUserRoleService;
 import com.maoatao.cas.core.service.ClientUserService;
 import com.maoatao.cas.core.service.UserService;
+import com.maoatao.cas.security.bean.ClientDetails;
 import com.maoatao.cas.security.bean.CustomUserDetails;
 import com.maoatao.daedalus.data.service.impl.DaedalusServiceImpl;
 import com.maoatao.daedalus.data.util.PageUtils;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import com.maoatao.synapse.lang.util.SynaStrings;
+import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -64,6 +70,9 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private ClientScopeService clientScopeService;
+
     @Override
     public Page<ClientUserVO> page(ClientUserQueryParam param) {
         ClientUserEntity entity = BeanUtil.copyProperties(param, ClientUserEntity.class);
@@ -77,12 +86,12 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
     }
 
     @Override
-    public UserDetails getUserDetails(String username, String clientId) throws UsernameNotFoundException {
-        ClientUserEntity existed = getByNameAndClient(username, clientId);
+    public UserDetails getUserDetails(String username, ClientDetails clientDetails) throws UsernameNotFoundException {
+        ClientUserEntity existed = getByNameAndClient(username, clientDetails.getClientId());
         if (existed == null) {
             throw new UsernameNotFoundException(SynaStrings.format("客户端用户 {} 不存在!", username));
         }
-        return buildUserDetails(existed);
+        return buildUserDetails(existed, clientDetails.getScopes());
     }
 
     @Override
@@ -200,9 +209,8 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
         }).toList();
     }
 
-    private UserDetails buildUserDetails(ClientUserEntity clientUserEntity) {
+    private UserDetails buildUserDetails(ClientUserEntity clientUserEntity, Map<String, Set<String>> scopes) {
         CustomUserDetails.CustomUserDetailsBuilder customUserDetailsBuilder = CustomUserDetails.builder()
-                .clientId(clientUserEntity.getClientId())
                 .username(clientUserEntity.getLoginName())
                 .password(clientUserEntity.getPassword())
                 .enabled(true)
@@ -211,17 +219,26 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
                 .credentialsNonExpired(true);
         Optional.ofNullable(userService.getById(clientUserEntity.getUserId()))
                 .ifPresent(userEntity -> customUserDetailsBuilder.openId(userEntity.getOpenId()));
-        List<PermissionEntity> permissionEntities = permissionService.listByUser(clientUserEntity.getId());
+        if (MapUtil.isEmpty(scopes)) {
+            return customUserDetailsBuilder.build();
+        }
+        Set<String> scopeNames = scopes.values().stream().flatMap(Collection::stream).collect(Collectors.toSet());
+        Set<String> clientIds = scopes.keySet();
+        // 按作用域名称查找所有客户端的作用域
+        List<ClientScopeEntity> clientScopeEntities = clientScopeService.list(Wrappers.<ClientScopeEntity>lambdaQuery().in(ClientScopeEntity::getName, scopeNames));
+        // 筛选指定的客户端作用域
+        List<Long> scopeIds = clientScopeEntities.stream()
+                .filter(o -> clientIds.contains(o.getClientId()))
+                .map(ClientScopeEntity::getId)
+                .distinct().toList();
+        // 查询作用域权限
+        List<PermissionEntity> permissionEntities = permissionService.listByClientScopes(scopeIds);
         if (IterUtil.isNotEmpty(permissionEntities)) {
             customUserDetailsBuilder.permissions(permissionEntities.stream()
-                    .map(PermissionEntity::getName)
-                    .collect(Collectors.toSet()));
-        }
-        List<RoleEntity> roleEntities = roleService.listByUser(clientUserEntity.getId());
-        if (IterUtil.isNotEmpty(roleEntities)) {
-            customUserDetailsBuilder.roles(roleEntities.stream()
-                    .map(RoleEntity::getName)
-                    .collect(Collectors.toSet()));
+                    .collect(Collectors.groupingBy(PermissionEntity::getClientId, Collectors.mapping(PermissionEntity::getName, Collectors.toSet())))
+            );
+        } else {
+            customUserDetailsBuilder.permissions(Map.of());
         }
         return customUserDetailsBuilder.build();
     }

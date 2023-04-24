@@ -10,6 +10,7 @@ import com.maoatao.cas.core.mapper.PermissionMapper;
 import com.maoatao.cas.core.service.PermissionService;
 import com.maoatao.daedalus.data.service.impl.DaedalusServiceImpl;
 import com.maoatao.daedalus.data.util.PageUtils;
+import com.maoatao.synapse.lang.util.SynaAssert;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,12 +32,18 @@ public class PermissionServiceImpl extends DaedalusServiceImpl<PermissionMapper,
     }
 
     @Override
-    public PermissionVO details(Long id){
+    public PermissionVO details(Long id) {
         return BeanUtil.toBean(super.getById(id), PermissionVO.class);
     }
 
     @Override
-    public List<PermissionEntity> listByUser(Long userId) {
-        return getBaseMapper().getPermissionByUser(userId);
+    public List<PermissionEntity> listByClientUser(Long userId) {
+        return getBaseMapper().listByClientUser(userId);
+    }
+
+    @Override
+    public List<PermissionEntity> listByClientScopes(List<Long> scopes) {
+        SynaAssert.notEmpty(scopes, "scopes 不能为空!");
+        return getBaseMapper().listByClientScopes(scopes);
     }
 }

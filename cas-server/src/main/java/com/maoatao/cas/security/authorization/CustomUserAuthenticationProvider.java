@@ -1,7 +1,7 @@
 package com.maoatao.cas.security.authorization;
 
 import com.maoatao.cas.core.service.ClientUserService;
-import com.maoatao.synapse.lang.util.SynaStrings;
+import com.maoatao.cas.security.bean.ClientDetails;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,8 +14,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.Assert;
-
-import java.util.Optional;
 
 /**
  * 自定义用户详细信息身份验证提供程序
@@ -83,10 +81,10 @@ public class CustomUserAuthenticationProvider extends AbstractUserDetailsAuthent
             throws AuthenticationException {
         prepareTimingAttackProtection();
         try {
-            // 上游构建 AuthorizationService generatePrincipal 时, details 设定为 clientId
+            // 上游构建 AuthorizationService generateUserPrincipal 时, details 设定为 clientDetails
             // 通过用户名和客户端 id 查询一个用户
-            String clientId = Optional.ofNullable(authentication.getDetails()).orElse(SynaStrings.EMPTY).toString();
-            UserDetails loadedUser = this.getClientUserService().getUserDetails(username, clientId);
+            ClientDetails clientDetails = (ClientDetails) authentication.getDetails();
+            UserDetails loadedUser = this.getClientUserService().getUserDetails(username, clientDetails);
             if (loadedUser == null) {
                 throw new InternalAuthenticationServiceException(
                         "clientUserService returned null, which is an interface contract violation");

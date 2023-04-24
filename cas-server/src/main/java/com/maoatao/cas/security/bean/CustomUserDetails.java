@@ -1,7 +1,7 @@
 package com.maoatao.cas.security.bean;
 
 import com.maoatao.cas.security.authorization.CustomUserAuthenticationProvider;
-import java.util.stream.Collectors;
+import java.util.Map;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -36,13 +36,9 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
 
     private String password;
 
-    private final String clientId;
-
     private final String username;
 
-    private final Set<String> roles;
-
-    private final Set<String> permissions;
+    private final Map<String, Set<String>> permissions;
 
     private final boolean accountNonExpired;
 
@@ -54,7 +50,8 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
 
     @Override
     public Collection<GrantedAuthority> getAuthorities() {
-        return this.roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+        // return this.permissions.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+        return null;
     }
 
     @Override

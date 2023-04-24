@@ -4,8 +4,11 @@ import com.maoatao.cas.common.authentication.CasAccessToken;
 import com.maoatao.cas.common.authentication.CasAuthorization;
 import com.maoatao.cas.common.authentication.DefaultAccessToken;
 import com.maoatao.cas.common.authentication.DefaultAuthorization;
+import com.maoatao.cas.core.bean.entity.ClientScopeEntity;
 import com.maoatao.cas.core.bean.param.accesstoken.GenerateAccessTokenParam;
+import com.maoatao.cas.core.service.ClientScopeService;
 import com.maoatao.cas.security.authorization.CustomUserAuthenticationProvider;
+import com.maoatao.cas.security.bean.ClientDetails;
 import com.maoatao.cas.security.constant.GrantType;
 import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.security.bean.CustomUserDetails;
@@ -16,6 +19,10 @@ import com.maoatao.daedalus.web.util.ServletUtils;
 import com.maoatao.synapse.lang.exception.SynaException;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import com.maoatao.synapse.lang.util.SynaDates;
+import com.maoatao.synapse.lang.util.SynaSafes;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,14 +85,18 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
     @Autowired
     private OAuth2TokenGenerator<OAuth2Token> tokenGenerator;
 
+    @Autowired
+    private ClientScopeService clientScopeService;
+
     @Override
     public String generateAuthorizationCode(GenerateAuthorizationCodeParam param) {
         OAuth2ClientAuthenticationToken clientAuthentication = getClientAuthentication();
-        checkParams(param, clientAuthentication.getRegisteredClient());
-        Authentication principal = generateUserPrincipal(clientAuthentication.getRegisteredClient().getClientId(), param.getUsername(), param.getPassword());
-        OAuth2TokenContext tokenContext = buildTokenContext(param.getScopes(), clientAuthentication.getRegisteredClient(), principal);
+        RegisteredClient registeredClient = clientAuthentication.getRegisteredClient();
+        checkParams(param, registeredClient);
+        Authentication principal = generateUserPrincipal(registeredClient.getClientId(), param.getUsername(), param.getPassword(), param.getScopes());
+        OAuth2TokenContext tokenContext = buildTokenContext(param.getClientScopes(), registeredClient, principal);
         OAuth2AuthorizationCode authorizationCode = buildAuthorizationCode(tokenContext);
-        saveAuthorization(param, clientAuthentication.getRegisteredClient(), principal, authorizationCode);
+        saveAuthorization(param, registeredClient, principal, authorizationCode);
         return authorizationCode.getTokenValue();
     }
 
@@ -139,9 +150,7 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
                     .user(client.getRegisteredClient().getClientName())
                     // 将 openid 和 客户端 id 设置为一致
                     .openId(client.getRegisteredClient().getClientId())
-                    .clientId(client.getRegisteredClient().getClientId())
-                    .permissions(Set.of())
-                    .roles(Set.of())
+                    .permissions(Map.of())
                     .expiresAt(SynaDates.of(authorization.getAccessToken().getToken().getExpiresAt()))
                     .issuedAt(SynaDates.of(authorization.getAccessToken().getToken().getIssuedAt()))
                     .clientCredentials(true)
@@ -152,9 +161,7 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
             return DefaultAuthorization.builder()
                     .user(principal.getUsername())
                     .openId(principal.getOpenId())
-                    .clientId(principal.getClientId())
                     .permissions(principal.getPermissions())
-                    .roles(principal.getRoles())
                     .expiresAt(SynaDates.of(authorization.getAccessToken().getToken().getExpiresAt()))
                     .issuedAt(SynaDates.of(authorization.getAccessToken().getToken().getIssuedAt()))
                     .clientCredentials(false)
@@ -165,7 +172,7 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
 
     @Override
     public Authentication generateUserPrincipal(ClientUser clientUser) {
-        return generateUserPrincipal(clientUser.clientId(), clientUser.username(), clientUser.password());
+        return generateUserPrincipal(clientUser.clientId(), clientUser.username(), clientUser.password(), Map.of());
     }
 
     @Override
@@ -177,6 +184,8 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
         OAuth2ClientAuthenticationToken clientAuthenticationToken;
         try {
             clientAuthenticationToken = (OAuth2ClientAuthenticationToken) this.authenticationManager.authenticate(clientAuthentication);
+        } catch (SynaException e) {
+            throw e;
         } catch (Exception e) {
             throw new SynaException("认证客户端失败!", e);
         }
@@ -191,15 +200,18 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
      * @param clientId 客户端 Id
      * @param username 用户名
      * @param password 密码
+     * @param scopes   作用域
      * @return 用户身份验证
      */
-    private Authentication generateUserPrincipal(String clientId, String username, String password) {
+    private Authentication generateUserPrincipal(String clientId, String username, String password, Map<String, Set<String>> scopes) {
         Authentication authentication;
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, password);
         // 设置客户端 id 供 CustomUserAuthenticationProvider#retrieveUser 方法使用
-        usernamePasswordAuthenticationToken.setDetails(clientId);
+        usernamePasswordAuthenticationToken.setDetails(ClientDetails.builder().clientId(clientId).scopes(scopes).build());
         try {
             authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+        } catch (SynaException e) {
+            throw e;
         } catch (Exception e) {
             throw new SynaException("用户身份验证失败!可能是用户名,密码或客户端ID错误.", e);
         }
@@ -233,9 +245,11 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
             authorizationRequest = OAuth2AuthorizationRequest.authorizationCode()
                     .authorizationUri(ServletUtils.getRequest().getRequestURL().toString())
                     .clientId(registeredClient.getClientId())
-                    .scopes(param.getScopes())
+                    .scopes(param.getClientScopes())
                     .additionalParameters(param.getAdditionalParameters())
                     .build();
+        } catch (SynaException e) {
+            throw e;
         } catch (Exception e) {
             throw new SynaException("生成用户身份验证失败!", e);
         }
@@ -261,6 +275,8 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
                     .tokenType(new OAuth2TokenType(OAuth2ParameterNames.CODE))
                     .authorizedScopes(scopes)
                     .build();
+        } catch (SynaException e) {
+            throw e;
         } catch (Exception e) {
             throw new SynaException("生成令牌上下文失败!", e);
         }
@@ -277,6 +293,8 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
         OAuth2AuthorizationCode authorizationCode;
         try {
             authorizationCode = (OAuth2AuthorizationCode) tokenGenerator.generate(tokenContext);
+        } catch (SynaException e) {
+            throw e;
         } catch (Exception e) {
             throw new SynaException("授权码生成失败!", e);
         }
@@ -306,14 +324,18 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
                     .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                     .attribute(Principal.class.getName(), principal)
                     .attribute(OAuth2AuthorizationRequest.class.getName(), authorizationRequest)
-                    .authorizedScopes(param.getScopes())
+                    .authorizedScopes(param.getClientScopes())
                     .token(authorizationCode)
                     .build();
+        } catch (SynaException e) {
+            throw e;
         } catch (Exception e) {
             throw new SynaException("生成授权信息失败!", e);
         }
         try {
             oAuth2AuthorizationService.save(authorization);
+        } catch (SynaException e) {
+            throw e;
         } catch (Exception e) {
             throw new SynaException("保存授权信息失败!", e);
         }
@@ -332,12 +354,16 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
     }
 
     private void checkParams(GenerateAuthorizationCodeParam param, RegisteredClient registeredClient) {
-        String errorMsg = "无效的请求参数[scopes]";
-        Set<String> scopes = param.getScopes();
-        SynaAssert.notEmpty(scopes, errorMsg);
-        for (String s : scopes) {
-            // TODO: 2023-03-05 15:49:12 疑问:请求一个多客户端的令牌 scopes 不能使用如下校验
-            SynaAssert.isTrue(registeredClient.getScopes().contains(s), errorMsg);
+        Map<String, Set<String>> clientScopes = param.getScopes();
+        SynaAssert.notEmpty(clientScopes, "无效的请求参数[scopes]");
+        List<String> clientIds = clientScopes.keySet().stream().toList();
+        Map<String, Set<String>> existedClientScopes = clientScopeService.listByClientIds(clientIds).stream()
+                .collect(Collectors.groupingBy(ClientScopeEntity::getClientId, Collectors.mapping(ClientScopeEntity::getName, Collectors.toSet())));
+        for (Map.Entry<String, Set<String>> entry : clientScopes.entrySet()) {
+            Set<String> existedScopes = existedClientScopes.get(entry.getKey());
+            SynaAssert.notEmpty(existedScopes, "客户端:{}不存在或该客户端没有可用的作用域!", entry.getKey());
+            Set<String> notExisted = entry.getValue().stream().filter(scope -> !existedScopes.contains(scope)).collect(Collectors.toSet());
+            SynaAssert.isEmpty(notExisted, "客户端:{}不存在作用域{}", entry.getKey(), notExisted);
         }
         if (registeredClient.getClientSettings().isRequireProofKey()) {
             SynaAssert.isTrue(StrUtil.isNotBlank(param.getCodeChallengeMethod()), "无效的请求参数[codeChallengeMethod]");
@@ -354,7 +380,7 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
      * @param client 客户端身份验证
      * @return 访问令牌
      */
-    private CasAccessToken buildAccessTokenByCode(String code, Authentication client) {
+    private CasAccessToken buildAccessTokenByCode(String code, OAuth2ClientAuthenticationToken client) {
         return buildAccessToken(new OAuth2AuthorizationCodeAuthenticationToken(code, client, null, null));
     }
 
@@ -367,7 +393,7 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
      * @param client       客户端身份验证
      * @return 访问令牌
      */
-    private CasAccessToken buildAccessTokenByRefresh(String refreshToken, Authentication client) {
+    private CasAccessToken buildAccessTokenByRefresh(String refreshToken, OAuth2ClientAuthenticationToken client) {
         return buildAccessToken(new OAuth2RefreshTokenAuthenticationToken(refreshToken, client, null, null));
     }
 
@@ -379,7 +405,7 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
      * @param client 客户端身份验证
      * @return 访问令牌
      */
-    private CasAccessToken buildAccessTokenByClient(Authentication client) {
+    private CasAccessToken buildAccessTokenByClient(OAuth2ClientAuthenticationToken client) {
         return buildAccessToken(new OAuth2ClientCredentialsAuthenticationToken(client, null, null));
     }
 
@@ -396,6 +422,8 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
         try {
             // 生成访问令牌
             accessTokenAuthentication = (OAuth2AccessTokenAuthenticationToken) this.authenticationManager.authenticate(authentication);
+        } catch (SynaException e) {
+            throw e;
         } catch (Exception e) {
             throw new SynaException("令牌生成失败!", e);
         }
