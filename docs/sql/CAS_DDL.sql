@@ -30,6 +30,7 @@ CREATE TABLE `t_cas_client`
     `secret`              varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci          DEFAULT NULL COMMENT '客户端密码',
     `secret_expires_at`   timestamp NULL DEFAULT NULL COMMENT '客户端密码过期时间',
     `name`                varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '客户端名称',
+    `alias`               varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '别名(全局唯一)',
     `description`         varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '描述',
     `created_by_id`       varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '创建人 ID',
     `created_date`        datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP (3) ON UPDATE CURRENT_TIMESTAMP (3) COMMENT '创建时间',

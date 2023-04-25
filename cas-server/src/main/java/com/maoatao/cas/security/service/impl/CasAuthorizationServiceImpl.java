@@ -360,9 +360,9 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
     private void checkParams(GenerateAuthorizationCodeParam param, RegisteredClient registeredClient) {
         Map<String, Set<String>> clientScopes = param.getScopes();
         SynaAssert.notEmpty(clientScopes, "无效的请求参数[scopes]");
-        List<String> clientNames = clientScopes.keySet().stream().toList();
-        List<ClientEntity> clientEntities = clientService.listByClientNames(clientNames);
-        SynaAssert.notEmpty(clientEntities, "不存在客户端{}", clientNames);
+        List<String> clientAliases = clientScopes.keySet().stream().toList();
+        List<ClientEntity> clientEntities = clientService.listByClientAliases(clientAliases);
+        SynaAssert.notEmpty(clientEntities, "不存在客户端{}", clientAliases);
         Map<String, String> clientMap = clientEntities.stream().collect(Collectors.toMap(ClientEntity::getName, ClientEntity::getClientId));
         List<String> clientIds = clientEntities.stream().map(ClientEntity::getClientId).toList();
         Map<String, Set<String>> existedClientScopes = clientScopeService.listByClientIds(clientIds).stream()

@@ -1,5 +1,6 @@
 package com.maoatao.cas.core.bean.param.authorization;
 
+import com.maoatao.cas.common.constant.CasSeparator;
 import com.maoatao.synapse.core.bean.base.BaseParam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -73,7 +74,7 @@ public class GenerateAuthorizationCodeParam extends BaseParam {
             return new HashSet<>();
         }
         return scopes.entrySet().stream()
-                .map(entry -> entry.getValue().stream().map(scope -> entry.getKey().concat(".").concat(scope)).toList())
+                .map(entry -> entry.getValue().stream().map(scope -> entry.getKey().concat(CasSeparator.SCOPE).concat(scope)).toList())
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
     }

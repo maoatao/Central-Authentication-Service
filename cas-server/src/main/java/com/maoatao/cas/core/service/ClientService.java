@@ -43,10 +43,10 @@ public interface ClientService extends DaedalusService<ClientEntity>, Registered
     /**
      * 通过名称查询
      *
-     * @param clientName CAS 客户端名称
+     * @param clientAlias CAS 客户端别名
      * @return CAS 客户端
      */
-    ClientEntity getByClientName(String clientName);
+    ClientEntity getByClientAlias(String clientAlias);
 
     /**
      * 通过id查询
@@ -59,8 +59,8 @@ public interface ClientService extends DaedalusService<ClientEntity>, Registered
     /**
      * 通过名称查询
      *
-     * @param clientNames CAS 客户端名称
+     * @param clientAliases CAS 客户端别名
      * @return CAS 客户端
      */
-    List<ClientEntity> listByClientNames(List<String> clientNames);
+    List<ClientEntity> listByClientAliases(List<String> clientAliases);
 }

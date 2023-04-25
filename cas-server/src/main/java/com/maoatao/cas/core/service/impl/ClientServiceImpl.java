@@ -4,9 +4,11 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.maoatao.cas.common.constant.CasSeparator;
 import com.maoatao.cas.core.bean.bo.ClientBo;
 import com.maoatao.cas.core.bean.entity.ClientAuthenticationMethodEntity;
 import com.maoatao.cas.core.bean.entity.ClientEntity;
@@ -91,8 +93,8 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
     }
 
     @Override
-    public ClientEntity getByClientName(String clientName) {
-        return super.getOne(Wrappers.<ClientEntity>lambdaQuery().eq(ClientEntity::getName, clientName));
+    public ClientEntity getByClientAlias(String clientAlias) {
+        return super.getOne(Wrappers.<ClientEntity>lambdaQuery().eq(ClientEntity::getAlias, clientAlias));
     }
 
     @Override
@@ -101,18 +103,18 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
     }
 
     @Override
-    public List<ClientEntity> listByClientNames(List<String> clientNames) {
-        return super.list(Wrappers.<ClientEntity>lambdaQuery().in(ClientEntity::getName, clientNames));
+    public List<ClientEntity> listByClientAliases(List<String> clientAliases) {
+        return super.list(Wrappers.<ClientEntity>lambdaQuery().in(ClientEntity::getAlias, clientAliases));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void save(RegisteredClient registeredClient) {
-        saveClient(registeredClient);
+        ClientEntity clientEntity = saveClient(registeredClient);
         saveClientAuthenticationMethod(registeredClient);
         saveClientGrantType(registeredClient);
         saveClientRedirectUrl(registeredClient);
-        saveClientScope(registeredClient);
+        saveClientScope(registeredClient, clientEntity.getAlias());
         saveClientSettings(registeredClient);
         saveTokenSettings(registeredClient);
     }
@@ -128,10 +130,9 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
         return convert(getClientBo(clientId));
     }
 
-    private void saveClient(RegisteredClient registeredClient) {
+    private ClientEntity saveClient(RegisteredClient registeredClient) {
         SynaAssert.notEmpty(registeredClient.getClientId(), "clientId 不能为空!");
         SynaAssert.notEmpty(registeredClient.getClientSecret(), "clientSecret 不能为空!");
-        // TODO: MaoAtao 2023-04-24 18:05:40 客户端名称要唯一
         SynaAssert.notEmpty(registeredClient.getClientName(), "clientName 不能为空!");
         ClientEntity clientEntity = ClientEntity.builder()
                 .clientId(registeredClient.getClientId())
@@ -139,8 +140,11 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
                 .secret(registeredClient.getClientSecret())
                 .secretExpiresAt(SynaDates.of(registeredClient.getClientSecretExpiresAt()))
                 .name(registeredClient.getClientName())
+                // 别名唯一,目前用于scope前缀,通过registeredClient储存时暂时设置为随机字符串
+                .alias(nextRandomAlias())
                 .build();
         SynaAssert.isTrue(super.save(clientEntity), "客户端保存失败!");
+        return clientEntity;
     }
 
     private void saveClientAuthenticationMethod(RegisteredClient registeredClient) {
@@ -176,12 +180,13 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
         SynaAssert.isTrue(clientRedirectUrlService.saveBatch(clientGrantTypeEntities), "客户端重定向地址保存失败!");
     }
 
-    private void saveClientScope(RegisteredClient registeredClient) {
+    private void saveClientScope(RegisteredClient registeredClient, String prefix) {
         SynaAssert.notEmpty(registeredClient.getScopes(), "scopes 不能为空!");
+        SynaAssert.notEmpty(prefix, "prefix 不能为空!");
         List<ClientScopeEntity> clientScopeEntities = registeredClient.getScopes().stream()
                 .map(o -> ClientScopeEntity.builder()
                         .clientId(registeredClient.getClientId())
-                        .name(o)
+                        .name(prefix.concat(CasSeparator.SCOPE).concat(o))
                         .build())
                 .toList();
         SynaAssert.isTrue(clientScopeService.saveBatch(clientScopeEntities), "客户端作用域保存失败!");
@@ -313,7 +318,14 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
                 .clientSettings(clientSettingsBuilder.build())
                 .tokenSettings(tokenSettingsBuilder.build());
         // TODO: MaoAtao 2023-04-12 11:10:45 添加自定义设置(令牌值的格式)
-
         return registeredClientBuilder.build();
+    }
+
+    private String nextRandomAlias() {
+        String alias = RandomUtil.randomString(10);
+        if (ObjUtil.isNull(getByClientAlias(alias))) {
+            return alias;
+        }
+        return nextRandomAlias();
     }
 }

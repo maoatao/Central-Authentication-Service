@@ -228,9 +228,9 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
             return customUserDetailsBuilder.build();
         }
         List<String> scopeNames = scopes.values().stream().flatMap(Collection::stream).toList();
-        List<String> clientNames = scopes.keySet().stream().toList();
-        List<String> clientIds = clientService.listByClientNames(clientNames).stream().map(ClientEntity::getClientId).toList();
-        SynaAssert.notEmpty(clientIds, "不存在客户端{}", clientNames);
+        List<String> clientAliases = scopes.keySet().stream().toList();
+        List<String> clientIds = clientService.listByClientAliases(clientAliases).stream().map(ClientEntity::getClientId).toList();
+        SynaAssert.notEmpty(clientIds, "不存在客户端{}", clientAliases);
         // 按作用域名称查找所有客户端的作用域
         List<ClientScopeEntity> clientScopeEntities = clientScopeService.listByScopeNames(scopeNames);
         // 筛选指定的客户端作用域

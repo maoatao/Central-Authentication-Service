@@ -6,6 +6,7 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.jwt.JWT;
 import cn.hutool.jwt.JWTUtil;
 import com.maoatao.cas.common.authentication.CasAccessToken;
+import com.maoatao.cas.common.constant.CasSeparator;
 import com.maoatao.cas.core.bean.entity.ClientScopeEntity;
 import com.maoatao.cas.core.bean.entity.ClientScopePermissionEntity;
 import com.maoatao.cas.core.bean.entity.PermissionEntity;
@@ -137,11 +138,11 @@ class CasApplicationTests {
     /**
      * 客户端作用域 test.read
      */
-    private static final String TEST_CLIENT_SCOPE_TEST_READ = TEST_CLIENT_NAME.concat(".").concat("read");
+    private static final String TEST_CLIENT_SCOPE_TEST_READ = TEST_CLIENT_NAME.concat(CasSeparator.SCOPE).concat("read");
     /**
      * 客户端作用域 test.write
      */
-    private static final String TEST_CLIENT_SCOPE_TEST_WRITE = TEST_CLIENT_NAME.concat(".").concat("write");
+    private static final String TEST_CLIENT_SCOPE_TEST_WRITE = TEST_CLIENT_NAME.concat(CasSeparator.SCOPE).concat("write");
     /**
      * 客户端授权范围
      */

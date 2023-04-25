@@ -68,6 +68,12 @@ public class ClientQueryParam extends BasePaginationParam {
     @Schema(description = "客户端名称")
     private String name;
     /**
+     * 别名(全局唯一)
+     */
+    @NotNull(message = "alias 不能为空")
+    @Schema(description = "别名(全局唯一)")
+    private String alias;
+    /**
      * 描述
      */
     @NotNull(message = "description 不能为空")

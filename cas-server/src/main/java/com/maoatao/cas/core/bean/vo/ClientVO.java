@@ -61,6 +61,11 @@ public class ClientVO extends BaseVO {
     @Schema(description = "客户端名称")
     private String name;
     /**
+     * 别名(全局唯一)
+     */
+    @Schema(description = "别名(全局唯一)")
+    private String alias;
+    /**
      * 描述
      */
     @Schema(description = "描述")

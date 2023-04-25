@@ -46,6 +46,10 @@ public class ClientEntity extends BaseEntity<ClientEntity> {
      */
     private String name;
     /**
+     * 别名(全局唯一)
+     */
+    private String alias;
+    /**
      * 描述
      */
     private String description;

@@ -9,6 +9,7 @@
         <result property="secret" column="secret"/>
         <result property="secretExpiresAt" column="secret_expires_at"/>
         <result property="name" column="name"/>
+        <result property="alias" column="alias"/>
         <result property="description" column="description"/>
         <result property="createdById" column="created_by_id"/>
         <result property="createdDate" column="created_date"/>
