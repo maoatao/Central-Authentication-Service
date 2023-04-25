@@ -73,7 +73,7 @@ public class GenerateAuthorizationCodeParam extends BaseParam {
             return new HashSet<>();
         }
         return scopes.entrySet().stream()
-                .map(entry -> entry.getValue().stream().map(scope -> scope.concat(" [").concat(entry.getKey()).concat("]")).toList())
+                .map(entry -> entry.getValue().stream().map(scope -> entry.getKey().concat(".").concat(scope)).toList())
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
     }

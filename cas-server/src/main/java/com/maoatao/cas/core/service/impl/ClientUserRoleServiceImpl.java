@@ -1,7 +1,7 @@
 package com.maoatao.cas.core.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.IterUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.core.bean.param.clientuserrole.ClientUserRoleQueryParam;
@@ -45,17 +45,17 @@ public class ClientUserRoleServiceImpl extends DaedalusServiceImpl<ClientUserRol
         List<Long> existed = list(Wrappers.<ClientUserRoleEntity>lambdaQuery().eq(ClientUserRoleEntity::getClientUserId, userId))
                 .stream()
                 .map(ClientUserRoleEntity::getRoleId).toList();
-        if (IterUtil.isEmpty(roleIds) && IterUtil.isNotEmpty(existed)) {
+        if (CollectionUtil.isEmpty(roleIds) && CollectionUtil.isNotEmpty(existed)) {
             return remove(Wrappers.<ClientUserRoleEntity>lambdaQuery().eq(ClientUserRoleEntity::getClientUserId, userId));
         }
         // 已有不在入参为删除(已有-交集)
         List<Long> preDelete = existed.stream().filter(o -> !roleIds.contains(o)).toList();
         // 入参不在已有为新增(入参-交集)
         List<Long> preAdd = roleIds.stream().filter(o -> !existed.contains(o)).toList();
-        if (IterUtil.isNotEmpty(preDelete)) {
+        if (CollectionUtil.isNotEmpty(preDelete)) {
             SynaAssert.isTrue(removeBatchByIds(preDelete), "删除用户角色关系失败!");
         }
-        if (IterUtil.isNotEmpty(preAdd)) {
+        if (CollectionUtil.isNotEmpty(preAdd)) {
             List<ClientUserRoleEntity> newUserRoles = preAdd.stream()
                     .map(o -> ClientUserRoleEntity.builder().clientUserId(userId).roleId(o).build())
                     .toList();

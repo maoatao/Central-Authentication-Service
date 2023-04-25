@@ -4,9 +4,11 @@ import com.maoatao.cas.common.authentication.CasAccessToken;
 import com.maoatao.cas.common.authentication.CasAuthorization;
 import com.maoatao.cas.common.authentication.DefaultAccessToken;
 import com.maoatao.cas.common.authentication.DefaultAuthorization;
+import com.maoatao.cas.core.bean.entity.ClientEntity;
 import com.maoatao.cas.core.bean.entity.ClientScopeEntity;
 import com.maoatao.cas.core.bean.param.accesstoken.GenerateAccessTokenParam;
 import com.maoatao.cas.core.service.ClientScopeService;
+import com.maoatao.cas.core.service.ClientService;
 import com.maoatao.cas.security.authorization.CustomUserAuthenticationProvider;
 import com.maoatao.cas.security.bean.ClientDetails;
 import com.maoatao.cas.security.constant.GrantType;
@@ -86,6 +88,9 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
 
     @Autowired
     private ClientScopeService clientScopeService;
+
+    @Autowired
+    private ClientService clientService;
 
     @Override
     public String generateAuthorizationCode(GenerateAuthorizationCodeParam param) {
@@ -355,11 +360,15 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
     private void checkParams(GenerateAuthorizationCodeParam param, RegisteredClient registeredClient) {
         Map<String, Set<String>> clientScopes = param.getScopes();
         SynaAssert.notEmpty(clientScopes, "无效的请求参数[scopes]");
-        List<String> clientIds = clientScopes.keySet().stream().toList();
+        List<String> clientNames = clientScopes.keySet().stream().toList();
+        List<ClientEntity> clientEntities = clientService.listByClientNames(clientNames);
+        SynaAssert.notEmpty(clientEntities, "不存在客户端{}", clientNames);
+        Map<String, String> clientMap = clientEntities.stream().collect(Collectors.toMap(ClientEntity::getName, ClientEntity::getClientId));
+        List<String> clientIds = clientEntities.stream().map(ClientEntity::getClientId).toList();
         Map<String, Set<String>> existedClientScopes = clientScopeService.listByClientIds(clientIds).stream()
                 .collect(Collectors.groupingBy(ClientScopeEntity::getClientId, Collectors.mapping(ClientScopeEntity::getName, Collectors.toSet())));
         for (Map.Entry<String, Set<String>> entry : clientScopes.entrySet()) {
-            Set<String> existedScopes = existedClientScopes.get(entry.getKey());
+            Set<String> existedScopes = existedClientScopes.get(clientMap.get(entry.getKey()));
             SynaAssert.notEmpty(existedScopes, "客户端:{}不存在或该客户端没有可用的作用域!", entry.getKey());
             Set<String> notExisted = entry.getValue().stream().filter(scope -> !existedScopes.contains(scope)).collect(Collectors.toSet());
             SynaAssert.isEmpty(notExisted, "客户端:{}不存在作用域{}", entry.getKey(), notExisted);

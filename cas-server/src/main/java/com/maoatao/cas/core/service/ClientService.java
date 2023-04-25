@@ -5,6 +5,7 @@ import com.maoatao.cas.core.bean.entity.ClientEntity;
 import com.maoatao.cas.core.bean.param.client.ClientQueryParam;
 import com.maoatao.cas.core.bean.vo.ClientVO;
 import com.maoatao.daedalus.data.service.DaedalusService;
+import java.util.List;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 
 /**
@@ -38,4 +39,28 @@ public interface ClientService extends DaedalusService<ClientEntity>, Registered
      * @return CAS 客户端
      */
     ClientEntity getByClientId(String clientId);
+
+    /**
+     * 通过名称查询
+     *
+     * @param clientName CAS 客户端名称
+     * @return CAS 客户端
+     */
+    ClientEntity getByClientName(String clientName);
+
+    /**
+     * 通过id查询
+     *
+     * @param clientIds CAS 客户端id
+     * @return CAS 客户端
+     */
+    List<ClientEntity> listByClientIds(List<String> clientIds);
+
+    /**
+     * 通过名称查询
+     *
+     * @param clientNames CAS 客户端名称
+     * @return CAS 客户端
+     */
+    List<ClientEntity> listByClientNames(List<String> clientNames);
 }

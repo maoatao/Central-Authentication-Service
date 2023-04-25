@@ -46,4 +46,12 @@ public interface ClientScopeService extends DaedalusService<ClientScopeEntity> {
      * @return CAS 客户端作用域
      */
     List<ClientScopeEntity> listByClientIds(List<String> clientIds);
+
+    /**
+     * 通过id查询
+     *
+     * @param scopeNames 作用域
+     * @return CAS 客户端作用域
+     */
+    List<ClientScopeEntity> listByScopeNames(List<String> scopeNames);
 }

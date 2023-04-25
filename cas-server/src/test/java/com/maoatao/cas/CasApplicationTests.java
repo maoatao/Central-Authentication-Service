@@ -121,6 +121,11 @@ class CasApplicationTests {
      * 客户端 id
      */
     private static final String TEST_CLIENT_ID = "test-client";
+
+    /**
+     * 客户端 名称
+     */
+    private static final String TEST_CLIENT_NAME = "test";
     /**
      * 客户端密码
      */
@@ -132,11 +137,11 @@ class CasApplicationTests {
     /**
      * 客户端作用域 test.read
      */
-    private static final String TEST_CLIENT_SCOPE_TEST_READ = "test.read";
+    private static final String TEST_CLIENT_SCOPE_TEST_READ = TEST_CLIENT_NAME.concat(".").concat("read");
     /**
      * 客户端作用域 test.write
      */
-    private static final String TEST_CLIENT_SCOPE_TEST_WRITE = "test.write";
+    private static final String TEST_CLIENT_SCOPE_TEST_WRITE = TEST_CLIENT_NAME.concat(".").concat("write");
     /**
      * 客户端授权范围
      */
@@ -189,7 +194,7 @@ class CasApplicationTests {
         // 3.通过客户端 id 新增用户 save_user_test
         save_user_test();
         System.out.println("----------------------------------------------------");
-        System.out.println(SynaStrings.format("已成功创建客户端: {}", TEST_CLIENT_ID));
+        System.out.println(SynaStrings.format("已成功创建客户端: {}", TEST_CLIENT_NAME));
         System.out.println(SynaStrings.format("已成功创建作用域: {}", TEST_CLIENT_SCOPES));
         System.out.println(SynaStrings.format("已成功创建角　色: {}", TEST_ROLE_NAME));
         System.out.println(SynaStrings.format("已成功创建权　限: {} {}", PERMISSION_TEST_GET_NAME, PERMISSION_TEST_ADD_NAME));
@@ -268,6 +273,7 @@ class CasApplicationTests {
     void save_client_test() {
         registeredClientRepository.save(RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId(TEST_CLIENT_ID)
+                .clientName(TEST_CLIENT_NAME)
                 .clientSecret(passwordEncoder.encode(TEST_CLIENT_SECRET))
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)

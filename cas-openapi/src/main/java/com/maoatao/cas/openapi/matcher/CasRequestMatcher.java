@@ -1,6 +1,6 @@
 package com.maoatao.cas.openapi.matcher;
 
-import cn.hutool.core.collection.IterUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,7 +79,7 @@ public class CasRequestMatcher {
      * @return 有任意匹配返回 true, matchers 为空返回 false
      */
     public static boolean anyMatch(List<CasRequestMatcher> matchers, HttpServletRequest request) {
-        if (IterUtil.isEmpty(matchers)) {
+        if (CollectionUtil.isEmpty(matchers)) {
             return false;
         }
         for (CasRequestMatcher requestMatcher : matchers) {

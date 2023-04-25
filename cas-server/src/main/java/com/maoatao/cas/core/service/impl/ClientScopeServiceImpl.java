@@ -43,4 +43,9 @@ public class ClientScopeServiceImpl extends DaedalusServiceImpl<ClientScopeMappe
     public List<ClientScopeEntity> listByClientIds(List<String> clientIds) {
         return super.list(Wrappers.<ClientScopeEntity>lambdaQuery().in(ClientScopeEntity::getClientId, clientIds));
     }
+
+    @Override
+    public List<ClientScopeEntity> listByScopeNames(List<String> scopeNames) {
+        return super.list(Wrappers.<ClientScopeEntity>lambdaQuery().in(ClientScopeEntity::getName, scopeNames));
+    }
 }

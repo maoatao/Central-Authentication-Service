@@ -1,6 +1,6 @@
 package com.maoatao.cas.security.service.impl;
 
-import cn.hutool.core.collection.IterUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.maoatao.cas.security.service.CustomAuthorizationService;
 import com.maoatao.daedalus.data.util.RedisUtils;
@@ -145,7 +145,7 @@ public class RedisAuthorizationServiceImpl implements CustomAuthorizationService
     public List<OAuth2Authorization> findByPrincipal(String principalName) {
         Set<String> keys = RedisUtils.keys(getPrincipalKey(principalName + RedisUtils.REDIS_KEY + "*"));
         List<OAuth2Authorization> authorizations = new ArrayList<>();
-        if (IterUtil.isNotEmpty(keys)) {
+        if (CollectionUtil.isNotEmpty(keys)) {
             keys.forEach(key -> authorizations.add(getAuthorization(
                     // 删除前缀
                     key.replaceAll(REDIS_KEY_CAS + REDIS_KEY_PRINCIPAL + principalName + RedisUtils.REDIS_KEY, ""))));

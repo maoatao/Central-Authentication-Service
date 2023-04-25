@@ -91,6 +91,21 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
     }
 
     @Override
+    public ClientEntity getByClientName(String clientName) {
+        return super.getOne(Wrappers.<ClientEntity>lambdaQuery().eq(ClientEntity::getName, clientName));
+    }
+
+    @Override
+    public List<ClientEntity> listByClientIds(List<String> clientIds) {
+        return super.list(Wrappers.<ClientEntity>lambdaQuery().in(ClientEntity::getClientId, clientIds));
+    }
+
+    @Override
+    public List<ClientEntity> listByClientNames(List<String> clientNames) {
+        return super.list(Wrappers.<ClientEntity>lambdaQuery().in(ClientEntity::getName, clientNames));
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void save(RegisteredClient registeredClient) {
         saveClient(registeredClient);
@@ -115,9 +130,8 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
 
     private void saveClient(RegisteredClient registeredClient) {
         SynaAssert.notEmpty(registeredClient.getClientId(), "clientId 不能为空!");
-        // SynaAssert.notNull(registeredClient.getClientIdIssuedAt(), "clientIdIssuedAt 不能为空!");
         SynaAssert.notEmpty(registeredClient.getClientSecret(), "clientSecret 不能为空!");
-        // SynaAssert.notNull(registeredClient.getClientSecretExpiresAt(), "clientSecretExpiresAt 不能为空!");
+        // TODO: MaoAtao 2023-04-24 18:05:40 客户端名称要唯一
         SynaAssert.notEmpty(registeredClient.getClientName(), "clientName 不能为空!");
         ClientEntity clientEntity = ClientEntity.builder()
                 .clientId(registeredClient.getClientId())

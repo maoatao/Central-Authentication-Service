@@ -1,6 +1,6 @@
 package com.maoatao.cas.openapi.authentication;
 
-import cn.hutool.core.collection.IterUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import com.maoatao.cas.openapi.converter.ContextConverter;
 import com.maoatao.cas.openapi.converter.JwtOperatorContextConverter;
 import com.maoatao.cas.openapi.matcher.CasRequestMatcher;
@@ -71,7 +71,7 @@ public class CasClientSettings {
             return new CasClientSettings(
                     this.appKey,
                     Objects.requireNonNullElse(this.contextConverter, new JwtOperatorContextConverter(this.appKey)),
-                    IterUtil.isEmpty(this.permitMatchers) ? CasRequestMatcher.builder().build() : this.permitMatchers);
+                    CollectionUtil.isEmpty(this.permitMatchers) ? CasRequestMatcher.builder().build() : this.permitMatchers);
         }
     }
 }

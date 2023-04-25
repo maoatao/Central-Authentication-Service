@@ -1,11 +1,12 @@
 package com.maoatao.cas.core.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.IterUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.maoatao.cas.core.bean.entity.ClientEntity;
 import com.maoatao.cas.core.bean.entity.ClientScopeEntity;
 import com.maoatao.cas.core.bean.param.clientuser.ClientUserQueryParam;
 import com.maoatao.cas.core.bean.param.clientuser.ClientUserSaveParam;
@@ -16,6 +17,7 @@ import com.maoatao.cas.core.bean.entity.RoleEntity;
 import com.maoatao.cas.core.bean.entity.ClientUserEntity;
 import com.maoatao.cas.core.mapper.ClientUserMapper;
 import com.maoatao.cas.core.service.ClientScopeService;
+import com.maoatao.cas.core.service.ClientService;
 import com.maoatao.cas.core.service.PermissionService;
 import com.maoatao.cas.core.service.RoleService;
 import com.maoatao.cas.core.service.ClientUserRoleService;
@@ -72,6 +74,9 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
 
     @Autowired
     private ClientScopeService clientScopeService;
+
+    @Autowired
+    private ClientService clientService;
 
     @Override
     public Page<ClientUserVO> page(ClientUserQueryParam param) {
@@ -197,7 +202,7 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
      * @return 如果角色都存在, 返回这些角色的 id
      */
     private List<Long> getAndCheckRoleIds(List<String> roleNames, String clientId) {
-        if (IterUtil.isEmpty(roleNames)) {
+        if (CollectionUtil.isEmpty(roleNames)) {
             return Collections.emptyList();
         }
         Map<String, Long> roleEntityMap = roleService.listByRolesAndClient(roleNames, clientId).stream()
@@ -222,10 +227,12 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
         if (MapUtil.isEmpty(scopes)) {
             return customUserDetailsBuilder.build();
         }
-        Set<String> scopeNames = scopes.values().stream().flatMap(Collection::stream).collect(Collectors.toSet());
-        Set<String> clientIds = scopes.keySet();
+        List<String> scopeNames = scopes.values().stream().flatMap(Collection::stream).toList();
+        List<String> clientNames = scopes.keySet().stream().toList();
+        List<String> clientIds = clientService.listByClientNames(clientNames).stream().map(ClientEntity::getClientId).toList();
+        SynaAssert.notEmpty(clientIds, "不存在客户端{}", clientNames);
         // 按作用域名称查找所有客户端的作用域
-        List<ClientScopeEntity> clientScopeEntities = clientScopeService.list(Wrappers.<ClientScopeEntity>lambdaQuery().in(ClientScopeEntity::getName, scopeNames));
+        List<ClientScopeEntity> clientScopeEntities = clientScopeService.listByScopeNames(scopeNames);
         // 筛选指定的客户端作用域
         List<Long> scopeIds = clientScopeEntities.stream()
                 .filter(o -> clientIds.contains(o.getClientId()))
@@ -233,7 +240,7 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
                 .distinct().toList();
         // 查询作用域权限
         List<PermissionEntity> permissionEntities = permissionService.listByClientScopes(scopeIds);
-        if (IterUtil.isNotEmpty(permissionEntities)) {
+        if (CollectionUtil.isNotEmpty(permissionEntities)) {
             customUserDetailsBuilder.permissions(permissionEntities.stream()
                     .collect(Collectors.groupingBy(PermissionEntity::getClientId, Collectors.mapping(PermissionEntity::getName, Collectors.toSet())))
             );

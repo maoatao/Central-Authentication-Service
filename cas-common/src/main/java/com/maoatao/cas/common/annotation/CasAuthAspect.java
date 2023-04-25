@@ -1,6 +1,6 @@
 package com.maoatao.cas.common.annotation;
 
-import cn.hutool.core.collection.IterUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import com.maoatao.daedalus.core.context.OperatorContextHolder;
 import com.maoatao.synapse.lang.exception.SynaException;
 import com.maoatao.synapse.lang.util.SynaSafes;
@@ -61,7 +61,7 @@ public class CasAuthAspect {
     private void preMethodAuthentication(CasAuth methodAnnotation, AtomicBoolean isAuthentication, AtomicBoolean isHci) {
         Set<String> methodAuths = getAnnotationValues(methodAnnotation);
         if (methodAnnotation != null) {
-            if (IterUtil.isNotEmpty(methodAuths)) {
+            if (CollectionUtil.isNotEmpty(methodAuths)) {
                 isAuthentication.set(anyAuthMatch(methodAuths, SynaSafes.of(OperatorContextHolder.getContext().getPermissions())));
                 isHci.set(true);
             } else {
@@ -75,7 +75,7 @@ public class CasAuthAspect {
         CasAuth classAnnotation = joinPoint.getTarget().getClass().getAnnotation(CasAuth.class);
         Set<String> classAuths = getAnnotationValues(classAnnotation);
         if (!isAuthentication.get() && classAnnotation != null) {
-            if (IterUtil.isNotEmpty(classAuths)) {
+            if (CollectionUtil.isNotEmpty(classAuths)) {
                 isAuthentication.set(anyAuthMatch(classAuths, SynaSafes.of(OperatorContextHolder.getContext().getPermissions())));
                 isHci.set(true);
             } else {
@@ -89,7 +89,7 @@ public class CasAuthAspect {
     }
 
     private boolean anyAuthMatch(@NonNull Set<String> annotationAuths, @NonNull Set<String> operatorAuths) {
-        if (IterUtil.isEmpty(operatorAuths)) {
+        if (CollectionUtil.isEmpty(operatorAuths)) {
             return false;
         }
         return annotationAuths.stream().anyMatch(operatorAuths::contains);

@@ -1,7 +1,7 @@
 package com.maoatao.cas.util;
 
 import cn.hutool.core.codec.Base64;
-import cn.hutool.core.collection.IterUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import com.maoatao.cas.security.bean.BasicAuthentication;
 import com.maoatao.cas.security.bean.ClientUser;
 import com.maoatao.cas.security.authorization.CustomAuthorizationServerContext;
@@ -110,7 +110,7 @@ public final class FilterUtils {
      * @return 有任意匹配返回 true, matchers 为空返回 false
      */
     public static boolean anyMatch(List<RequestMatcher> matchers, HttpServletRequest request) {
-        if (IterUtil.isEmpty(matchers)) {
+        if (CollectionUtil.isEmpty(matchers)) {
             return false;
         }
         for (RequestMatcher requestMatcher : matchers) {
