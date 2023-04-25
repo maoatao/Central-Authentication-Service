@@ -39,9 +39,9 @@ public class ClientAuthenticationMethodVO extends BaseVO {
     @Schema(description = "客户端 id")
     private String clientId;
     /**
-     * 客户端对应设定的值
+     * 身份验证方法
      */
-    @Schema(description = "客户端对应设定的值")
+    @Schema(description = "身份验证方法")
     private String value;
     /**
      * 创建人 ID
@@ -65,11 +65,6 @@ public class ClientAuthenticationMethodVO extends BaseVO {
     @JsonFormat(pattern = SynaDates.DATE_TIME_FORMAT, timezone = SynaDates.CN_TIME_ZONE)
     @Schema(description = "更新时间")
     private LocalDateTime updatedDate;
-    /**
-     * 是否删除;false:未删除,true:删除
-     */
-    @Schema(description = "是否删除;false:未删除,true:删除")
-    private Boolean deleted;
 
     @Tolerate
     public ClientAuthenticationMethodVO() {}

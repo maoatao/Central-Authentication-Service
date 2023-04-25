@@ -121,12 +121,15 @@ class CasApplicationTests {
     /**
      * 客户端 id
      */
-    private static final String TEST_CLIENT_ID = "test-client";
-
+    private static final String TEST_CLIENT_ID = "6023643A-3979-328B-F932-35EBB11EA75C";
     /**
      * 客户端 名称
      */
-    private static final String TEST_CLIENT_NAME = "test";
+    private static final String TEST_CLIENT_NAME = "test-client";
+    /**
+     * 客户端 别名
+     */
+    private static final String TEST_CLIENT_ALIAS = "test";
     /**
      * 客户端密码
      */
@@ -138,11 +141,11 @@ class CasApplicationTests {
     /**
      * 客户端作用域 test.read
      */
-    private static final String TEST_CLIENT_SCOPE_TEST_READ = TEST_CLIENT_NAME.concat(CasSeparator.SCOPE).concat("read");
+    private static final String TEST_CLIENT_SCOPE_TEST_READ = TEST_CLIENT_ALIAS.concat(CasSeparator.SCOPE).concat("read");
     /**
      * 客户端作用域 test.write
      */
-    private static final String TEST_CLIENT_SCOPE_TEST_WRITE = TEST_CLIENT_NAME.concat(CasSeparator.SCOPE).concat("write");
+    private static final String TEST_CLIENT_SCOPE_TEST_WRITE = TEST_CLIENT_ALIAS.concat(CasSeparator.SCOPE).concat("write");
     /**
      * 客户端授权范围
      */
@@ -337,7 +340,7 @@ class CasApplicationTests {
      */
     @Test
     void save_user_test() {
-        UserSaveParam userSaveParam = UserSaveParam.builder().name(TEST_USER_NAME).openId(IdUtils.nextUserOpenId()).build();
+        UserSaveParam userSaveParam = UserSaveParam.builder().name(TEST_USER_NAME).build();
         ClientUserSaveParam param = new ClientUserSaveParam();
         param.setUserId(userService.save(userSaveParam));
         param.setClientId(TEST_CLIENT_ID);

@@ -29,7 +29,7 @@ public class ClientAuthenticationMethodEntity extends BaseEntity<ClientAuthentic
      */
     private String clientId;
     /**
-     * 客户端对应设定的值
+     * 身份验证方法
      */
     private String value;
 

@@ -48,7 +48,7 @@ CREATE TABLE `t_cas_client_authentication_method`
 (
     `id`            bigint                                                  NOT NULL AUTO_INCREMENT COMMENT '主键id(自增)',
     `client_id`     varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '客户端 id',
-    `value`         varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '客户端对应设定的值',
+    `value`         varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '身份验证方法',
     `created_by_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '创建人 ID',
     `created_date`  datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP (3) ON UPDATE CURRENT_TIMESTAMP (3) COMMENT '创建时间',
     `updated_by_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL DEFAULT '' COMMENT '更新人 ID',

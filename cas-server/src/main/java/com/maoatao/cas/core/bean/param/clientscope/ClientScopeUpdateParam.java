@@ -30,18 +30,6 @@ public class ClientScopeUpdateParam extends BaseUpdateParam {
     private static final long serialVersionUID = -2982913238351357392L;
 
     /**
-     * 主键id(自增)
-     */
-    @NotNull(message = "id 不能为空")
-    @Schema(description = "主键id(自增)")
-    private Long id;
-    /**
-     * 客户端 id
-     */
-    @NotNull(message = "clientId 不能为空")
-    @Schema(description = "客户端 id")
-    private String clientId;
-    /**
      * 作用域
      */
     @NotNull(message = "name 不能为空")
@@ -53,38 +41,6 @@ public class ClientScopeUpdateParam extends BaseUpdateParam {
     @NotNull(message = "description 不能为空")
     @Schema(description = "描述")
     private String description;
-    /**
-     * 创建人 ID
-     */
-    @NotNull(message = "createdById 不能为空")
-    @Schema(description = "创建人 ID")
-    private String createdById;
-    /**
-     * 创建时间
-     */
-    @DateTimeFormat(pattern = SynaDates.DATE_TIME_FORMAT)
-    @NotNull(message = "createdDate 不能为空")
-    @Schema(description = "创建时间")
-    private LocalDateTime createdDate;
-    /**
-     * 更新人 ID
-     */
-    @NotNull(message = "updatedById 不能为空")
-    @Schema(description = "更新人 ID")
-    private String updatedById;
-    /**
-     * 更新时间
-     */
-    @DateTimeFormat(pattern = SynaDates.DATE_TIME_FORMAT)
-    @NotNull(message = "updatedDate 不能为空")
-    @Schema(description = "更新时间")
-    private LocalDateTime updatedDate;
-    /**
-     * 是否删除;false:未删除,true:删除
-     */
-    @NotNull(message = "deleted 不能为空")
-    @Schema(description = "是否删除;false:未删除,true:删除")
-    private Boolean deleted;
 
     @Tolerate
     public ClientScopeUpdateParam() {}

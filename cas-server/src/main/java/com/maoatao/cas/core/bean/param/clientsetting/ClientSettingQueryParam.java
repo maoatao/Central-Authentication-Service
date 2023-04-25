@@ -1,7 +1,6 @@
 package com.maoatao.cas.core.bean.param.clientsetting;
 
 import com.maoatao.daedalus.web.bean.param.BasePaginationParam;
-import com.maoatao.synapse.lang.util.SynaDates;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -10,9 +9,6 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Tolerate;
 
 import java.io.Serial;
-import java.time.LocalDateTime;
-
-import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * CAS 客户端设置
@@ -28,13 +24,6 @@ public class ClientSettingQueryParam extends BasePaginationParam {
 
     @Serial
     private static final long serialVersionUID = -3262588912351943382L;
-
-    /**
-     * 主键id(自增)
-     */
-    @NotNull(message = "id 不能为空")
-    @Schema(description = "主键id(自增)")
-    private Long id;
     /**
      * 客户端 id
      */
@@ -65,38 +54,6 @@ public class ClientSettingQueryParam extends BasePaginationParam {
     @NotNull(message = "signingAlgorithm 不能为空")
     @Schema(description = "签名算法")
     private String signingAlgorithm;
-    /**
-     * 创建人 ID
-     */
-    @NotNull(message = "createdById 不能为空")
-    @Schema(description = "创建人 ID")
-    private String createdById;
-    /**
-     * 创建时间
-     */
-    @DateTimeFormat(pattern = SynaDates.DATE_TIME_FORMAT)
-    @NotNull(message = "createdDate 不能为空")
-    @Schema(description = "创建时间")
-    private LocalDateTime createdDate;
-    /**
-     * 更新人 ID
-     */
-    @NotNull(message = "updatedById 不能为空")
-    @Schema(description = "更新人 ID")
-    private String updatedById;
-    /**
-     * 更新时间
-     */
-    @DateTimeFormat(pattern = SynaDates.DATE_TIME_FORMAT)
-    @NotNull(message = "updatedDate 不能为空")
-    @Schema(description = "更新时间")
-    private LocalDateTime updatedDate;
-    /**
-     * 是否删除;false:未删除,true:删除
-     */
-    @NotNull(message = "deleted 不能为空")
-    @Schema(description = "是否删除;false:未删除,true:删除")
-    private Boolean deleted;
 
     @Tolerate
     public ClientSettingQueryParam() {}

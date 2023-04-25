@@ -34,9 +34,9 @@ public class ClientScopePermissionVO extends BaseVO {
     @Schema(description = "主键id(自增)")
     private Long id;
     /**
-     * 用户id
+     * 作用域id
      */
-    @Schema(description = "用户id")
+    @Schema(description = "作用域id")
     private Long scopeId;
     /**
      * 权限id
@@ -65,11 +65,6 @@ public class ClientScopePermissionVO extends BaseVO {
     @JsonFormat(pattern = SynaDates.DATE_TIME_FORMAT, timezone = SynaDates.CN_TIME_ZONE)
     @Schema(description = "更新时间")
     private LocalDateTime updatedDate;
-    /**
-     * 是否删除;false:未删除,true:删除
-     */
-    @Schema(description = "是否删除;false:未删除,true:删除")
-    private Boolean deleted;
 
     @Tolerate
     public ClientScopePermissionVO() {}

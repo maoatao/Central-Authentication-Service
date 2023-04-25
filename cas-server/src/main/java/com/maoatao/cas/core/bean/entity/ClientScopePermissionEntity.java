@@ -25,7 +25,7 @@ public class ClientScopePermissionEntity extends BaseEntity<ClientScopePermissio
     private static final long serialVersionUID = 124897359665403831L;
 
     /**
-     * 用户id
+     * 作用域id
      */
     private Long scopeId;
     /**

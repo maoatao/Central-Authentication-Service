@@ -18,6 +18,7 @@ import com.maoatao.cas.core.bean.entity.ClientScopeEntity;
 import com.maoatao.cas.core.bean.entity.ClientSettingEntity;
 import com.maoatao.cas.core.bean.entity.ClientTokenSettingEntity;
 import com.maoatao.cas.core.bean.param.client.ClientQueryParam;
+import com.maoatao.cas.core.bean.param.client.ClientSaveParam;
 import com.maoatao.cas.core.bean.vo.ClientVO;
 import com.maoatao.cas.core.mapper.ClientMapper;
 import com.maoatao.cas.core.service.ClientAuthenticationMethodService;
@@ -105,6 +106,12 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
     @Override
     public List<ClientEntity> listByClientAliases(List<String> clientAliases) {
         return super.list(Wrappers.<ClientEntity>lambdaQuery().in(ClientEntity::getAlias, clientAliases));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public long save(ClientSaveParam param) {
+        return -1;
     }
 
     @Override

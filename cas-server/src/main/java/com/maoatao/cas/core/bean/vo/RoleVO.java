@@ -70,11 +70,6 @@ public class RoleVO extends BaseVO {
     @JsonFormat(pattern = SynaDates.DATE_TIME_FORMAT, timezone = SynaDates.CN_TIME_ZONE)
     @Schema(description = "更新时间")
     private LocalDateTime updatedDate;
-    /**
-     * 是否删除;false:未删除,true:删除
-     */
-    @Schema(description = "是否删除;false:未删除,true:删除")
-    private Boolean deleted;
 
     @Tolerate
     public RoleVO() {}
