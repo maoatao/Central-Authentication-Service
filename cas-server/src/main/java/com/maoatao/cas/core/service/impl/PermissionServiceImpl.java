@@ -37,8 +37,13 @@ public class PermissionServiceImpl extends DaedalusServiceImpl<PermissionMapper,
     }
 
     @Override
-    public List<PermissionEntity> listByClientUser(Long userId) {
-        return getBaseMapper().listByClientUser(userId);
+    public List<PermissionEntity> listByClientUser(Long clientUserIds) {
+        return getBaseMapper().listByClientUser(clientUserIds);
+    }
+
+    @Override
+    public List<PermissionEntity> listByClientUsers(List<Long> clientUserIds) {
+        return getBaseMapper().listByClientUsers(clientUserIds);
     }
 
     @Override

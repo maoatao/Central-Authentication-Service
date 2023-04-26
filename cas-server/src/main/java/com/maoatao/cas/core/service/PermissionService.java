@@ -33,12 +33,20 @@ public interface PermissionService extends DaedalusService<PermissionEntity> {
     PermissionVO details(Long id);
 
     /**
-     * 通过用户id查询列表
+     * 查询权限列表
      *
-     * @param userId 用户ID
+     * @param clientUserIds 客户端用户ID
      * @return 权限列表
      */
-    List<PermissionEntity> listByClientUser(Long userId);
+    List<PermissionEntity> listByClientUser(Long clientUserIds);
+
+    /**
+     * 查询权限列表
+     *
+     * @param clientUserIds 客户端用户ID
+     * @return 权限列表
+     */
+    List<PermissionEntity> listByClientUsers(List<Long> clientUserIds);
 
     /**
      * 通过作用域查询列表

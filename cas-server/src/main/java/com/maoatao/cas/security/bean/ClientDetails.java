@@ -36,6 +36,11 @@ public class ClientDetails implements Serializable {
      */
     private Set<String> scopes;
 
+    /**
+     * 客户端别名
+     */
+    private Set<String> aliases;
+
     public Map<String, Set<String>> getClientScopes() {
         if (scopes == null) {
             return Map.of();

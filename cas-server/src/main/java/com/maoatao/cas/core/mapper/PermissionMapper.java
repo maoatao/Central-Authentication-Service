@@ -18,10 +18,18 @@ public interface PermissionMapper extends BaseMapper<PermissionEntity> {
     /**
      * 查询权限列表
      *
-     * @param userId 用户ID
+     * @param clientUserId 客户端用户ID
      * @return 权限列表
      */
-    List<PermissionEntity> listByClientUser(Long userId);
+    List<PermissionEntity> listByClientUser(Long clientUserId);
+
+    /**
+     * 查询权限列表
+     *
+     * @param clientUserIds 客户端用户ID
+     * @return 权限列表
+     */
+    List<PermissionEntity> listByClientUsers(List<Long> clientUserIds);
 
     /**
      * 通过作用域查询列表

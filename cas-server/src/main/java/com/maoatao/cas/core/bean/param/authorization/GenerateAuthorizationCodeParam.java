@@ -39,10 +39,15 @@ public class GenerateAuthorizationCodeParam extends BaseParam {
     @Schema(description = "密码")
     private String password;
     /**
-     * 授权范围
+     * 作用域
      */
-    @Schema(description = "授权范围")
+    @Schema(description = "作用域")
     private Set<String> scopes;
+    /**
+     * 授权客户端别名
+     */
+    @Schema(description = "授权客户端别名")
+    private Set<String> aliases;
     /**
      * PKCE协议额外参数:校验方法
      * <p>

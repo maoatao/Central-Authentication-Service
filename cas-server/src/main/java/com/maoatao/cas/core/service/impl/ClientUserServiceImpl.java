@@ -167,7 +167,7 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
         if (ObjUtil.isNull(userEntity)) {
             return Map.of();
         }
-        Set<String> clientIds = getClientsByUser(userEntity.getId());
+        Set<String> clientIds = getClientIdsByUser(userEntity.getId());
         if (CollectionUtil.isEmpty(clientIds)) {
             return Map.of();
         }
@@ -244,12 +244,33 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
     }
 
     private Map<String, Set<String>> buildUserPermission(long userId, ClientDetails clientDetails) {
-        Set<String> clientIds = getClientsByUser(userId);
+        Set<String> clientIds = getClientIdsByUser(userId);
+        // scope 和 alias 参数优先使用 scope (scope权限粒度更小)
+        if (MapUtil.isNotEmpty(clientDetails.getClientScopes())) {
+            return buildUserPermissionByScopes(clientIds, clientDetails.getClientScopes());
+        }
+        if (CollectionUtil.isNotEmpty(clientDetails.getAliases())) {
+            return buildUserPermissionByAliases(userId, clientIds, clientDetails.getAliases());
+        }
         return Map.of();
     }
 
-    private Map<String, Set<String>> buildUserPermissionByRoles(Map<String, Set<String>> scopes) {
-        return Map.of();
+    private Map<String, Set<String>> buildUserPermissionByAliases(long userId, Set<String> clientIds, Set<String> aliases) {
+        if (CollectionUtil.isEmpty(aliases)) {
+            return Map.of();
+        }
+        List<String> requestClientIds = clientService.listByClientAliases(aliases.stream().toList()).stream()
+                .map(ClientEntity::getClientId).collect(Collectors.toList());
+        // 请求客户端和所属客户端取交集
+        requestClientIds.retainAll(clientIds);
+        if (CollectionUtil.isEmpty(requestClientIds)) {
+            return Map.of();
+        }
+        List<Long> clientUserIds = getAllClientUsersByUser(userId).stream()
+                .filter(o -> requestClientIds.contains(o.getClientId()))
+                .map(ClientUserEntity::getUserId)
+                .distinct().toList();
+        return buildPermissionByEntity(permissionService.listByClientUsers(clientUserIds));
     }
 
     private Map<String, Set<String>> buildUserPermissionByScopes(Set<String> clientIds, Map<String, Set<String>> scopes) {
@@ -280,16 +301,22 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
         if (CollectionUtil.isEmpty(scopeIds)) {
             return Map.of();
         }
-        // 查询作用域权限
-        List<PermissionEntity> permissionEntities = permissionService.listByClientScopes(scopeIds);
+        return buildPermissionByEntity(permissionService.listByClientScopes(scopeIds));
+    }
+
+    private Set<String> getClientIdsByUser(long userId) {
+        return list(Wrappers.<ClientUserEntity>lambdaQuery().eq(ClientUserEntity::getUserId, userId)).stream().map(ClientUserEntity::getClientId).collect(Collectors.toSet());
+    }
+
+    private List<ClientUserEntity> getAllClientUsersByUser(long userId) {
+        return list(Wrappers.<ClientUserEntity>lambdaQuery().eq(ClientUserEntity::getUserId, userId)).stream().toList();
+    }
+
+    private Map<String, Set<String>> buildPermissionByEntity(List<PermissionEntity> permissionEntities) {
         if (CollectionUtil.isNotEmpty(permissionEntities)) {
             return permissionEntities.stream()
                     .collect(Collectors.groupingBy(PermissionEntity::getClientId, Collectors.mapping(PermissionEntity::getName, Collectors.toSet())));
         }
         return Map.of();
-    }
-
-    private Set<String> getClientsByUser(long userId) {
-        return list(Wrappers.<ClientUserEntity>lambdaQuery().eq(ClientUserEntity::getUserId, userId)).stream().map(ClientUserEntity::getClientId).collect(Collectors.toSet());
     }
 }
