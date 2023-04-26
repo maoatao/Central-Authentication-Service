@@ -150,6 +150,12 @@ Central Authentication Service (CAS 中央认证服务 OAuth2.1协议)
 1. 使用单元测试生成S256的参数
    `com.maoatao.cas.test.CodeVerifierTest#generate_verifier_by_S256_test()`
 
+## 开发计划
+✅ 请求令牌时使用 scope 参数控制权限  
+🚀 请求令牌时不使用 scope 参数获取用户角色权限  
+💭 自定义授权同意服务  
+💭 自定义登录页面  
+
 ## 帮助
 
 联系邮箱：maoatao@outlook.com
