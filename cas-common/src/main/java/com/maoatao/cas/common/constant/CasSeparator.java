@@ -14,6 +14,12 @@ public class CasSeparator {
      * 客户端别名.作用域名称
      */
     public static final String SCOPE = ".";
+    /**
+     * 作用域分隔符 正则
+     * <p>
+     * 客户端别名.作用域名称
+     */
+    public static final String SCOPE_REGEX = "\\.";
 
     private CasSeparator() {
     }

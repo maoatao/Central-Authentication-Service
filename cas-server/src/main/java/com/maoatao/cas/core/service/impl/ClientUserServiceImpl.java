@@ -218,6 +218,7 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
         CustomUserDetails.CustomUserDetailsBuilder customUserDetailsBuilder = CustomUserDetails.builder()
                 .username(clientUserEntity.getLoginName())
                 .password(clientUserEntity.getPassword())
+                .permissions(Map.of())
                 .enabled(true)
                 .accountNonExpired(true)
                 .accountNonLocked(true)
@@ -229,23 +230,32 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
         }
         List<String> scopeNames = scopes.values().stream().flatMap(Collection::stream).toList();
         List<String> clientAliases = scopes.keySet().stream().toList();
+        if (CollectionUtil.isEmpty(scopeNames) || CollectionUtil.isEmpty(clientAliases)) {
+            return customUserDetailsBuilder.build();
+        }
         List<String> clientIds = clientService.listByClientAliases(clientAliases).stream().map(ClientEntity::getClientId).toList();
-        SynaAssert.notEmpty(clientIds, "不存在客户端{}", clientAliases);
+        if (CollectionUtil.isEmpty(clientIds)) {
+            return customUserDetailsBuilder.build();
+        }
         // 按作用域名称查找所有客户端的作用域
         List<ClientScopeEntity> clientScopeEntities = clientScopeService.listByScopeNames(scopeNames);
+        if (CollectionUtil.isEmpty(clientScopeEntities)) {
+            return customUserDetailsBuilder.build();
+        }
         // 筛选指定的客户端作用域
         List<Long> scopeIds = clientScopeEntities.stream()
                 .filter(o -> clientIds.contains(o.getClientId()))
                 .map(ClientScopeEntity::getId)
                 .distinct().toList();
+        if (CollectionUtil.isEmpty(scopeIds)) {
+            return customUserDetailsBuilder.build();
+        }
         // 查询作用域权限
         List<PermissionEntity> permissionEntities = permissionService.listByClientScopes(scopeIds);
         if (CollectionUtil.isNotEmpty(permissionEntities)) {
             customUserDetailsBuilder.permissions(permissionEntities.stream()
                     .collect(Collectors.groupingBy(PermissionEntity::getClientId, Collectors.mapping(PermissionEntity::getName, Collectors.toSet())))
             );
-        } else {
-            customUserDetailsBuilder.permissions(Map.of());
         }
         return customUserDetailsBuilder.build();
     }

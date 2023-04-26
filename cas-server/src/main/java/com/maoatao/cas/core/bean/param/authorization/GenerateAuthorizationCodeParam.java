@@ -2,10 +2,10 @@ package com.maoatao.cas.core.bean.param.authorization;
 
 import com.maoatao.cas.common.constant.CasSeparator;
 import com.maoatao.synapse.core.bean.base.BaseParam;
+import com.maoatao.synapse.lang.util.SynaSafes;
+import com.maoatao.synapse.lang.util.SynaStrings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -46,7 +46,7 @@ public class GenerateAuthorizationCodeParam extends BaseParam {
      * 授权范围
      */
     @Schema(description = "授权范围")
-    private Map<String, Set<String>> scopes;
+    private Set<String> scopes;
     /**
      * PKCE协议额外参数:校验方法
      * <p>
@@ -69,13 +69,11 @@ public class GenerateAuthorizationCodeParam extends BaseParam {
         return additionalParameters;
     }
 
-    public Set<String> getClientScopes() {
+    public Map<String, Set<String>> getClientScopes() {
         if (scopes == null) {
-            return new HashSet<>();
+            return Map.of();
         }
-        return scopes.entrySet().stream()
-                .map(entry -> entry.getValue().stream().map(scope -> entry.getKey().concat(CasSeparator.SCOPE).concat(scope)).toList())
-                .flatMap(Collection::stream)
-                .collect(Collectors.toSet());
+        return scopes.stream().map(o -> o.split(CasSeparator.SCOPE_REGEX))
+                .collect(Collectors.groupingBy(o -> SynaSafes.of(o[0]), Collectors.mapping(o -> o.length == 2 ? SynaSafes.of(o[1]) : SynaStrings.EMPTY, Collectors.toSet())));
     }
 }

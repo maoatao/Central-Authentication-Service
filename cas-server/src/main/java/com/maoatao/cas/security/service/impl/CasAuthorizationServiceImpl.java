@@ -4,11 +4,7 @@ import com.maoatao.cas.common.authentication.CasAccessToken;
 import com.maoatao.cas.common.authentication.CasAuthorization;
 import com.maoatao.cas.common.authentication.DefaultAccessToken;
 import com.maoatao.cas.common.authentication.DefaultAuthorization;
-import com.maoatao.cas.core.bean.entity.ClientEntity;
-import com.maoatao.cas.core.bean.entity.ClientScopeEntity;
 import com.maoatao.cas.core.bean.param.accesstoken.GenerateAccessTokenParam;
-import com.maoatao.cas.core.service.ClientScopeService;
-import com.maoatao.cas.core.service.ClientService;
 import com.maoatao.cas.security.authorization.CustomUserAuthenticationProvider;
 import com.maoatao.cas.security.bean.ClientDetails;
 import com.maoatao.cas.security.constant.GrantType;
@@ -21,9 +17,7 @@ import com.maoatao.daedalus.web.util.ServletUtils;
 import com.maoatao.synapse.lang.exception.SynaException;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import com.maoatao.synapse.lang.util.SynaDates;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,19 +80,13 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
     @Autowired
     private OAuth2TokenGenerator<OAuth2Token> tokenGenerator;
 
-    @Autowired
-    private ClientScopeService clientScopeService;
-
-    @Autowired
-    private ClientService clientService;
-
     @Override
     public String generateAuthorizationCode(GenerateAuthorizationCodeParam param) {
         OAuth2ClientAuthenticationToken clientAuthentication = getClientAuthentication();
         RegisteredClient registeredClient = clientAuthentication.getRegisteredClient();
         checkParams(param, registeredClient);
-        Authentication principal = generateUserPrincipal(registeredClient.getClientId(), param.getUsername(), param.getPassword(), param.getScopes());
-        OAuth2TokenContext tokenContext = buildTokenContext(param.getClientScopes(), registeredClient, principal);
+        Authentication principal = generateUserPrincipal(registeredClient.getClientId(), param.getUsername(), param.getPassword(), param.getClientScopes());
+        OAuth2TokenContext tokenContext = buildTokenContext(param.getScopes(), registeredClient, principal);
         OAuth2AuthorizationCode authorizationCode = buildAuthorizationCode(tokenContext);
         saveAuthorization(param, registeredClient, principal, authorizationCode);
         return authorizationCode.getTokenValue();
@@ -249,7 +237,7 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
             authorizationRequest = OAuth2AuthorizationRequest.authorizationCode()
                     .authorizationUri(ServletUtils.getRequest().getRequestURL().toString())
                     .clientId(registeredClient.getClientId())
-                    .scopes(param.getClientScopes())
+                    .scopes(param.getScopes())
                     .additionalParameters(param.getAdditionalParameters())
                     .build();
         } catch (SynaException e) {
@@ -328,7 +316,7 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
                     .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                     .attribute(Principal.class.getName(), principal)
                     .attribute(OAuth2AuthorizationRequest.class.getName(), authorizationRequest)
-                    .authorizedScopes(param.getClientScopes())
+                    .authorizedScopes(param.getScopes())
                     .token(authorizationCode)
                     .build();
         } catch (SynaException e) {
@@ -358,21 +346,6 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
     }
 
     private void checkParams(GenerateAuthorizationCodeParam param, RegisteredClient registeredClient) {
-        Map<String, Set<String>> clientScopes = param.getScopes();
-        SynaAssert.notEmpty(clientScopes, "无效的请求参数[scopes]");
-        List<String> clientAliases = clientScopes.keySet().stream().toList();
-        List<ClientEntity> clientEntities = clientService.listByClientAliases(clientAliases);
-        SynaAssert.notEmpty(clientEntities, "不存在客户端{}", clientAliases);
-        Map<String, String> clientMap = clientEntities.stream().collect(Collectors.toMap(ClientEntity::getName, ClientEntity::getClientId));
-        List<String> clientIds = clientEntities.stream().map(ClientEntity::getClientId).toList();
-        Map<String, Set<String>> existedClientScopes = clientScopeService.listByClientIds(clientIds).stream()
-                .collect(Collectors.groupingBy(ClientScopeEntity::getClientId, Collectors.mapping(ClientScopeEntity::getName, Collectors.toSet())));
-        for (Map.Entry<String, Set<String>> entry : clientScopes.entrySet()) {
-            Set<String> existedScopes = existedClientScopes.get(clientMap.get(entry.getKey()));
-            SynaAssert.notEmpty(existedScopes, "客户端:{}不存在或该客户端没有可用的作用域!", entry.getKey());
-            Set<String> notExisted = entry.getValue().stream().filter(scope -> !existedScopes.contains(scope)).collect(Collectors.toSet());
-            SynaAssert.isEmpty(notExisted, "客户端:{}不存在作用域{}", entry.getKey(), notExisted);
-        }
         if (registeredClient.getClientSettings().isRequireProofKey()) {
             SynaAssert.isTrue(StrUtil.isNotBlank(param.getCodeChallengeMethod()), "无效的请求参数[codeChallengeMethod]");
             SynaAssert.isTrue(StrUtil.isNotBlank(param.getCodeChallenge()), "无效的请求参数[codeChallenge]");
