@@ -15,6 +15,9 @@
  */
 package com.maoatao.cas.security.oauth2.auth.provider;
 
+import com.maoatao.cas.core.service.ClientUserService;
+import com.maoatao.cas.security.bean.ClientDetails;
+import com.maoatao.cas.security.bean.CustomUserDetails;
 import com.maoatao.cas.security.oauth2.auth.generator.CustomAuthorizationCodeGenerator;
 import java.util.Collections;
 import java.util.HashSet;
@@ -68,6 +71,7 @@ public final class CustomAuthorizationConsentProvider implements AuthenticationP
     private final RegisteredClientRepository registeredClientRepository;
     private final OAuth2AuthorizationService authorizationService;
     private final OAuth2AuthorizationConsentService authorizationConsentService;
+    private final ClientUserService clientUserService;
     private OAuth2TokenGenerator<? extends OAuth2Token> authorizationCodeGenerator = new CustomAuthorizationCodeGenerator();
     private Consumer<OAuth2AuthorizationConsentAuthenticationContext> authorizationConsentCustomizer;
 
@@ -79,13 +83,17 @@ public final class CustomAuthorizationConsentProvider implements AuthenticationP
      * @param authorizationConsentService the authorization consent service
      */
     public CustomAuthorizationConsentProvider(RegisteredClientRepository registeredClientRepository,
-                                              OAuth2AuthorizationService authorizationService, OAuth2AuthorizationConsentService authorizationConsentService) {
+                                              OAuth2AuthorizationService authorizationService,
+                                              OAuth2AuthorizationConsentService authorizationConsentService,
+                                              ClientUserService clientUserService) {
         Assert.notNull(registeredClientRepository, "registeredClientRepository cannot be null");
         Assert.notNull(authorizationService, "authorizationService cannot be null");
         Assert.notNull(authorizationConsentService, "authorizationConsentService cannot be null");
+        Assert.notNull(clientUserService, "clientUserService cannot be null");
         this.registeredClientRepository = registeredClientRepository;
         this.authorizationService = authorizationService;
         this.authorizationConsentService = authorizationConsentService;
+        this.clientUserService = clientUserService;
     }
 
     @Override
@@ -109,6 +117,14 @@ public final class CustomAuthorizationConsentProvider implements AuthenticationP
         if (!isPrincipalAuthenticated(principal) || !principal.getName().equals(authorization.getPrincipalName())) {
             throwError(OAuth2ErrorCodes.INVALID_REQUEST, OAuth2ParameterNames.STATE,
                     authorizationConsentAuthentication, null, null);
+        }
+
+        // 补充权限
+        if (principal.getDetails() instanceof ClientDetails clientDetails) {
+            clientDetails.setScopes(authorizationConsentAuthentication.getScopes());
+            if (principal.getPrincipal() instanceof CustomUserDetails customUserDetails) {
+                customUserDetails.setPermissions(this.clientUserService.buildPermissions(customUserDetails.getOpenId(), clientDetails));
+            }
         }
 
         RegisteredClient registeredClient = this.registeredClientRepository.findByClientId(

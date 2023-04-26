@@ -85,7 +85,7 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
         OAuth2ClientAuthenticationToken clientAuthentication = getClientAuthentication();
         RegisteredClient registeredClient = clientAuthentication.getRegisteredClient();
         checkParams(param, registeredClient);
-        Authentication principal = generateUserPrincipal(registeredClient.getClientId(), param.getUsername(), param.getPassword(), param.getClientScopes());
+        Authentication principal = generateUserPrincipal(registeredClient.getClientId(), param.getUsername(), param.getPassword(), param.getScopes());
         OAuth2TokenContext tokenContext = buildTokenContext(param.getScopes(), registeredClient, principal);
         OAuth2AuthorizationCode authorizationCode = buildAuthorizationCode(tokenContext);
         saveAuthorization(param, registeredClient, principal, authorizationCode);
@@ -164,7 +164,7 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
 
     @Override
     public Authentication generateUserPrincipal(ClientUser clientUser) {
-        return generateUserPrincipal(clientUser.clientId(), clientUser.username(), clientUser.password(), Map.of());
+        return generateUserPrincipal(clientUser.clientId(), clientUser.username(), clientUser.password(), Set.of());
     }
 
     @Override
@@ -195,7 +195,7 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
      * @param scopes   作用域
      * @return 用户身份验证
      */
-    private Authentication generateUserPrincipal(String clientId, String username, String password, Map<String, Set<String>> scopes) {
+    private Authentication generateUserPrincipal(String clientId, String username, String password, Set<String> scopes) {
         Authentication authentication;
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, password);
         // 设置客户端 id 供 CustomUserAuthenticationProvider#retrieveUser 方法使用

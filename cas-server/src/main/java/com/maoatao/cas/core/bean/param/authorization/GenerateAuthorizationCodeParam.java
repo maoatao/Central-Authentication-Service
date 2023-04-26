@@ -1,12 +1,8 @@
 package com.maoatao.cas.core.bean.param.authorization;
 
-import com.maoatao.cas.common.constant.CasSeparator;
 import com.maoatao.synapse.core.bean.base.BaseParam;
-import com.maoatao.synapse.lang.util.SynaSafes;
-import com.maoatao.synapse.lang.util.SynaStrings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.security.oauth2.core.endpoint.PkceParameterNames;
@@ -67,13 +63,5 @@ public class GenerateAuthorizationCodeParam extends BaseParam {
         additionalParameters.put(PkceParameterNames.CODE_CHALLENGE_METHOD, getCodeChallengeMethod());
         additionalParameters.put(PkceParameterNames.CODE_CHALLENGE, getCodeChallenge());
         return additionalParameters;
-    }
-
-    public Map<String, Set<String>> getClientScopes() {
-        if (scopes == null) {
-            return Map.of();
-        }
-        return scopes.stream().map(o -> o.split(CasSeparator.SCOPE_REGEX))
-                .collect(Collectors.groupingBy(o -> SynaSafes.of(o[0]), Collectors.mapping(o -> o.length == 2 ? SynaSafes.of(o[1]) : SynaStrings.EMPTY, Collectors.toSet())));
     }
 }

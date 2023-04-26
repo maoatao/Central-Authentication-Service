@@ -8,6 +8,8 @@ import com.maoatao.cas.core.bean.vo.ClientUserVO;
 import com.maoatao.cas.core.bean.entity.ClientUserEntity;
 import com.maoatao.cas.security.bean.ClientDetails;
 import com.maoatao.daedalus.data.service.DaedalusService;
+import java.util.Map;
+import java.util.Set;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -40,7 +42,7 @@ public interface ClientUserService extends DaedalusService<ClientUserEntity> {
      * <p>
      * 与{@link org.springframework.security.core.userdetails.UserDetailsService#loadUserByUsername}不同,需要客户端id
      *
-     * @param username     用户名
+     * @param username      用户名
      * @param clientDetails 客户端作用域
      * @return 返回用户信息
      * @throws UsernameNotFoundException 如果找不到用户或用户没有授权权限
@@ -100,4 +102,13 @@ public interface ClientUserService extends DaedalusService<ClientUserEntity> {
      * @return 用户不存在返回 null
      */
     ClientUserEntity getByNameAndClient(String name, String clientId);
+
+    /**
+     * 构建权限
+     *
+     * @param openId        用户开放id
+     * @param clientDetails 请求作用域
+     * @return 权限
+     */
+    Map<String, Set<String>> buildPermissions(String openId, ClientDetails clientDetails);
 }

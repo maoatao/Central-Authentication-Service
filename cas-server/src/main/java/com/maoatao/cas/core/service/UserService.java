@@ -38,4 +38,12 @@ public interface UserService extends DaedalusService<UserEntity> {
      * @return 新增成功返回主键 id
      */
     long save(UserSaveParam param);
+
+    /**
+     * 通过开放id查询
+     *
+     * @param openId 开放id
+     * @return CAS 用户
+     */
+    UserEntity getByOpenId(String openId);
 }

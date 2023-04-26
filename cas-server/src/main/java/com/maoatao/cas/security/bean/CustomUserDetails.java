@@ -4,6 +4,7 @@ import com.maoatao.cas.security.authorization.CustomUserAuthenticationProvider;
 import java.util.Map;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
@@ -38,7 +39,8 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
 
     private final String username;
 
-    private final Map<String, Set<String>> permissions;
+    @Setter
+    private Map<String, Set<String>> permissions;
 
     private final boolean accountNonExpired;
 

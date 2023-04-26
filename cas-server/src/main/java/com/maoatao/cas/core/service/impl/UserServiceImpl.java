@@ -42,7 +42,12 @@ public class UserServiceImpl extends DaedalusServiceImpl<UserMapper, UserEntity>
     public long save(UserSaveParam param) {
         UserEntity userEntity = BeanUtil.copyProperties(param, UserEntity.class);
         userEntity.setOpenId(IdUtils.nextUserOpenId());
-        SynaAssert.isTrue(save(userEntity), "新增用户失败!");
+        SynaAssert.isTrue(super.save(userEntity), "新增用户失败!");
         return userEntity.getId();
+    }
+
+    @Override
+    public UserEntity getByOpenId(String openId) {
+        return super.getOne(Wrappers.<UserEntity>lambdaQuery().eq(UserEntity::getOpenId, openId));
     }
 }

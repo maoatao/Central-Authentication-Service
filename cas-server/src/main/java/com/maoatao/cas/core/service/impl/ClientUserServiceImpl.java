@@ -3,11 +3,13 @@ package com.maoatao.cas.core.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.core.bean.entity.ClientEntity;
 import com.maoatao.cas.core.bean.entity.ClientScopeEntity;
+import com.maoatao.cas.core.bean.entity.UserEntity;
 import com.maoatao.cas.core.bean.param.clientuser.ClientUserQueryParam;
 import com.maoatao.cas.core.bean.param.clientuser.ClientUserSaveParam;
 import com.maoatao.cas.core.bean.param.clientuser.ClientUserUpdateParam;
@@ -96,7 +98,7 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
         if (existed == null) {
             throw new UsernameNotFoundException(SynaStrings.format("客户端用户 {} 不存在!", username));
         }
-        return buildUserDetails(existed, clientDetails.getScopes());
+        return buildUserDetails(existed, clientDetails);
     }
 
     @Override
@@ -159,6 +161,19 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
         return getOne(Wrappers.query(ClientUserEntity.builder().loginName(name).clientId(clientId).build()));
     }
 
+    @Override
+    public Map<String, Set<String>> buildPermissions(String openId, ClientDetails clientDetails) {
+        UserEntity userEntity = userService.getByOpenId(openId);
+        if (ObjUtil.isNull(userEntity)) {
+            return Map.of();
+        }
+        Set<String> clientIds = getClientsByUser(userEntity.getId());
+        if (CollectionUtil.isEmpty(clientIds)) {
+            return Map.of();
+        }
+        return buildUserPermissionByScopes(clientIds, clientDetails.getClientScopes());
+    }
+
     /**
      * 校验客户端是否存在
      *
@@ -214,49 +229,67 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
         }).toList();
     }
 
-    private UserDetails buildUserDetails(ClientUserEntity clientUserEntity, Map<String, Set<String>> scopes) {
+    private UserDetails buildUserDetails(ClientUserEntity clientUserEntity, ClientDetails clientDetails) {
         CustomUserDetails.CustomUserDetailsBuilder customUserDetailsBuilder = CustomUserDetails.builder()
                 .username(clientUserEntity.getLoginName())
                 .password(clientUserEntity.getPassword())
-                .permissions(Map.of())
                 .enabled(true)
                 .accountNonExpired(true)
                 .accountNonLocked(true)
                 .credentialsNonExpired(true);
         Optional.ofNullable(userService.getById(clientUserEntity.getUserId()))
                 .ifPresent(userEntity -> customUserDetailsBuilder.openId(userEntity.getOpenId()));
+        customUserDetailsBuilder.permissions(buildUserPermission(clientUserEntity.getUserId(), clientDetails));
+        return customUserDetailsBuilder.build();
+    }
+
+    private Map<String, Set<String>> buildUserPermission(long userId, ClientDetails clientDetails) {
+        Set<String> clientIds = getClientsByUser(userId);
+        return Map.of();
+    }
+
+    private Map<String, Set<String>> buildUserPermissionByRoles(Map<String, Set<String>> scopes) {
+        return Map.of();
+    }
+
+    private Map<String, Set<String>> buildUserPermissionByScopes(Set<String> clientIds, Map<String, Set<String>> scopes) {
         if (MapUtil.isEmpty(scopes)) {
-            return customUserDetailsBuilder.build();
+            return Map.of();
         }
         List<String> scopeNames = scopes.values().stream().flatMap(Collection::stream).toList();
         List<String> clientAliases = scopes.keySet().stream().toList();
         if (CollectionUtil.isEmpty(scopeNames) || CollectionUtil.isEmpty(clientAliases)) {
-            return customUserDetailsBuilder.build();
+            return Map.of();
         }
-        List<String> clientIds = clientService.listByClientAliases(clientAliases).stream().map(ClientEntity::getClientId).toList();
-        if (CollectionUtil.isEmpty(clientIds)) {
-            return customUserDetailsBuilder.build();
+        List<String> requestClientIds = clientService.listByClientAliases(clientAliases).stream().map(ClientEntity::getClientId).collect(Collectors.toList());
+        // 请求客户端和所属客户端取交集
+        requestClientIds.retainAll(clientIds);
+        if (CollectionUtil.isEmpty(requestClientIds)) {
+            return Map.of();
         }
         // 按作用域名称查找所有客户端的作用域
         List<ClientScopeEntity> clientScopeEntities = clientScopeService.listByScopeNames(scopeNames);
         if (CollectionUtil.isEmpty(clientScopeEntities)) {
-            return customUserDetailsBuilder.build();
+            return Map.of();
         }
         // 筛选指定的客户端作用域
         List<Long> scopeIds = clientScopeEntities.stream()
-                .filter(o -> clientIds.contains(o.getClientId()))
+                .filter(o -> requestClientIds.contains(o.getClientId()))
                 .map(ClientScopeEntity::getId)
                 .distinct().toList();
         if (CollectionUtil.isEmpty(scopeIds)) {
-            return customUserDetailsBuilder.build();
+            return Map.of();
         }
         // 查询作用域权限
         List<PermissionEntity> permissionEntities = permissionService.listByClientScopes(scopeIds);
         if (CollectionUtil.isNotEmpty(permissionEntities)) {
-            customUserDetailsBuilder.permissions(permissionEntities.stream()
-                    .collect(Collectors.groupingBy(PermissionEntity::getClientId, Collectors.mapping(PermissionEntity::getName, Collectors.toSet())))
-            );
+            return permissionEntities.stream()
+                    .collect(Collectors.groupingBy(PermissionEntity::getClientId, Collectors.mapping(PermissionEntity::getName, Collectors.toSet())));
         }
-        return customUserDetailsBuilder.build();
+        return Map.of();
+    }
+
+    private Set<String> getClientsByUser(long userId) {
+        return list(Wrappers.<ClientUserEntity>lambdaQuery().eq(ClientUserEntity::getUserId, userId)).stream().map(ClientUserEntity::getClientId).collect(Collectors.toSet());
     }
 }

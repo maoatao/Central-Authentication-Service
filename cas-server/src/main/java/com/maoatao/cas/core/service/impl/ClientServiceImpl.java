@@ -319,7 +319,7 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
                 ))
                 .scopes(scopes -> scopes.addAll(
                         clientBo.getScopes().stream()
-                                .map(ClientScopeEntity::getName)
+                                .map(o -> clientBo.getContent().getAlias().concat(CasSeparator.SCOPE).concat(o.getName()))
                                 .collect(Collectors.toSet())
                 ))
                 .clientSettings(clientSettingsBuilder.build())

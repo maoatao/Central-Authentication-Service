@@ -16,7 +16,6 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
-import org.springframework.security.oauth2.server.authorization.authentication.ClientSecretAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
@@ -97,7 +96,7 @@ public class ProviderConfig {
      */
     @Bean
     public CustomClientSecretAuthenticationProvider customClientSecretAuthenticationProvider(RegisteredClientRepository registeredClientRepository,
-                                                                                 OAuth2AuthorizationService oAuth2AuthorizationService) {
+                                                                                             OAuth2AuthorizationService oAuth2AuthorizationService) {
         return new CustomClientSecretAuthenticationProvider(registeredClientRepository, oAuth2AuthorizationService);
     }
 
@@ -127,9 +126,10 @@ public class ProviderConfig {
     public CustomAuthorizationCodeProvider customAuthorizationCodeProvider(RegisteredClientRepository registeredClientRepository,
                                                                            OAuth2AuthorizationService oAuth2AuthorizationService,
                                                                            OAuth2AuthorizationConsentService oAuth2AuthorizationConsentService,
-                                                                           OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator) {
+                                                                           OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator,
+                                                                           ClientUserService clientUserService) {
         CustomAuthorizationCodeProvider provider =
-                new CustomAuthorizationCodeProvider(registeredClientRepository, oAuth2AuthorizationService, oAuth2AuthorizationConsentService);
+                new CustomAuthorizationCodeProvider(registeredClientRepository, oAuth2AuthorizationService, oAuth2AuthorizationConsentService, clientUserService);
         // 配置自定义授权码生成器
         provider.setAuthorizationCodeGenerator(oAuth2TokenGenerator);
         return provider;
@@ -142,9 +142,10 @@ public class ProviderConfig {
     public CustomAuthorizationConsentProvider customAuthorizationConsentProvider(RegisteredClientRepository registeredClientRepository,
                                                                                  OAuth2AuthorizationService oAuth2AuthorizationService,
                                                                                  OAuth2AuthorizationConsentService oAuth2AuthorizationConsentService,
-                                                                                 OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator) {
+                                                                                 OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator,
+                                                                                 ClientUserService clientUserService) {
         CustomAuthorizationConsentProvider provider =
-                new CustomAuthorizationConsentProvider(registeredClientRepository, oAuth2AuthorizationService, oAuth2AuthorizationConsentService);
+                new CustomAuthorizationConsentProvider(registeredClientRepository, oAuth2AuthorizationService, oAuth2AuthorizationConsentService, clientUserService);
         // 配置自定义授权码生成器
         provider.setAuthorizationCodeGenerator(oAuth2TokenGenerator);
         return provider;

@@ -150,10 +150,17 @@ Central Authentication Service (CAS 中央认证服务 OAuth2.1协议)
 1. 使用单元测试生成S256的参数
    `com.maoatao.cas.test.CodeVerifierTest#generate_verifier_by_S256_test()`
 
-## 开发计划
+## 自定义功能开发
+✅ Redis储存授权信息  
+✅ 自定义客户端服务
+✅ 自定义用户服务  
+💭 自定义授权同意服务  
+✅ 自定义授权码和生成令牌接口  
+✅ 快速集成CAS的API包
+✅ 权限控制(服务权限拦截和接口权限拦截)  
+✅ 单点登录(多客户端用户绑定到一个开放用户实现跨客户端授权,非多个App公用一个客户端)  
 ✅ 请求令牌时使用 scope 参数控制权限  
 🚀 请求令牌时不使用 scope 参数获取用户角色权限  
-💭 自定义授权同意服务  
 💭 自定义登录页面  
 
 ## 帮助
