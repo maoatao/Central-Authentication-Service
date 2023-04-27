@@ -91,7 +91,7 @@ public class CasAuthorizationServiceImpl implements CasAuthorizationService {
                 .aliases(param.getAliases())
                 .build();
         Authentication principal = generateUserPrincipal(param.getUsername(), param.getPassword(), clientDetails);
-        OAuth2TokenContext tokenContext = buildTokenContext(param.getScopes(), registeredClient, principal);
+        OAuth2TokenContext tokenContext = buildTokenContext(clientDetails.getScopes(), registeredClient, principal);
         OAuth2AuthorizationCode authorizationCode = buildAuthorizationCode(tokenContext);
         saveAuthorization(param, registeredClient, principal, authorizationCode);
         return authorizationCode.getTokenValue();

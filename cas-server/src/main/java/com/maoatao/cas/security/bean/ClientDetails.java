@@ -48,4 +48,12 @@ public class ClientDetails implements Serializable {
         return scopes.stream().map(o -> o.split(CasSeparator.SCOPE_REGEX))
                 .collect(Collectors.groupingBy(o -> SynaSafes.of(o[0]), Collectors.mapping(o -> o.length == 2 ? SynaSafes.of(o[1]) : SynaStrings.EMPTY, Collectors.toSet())));
     }
+
+    public Set<String> getScopes() {
+        return SynaSafes.of(scopes);
+    }
+
+    public Set<String> getAliases() {
+        return SynaSafes.of(aliases);
+    }
 }
