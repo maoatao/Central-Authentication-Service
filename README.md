@@ -162,6 +162,8 @@ Central Authentication Service (CAS 中央认证服务 OAuth2.1协议)
 ✅ 请求令牌时使用 scope 参数控制权限(权限粒度)  
 ✅ 请求令牌时使用 alias 参数控制权限(角色粒度)  
 💭 自定义登录页面  
+💭 自定义授权页面  
+❓ 是否需要管理页面  
 
 ## 帮助
 
