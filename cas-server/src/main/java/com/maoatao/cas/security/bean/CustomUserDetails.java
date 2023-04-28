@@ -2,13 +2,13 @@ package com.maoatao.cas.security.bean;
 
 import com.maoatao.cas.security.authorization.CustomUserAuthenticationProvider;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
@@ -52,8 +52,10 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
 
     @Override
     public Collection<GrantedAuthority> getAuthorities() {
-        // return this.permissions.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-        return null;
+        return this.permissions.entrySet().stream()
+                .map(o -> o.getValue().stream().map(x -> ClientAuthority.builder().clientId(o.getKey()).permission(x).build()).toList())
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
     }
 
     @Override
