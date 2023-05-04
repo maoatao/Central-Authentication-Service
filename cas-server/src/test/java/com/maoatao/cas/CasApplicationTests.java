@@ -25,6 +25,7 @@ import com.maoatao.cas.core.service.PermissionService;
 import com.maoatao.cas.core.service.RolePermissionService;
 import com.maoatao.cas.core.service.RoleService;
 import com.maoatao.cas.core.service.ClientUserService;
+import com.maoatao.cas.util.ClientSettingUtils;
 import com.maoatao.cas.util.FilterUtils;
 import com.maoatao.cas.util.IdUtils;
 import com.maoatao.synapse.lang.exception.SynaException;
@@ -67,6 +68,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -275,6 +277,9 @@ class CasApplicationTests {
      */
     @Test
     void save_client_test() {
+        ClientSettings.Builder clientSettingsBuilder = ClientSettings.builder().requireProofKey(true);
+        ClientSettingUtils.setClientAlias(clientSettingsBuilder, TEST_CLIENT_ALIAS);
+        TokenSettings tokenSettings = TokenSettings.builder().accessTokenFormat(OAuth2TokenFormat.REFERENCE).build();
         registeredClientRepository.save(RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId(TEST_CLIENT_ID)
                 .clientName(TEST_CLIENT_NAME)
@@ -287,8 +292,8 @@ class CasApplicationTests {
                 .redirectUri(TEST_CLIENT_REDIRECT_URI)
                 .scopes(scope -> scope.addAll(TEST_CLIENT_SCOPES))
                 // requireProofKey 需要额外参数验证,requireAuthorizationConsent 授权需要同意
-                .clientSettings(ClientSettings.builder().requireProofKey(true).build())
-                .tokenSettings(TokenSettings.builder().accessTokenFormat(OAuth2TokenFormat.REFERENCE).build())
+                .clientSettings(clientSettingsBuilder.build())
+                .tokenSettings(tokenSettings)
                 .build());
         RegisteredClient registeredClient = registeredClientRepository.findByClientId(TEST_CLIENT_ID);
         Assert.assertNotNull(registeredClient);
@@ -366,7 +371,7 @@ class CasApplicationTests {
         generateAuthorizationCodeParam.setUsername(TEST_USER_NAME);
         generateAuthorizationCodeParam.setPassword(TEST_USER_PASSWORD);
         // scopes需要在客户端的范围内
-        generateAuthorizationCodeParam.setScopes(Map.of(TEST_CLIENT_ID, TEST_CLIENT_SCOPES));
+        generateAuthorizationCodeParam.setScopes(TEST_CLIENT_SCOPES);
         generateAuthorizationCodeParam.setCodeChallengeMethod("S256");
         generateAuthorizationCodeParam.setCodeChallenge("3vrxycun-VbyenvO5GiFOaOBazUBX_xcFElnqbl-TXA");
         // 非OAuth2原获取授权码接口,原版请求成功后跳转页面 get http://localhost:8080/oauth2/authorize

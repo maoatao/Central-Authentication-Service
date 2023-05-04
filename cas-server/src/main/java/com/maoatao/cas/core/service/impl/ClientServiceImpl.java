@@ -28,11 +28,13 @@ import com.maoatao.cas.core.service.ClientScopeService;
 import com.maoatao.cas.core.service.ClientService;
 import com.maoatao.cas.core.service.ClientSettingService;
 import com.maoatao.cas.core.service.ClientTokenSettingService;
+import com.maoatao.cas.util.ClientSettingUtils;
 import com.maoatao.daedalus.data.service.impl.DaedalusServiceImpl;
 import com.maoatao.daedalus.data.util.PageUtils;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import com.maoatao.synapse.lang.util.SynaChecks;
 import com.maoatao.synapse.lang.util.SynaDates;
+import com.maoatao.synapse.lang.util.SynaStrings;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
@@ -141,6 +143,7 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
         SynaAssert.notEmpty(registeredClient.getClientId(), "clientId 不能为空!");
         SynaAssert.notEmpty(registeredClient.getClientSecret(), "clientSecret 不能为空!");
         SynaAssert.notEmpty(registeredClient.getClientName(), "clientName 不能为空!");
+        String alias = ObjUtil.isNotNull(registeredClient.getClientSettings()) ? ClientSettingUtils.getClientAlias(registeredClient.getClientSettings()) : SynaStrings.EMPTY;
         ClientEntity clientEntity = ClientEntity.builder()
                 .clientId(registeredClient.getClientId())
                 .clientIdIssuedAt(SynaDates.of(registeredClient.getClientIdIssuedAt()))
@@ -148,7 +151,7 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
                 .secretExpiresAt(SynaDates.of(registeredClient.getClientSecretExpiresAt()))
                 .name(registeredClient.getClientName())
                 // 别名唯一,目前用于scope前缀,通过registeredClient储存时暂时设置为随机字符串
-                .alias(nextRandomAlias())
+                .alias(StrUtil.isNotEmpty(alias) ? alias : nextRandomAlias())
                 .build();
         SynaAssert.isTrue(super.save(clientEntity), "客户端保存失败!");
         return clientEntity;
@@ -193,7 +196,7 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
         List<ClientScopeEntity> clientScopeEntities = registeredClient.getScopes().stream()
                 .map(o -> ClientScopeEntity.builder()
                         .clientId(registeredClient.getClientId())
-                        .name(prefix.concat(CasSeparator.SCOPE).concat(o))
+                        .name(o.startsWith(prefix.concat(CasSeparator.SCOPE)) ? o : prefix.concat(CasSeparator.SCOPE).concat(o))
                         .build())
                 .toList();
         SynaAssert.isTrue(clientScopeService.saveBatch(clientScopeEntities), "客户端作用域保存失败!");
