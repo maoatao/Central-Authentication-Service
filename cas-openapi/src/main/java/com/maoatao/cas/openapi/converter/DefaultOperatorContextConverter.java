@@ -2,7 +2,6 @@ package com.maoatao.cas.openapi.converter;
 
 import com.maoatao.cas.common.authentication.CasAuthorization;
 import com.maoatao.cas.openapi.authentication.CasAuthorizationService;
-import com.maoatao.cas.openapi.authentication.CasClientSettings;
 import com.maoatao.daedalus.core.context.DaedalusOperatorContext;
 import com.maoatao.daedalus.core.context.DefalutOperatorContext;
 import com.maoatao.synapse.lang.util.SynaAssert;
@@ -20,11 +19,11 @@ public class DefaultOperatorContextConverter implements ContextConverter {
 
     private final CasAuthorizationService casAuthorizationService;
 
-    public DefaultOperatorContextConverter(CasClientSettings casClientSettings,
+    public DefaultOperatorContextConverter(String appKey,
                                            CasAuthorizationService casAuthorizationService) {
-        SynaAssert.notNull(casClientSettings, "casClientSettings cannot be null");
+        SynaAssert.notNull(appKey, "appKey cannot be null");
         SynaAssert.notNull(casAuthorizationService, "casAuthorizationService cannot be null");
-        this.appKey = casClientSettings.getAppKey();
+        this.appKey = appKey;
         this.casAuthorizationService = casAuthorizationService;
     }
 

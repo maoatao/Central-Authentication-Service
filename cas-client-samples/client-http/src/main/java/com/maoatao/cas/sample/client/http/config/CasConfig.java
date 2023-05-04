@@ -19,7 +19,7 @@ public class CasConfig {
     public CasClientSettings casClientSettings(CasClientSettings casClientSettings,
                                                CasAuthorizationService casAuthorizationService) {
         return CasClientSettings.builder()
-                .contextConverter(new DefaultOperatorContextConverter(casClientSettings, casAuthorizationService))
+                .contextConverter(new DefaultOperatorContextConverter(casClientSettings.getAppKey(), casAuthorizationService))
                 .build();
     }
 }
