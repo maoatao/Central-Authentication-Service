@@ -106,7 +106,6 @@ public class ProviderConfig {
     @Bean
     public CustomAuthorizationCodeAccessTokenProvider customAuthorizationCodeAccessTokenProvider(OAuth2AuthorizationService oAuth2AuthorizationService,
                                                                                                  OAuth2TokenGenerator<OAuth2Token> oAuth2TokenGenerator) {
-        // TODO: MaoAtao 2023-04-14 10:18:52 用户 客户端 多对多(解决单点登录)
         return new CustomAuthorizationCodeAccessTokenProvider(oAuth2AuthorizationService, oAuth2TokenGenerator);
     }
 
