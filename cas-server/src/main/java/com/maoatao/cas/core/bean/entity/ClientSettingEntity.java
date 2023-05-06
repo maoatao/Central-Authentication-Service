@@ -44,6 +44,12 @@ public class ClientSettingEntity extends BaseEntity<ClientSettingEntity> {
      * 签名算法
      */
     private String signingAlgorithm;
+    /**
+     * 授权同意持续时间(单位秒,默认 2592000 秒)
+     * <p>
+     * 默认30天(60 * 60 * 24 * 30)
+     */
+    private Long approvalsDuration;
 
     @Tolerate
     public ClientSettingEntity() {}

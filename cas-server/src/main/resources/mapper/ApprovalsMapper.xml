@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.maoatao.cas.core.mapper.ClientSettingMapper">
-    <resultMap id="clientSettingMap" type="com.maoatao.cas.core.bean.entity.ClientSettingEntity">
+<mapper namespace="com.maoatao.cas.core.mapper.ApprovalsMapper">
+
+    <resultMap id="approvalsMap" type="com.maoatao.cas.core.bean.entity.ApprovalsEntity">
         <id property="id" column="id"/>
         <result property="clientId" column="client_id"/>
-        <result property="requireProofKey" column="require_proof_key"/>
-        <result property="requireAuthorizationConsent" column="require_authorization_consent"/>
-        <result property="jwkSetUrl" column="jwk_set_url"/>
-        <result property="signingAlgorithm" column="signing_algorithm"/>
-        <result property="approvalsDuration" column="approvals_duration"/>
+        <result property="userId" column="user_id"/>
+        <result property="expiresDate" column="expires_date"/>
         <result property="createdById" column="created_by_id"/>
         <result property="createdDate" column="created_date"/>
         <result property="updatedById" column="updated_by_id"/>

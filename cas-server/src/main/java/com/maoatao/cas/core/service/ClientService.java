@@ -1,6 +1,7 @@
 package com.maoatao.cas.core.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.maoatao.cas.core.bean.bo.ClientBo;
 import com.maoatao.cas.core.bean.entity.ClientEntity;
 import com.maoatao.cas.core.bean.param.client.ClientQueryParam;
 import com.maoatao.cas.core.bean.param.client.ClientSaveParam;
@@ -72,4 +73,12 @@ public interface ClientService extends DaedalusService<ClientEntity>, Registered
      * @return 新增成功返回客户端 id
      */
     long save(ClientSaveParam param);
+
+    /**
+     * 通过id查询
+     *
+     * @param clientId CAS 客户端id
+     * @return CAS 客户端
+     */
+    ClientBo getByClientBoId(String clientId);
 }

@@ -173,6 +173,7 @@ CREATE TABLE `t_cas_client_setting`
     `require_authorization_consent` bit(1)                                                         NOT NULL DEFAULT b'1' COMMENT '是否启用授权同意;0:禁用,1:启用',
     `jwk_set_url`                   varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'JWK 秘钥集 URL',
     `signing_algorithm`             varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci   NOT NULL DEFAULT '' COMMENT '签名算法',
+    `approvals_duration`            bigint unsigned NOT NULL DEFAULT '2592000' COMMENT '授权同意持续时间(单位秒,默认 2592000 秒)',
     `created_by_id`                 varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci   NOT NULL DEFAULT '' COMMENT '创建人 ID',
     `created_date`                  datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP (3) ON UPDATE CURRENT_TIMESTAMP (3) COMMENT '创建时间',
     `updated_by_id`                 varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci   NOT NULL DEFAULT '' COMMENT '更新人 ID',

@@ -113,7 +113,13 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
     @Override
     @Transactional(rollbackFor = Exception.class)
     public long save(ClientSaveParam param) {
+        // TODO: MaoAtao 2023-05-06 11:01:47 待实现
         return -1;
+    }
+
+    @Override
+    public ClientBo getByClientBoId(String clientId) {
+        return getClientBo(clientId);
     }
 
     @Override
@@ -322,7 +328,7 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
                 ))
                 .scopes(scopes -> scopes.addAll(
                         clientBo.getScopes().stream()
-                                .map(o -> clientBo.getContent().getAlias().concat(CasSeparator.SCOPE).concat(o.getName()))
+                                .map(ClientScopeEntity::getName)
                                 .collect(Collectors.toSet())
                 ))
                 .clientSettings(clientSettingsBuilder.build())

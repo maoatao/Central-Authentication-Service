@@ -9,7 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 /**
  * 授予的客户权限
  *
- * @author LiYuanHao
+ * @author MaoAtao
  * @date 2023-04-27 12:14:17
  */
 @Getter
