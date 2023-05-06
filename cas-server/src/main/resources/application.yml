@@ -61,3 +61,6 @@ mybatis-plus:
 logging:
   level:
     com.maoatao.*: debug
+
+cas:
+  app-key: 6023643A-3979-328B-F932-35EBB11EA75C

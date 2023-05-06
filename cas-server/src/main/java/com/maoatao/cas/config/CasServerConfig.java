@@ -1,6 +1,7 @@
 package com.maoatao.cas.config;
 
 import com.maoatao.cas.security.authorization.CasServerSettings;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -52,8 +53,8 @@ public class CasServerConfig {
      * 默认CAS服务端配置
      */
     @Bean
-    public CasServerSettings casServerSettings() {
-        return CasServerSettings.builder().appKey("test-client").build();
+    public CasServerSettings casServerSettings(@Value("${cas.app-key:''}") String appKey) {
+        return CasServerSettings.builder().appKey(appKey).build();
     }
 }
 

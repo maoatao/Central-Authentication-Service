@@ -36,6 +36,7 @@ import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
@@ -120,7 +121,8 @@ class CasApplicationTests {
     /**
      * 客户端 id
      */
-    private static final String TEST_CLIENT_ID = "6023643A-3979-328B-F932-35EBB11EA75C";
+    @Value("${cas.app-key:''}")
+    private String TEST_CLIENT_ID;
     /**
      * 客户端 名称
      */
