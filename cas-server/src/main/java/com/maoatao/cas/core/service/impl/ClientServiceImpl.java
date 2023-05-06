@@ -113,8 +113,14 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
     @Override
     @Transactional(rollbackFor = Exception.class)
     public long save(ClientSaveParam param) {
-        // TODO: MaoAtao 2023-05-06 11:01:47 待实现
-        return -1;
+        ClientEntity clientEntity = saveClient(param);
+        saveClientAuthenticationMethod(param, clientEntity);
+        saveClientGrantType(param, clientEntity);
+        saveClientRedirectUrl(param, clientEntity);
+        saveClientScope(param, clientEntity);
+        saveClientSetting(param, clientEntity);
+        saveClientTokenSetting(param, clientEntity);
+        return clientEntity.getId();
     }
 
     @Override
@@ -131,7 +137,7 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
         saveClientRedirectUrl(registeredClient);
         saveClientScope(registeredClient, clientEntity.getAlias());
         saveClientSettings(registeredClient);
-        saveTokenSettings(registeredClient);
+        saveClientTokenSetting(registeredClient);
     }
 
     @Override
@@ -143,6 +149,12 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
     @Override
     public RegisteredClient findByClientId(String clientId) {
         return convert(getClientBo(clientId));
+    }
+
+    private ClientEntity saveClient(ClientSaveParam param) {
+        ClientEntity clientEntity = BeanUtil.toBean(param, ClientEntity.class);
+        SynaAssert.isTrue(super.save(clientEntity), "客户端保存失败!");
+        return clientEntity;
     }
 
     private ClientEntity saveClient(RegisteredClient registeredClient) {
@@ -163,6 +175,14 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
         return clientEntity;
     }
 
+    private void saveClientAuthenticationMethod(ClientSaveParam param, ClientEntity clientEntity) {
+        List<ClientAuthenticationMethodEntity> clientAuthenticationMethodEntities = param.getAuthenticationMethods().stream()
+                .filter(StrUtil::isNotBlank)
+                .map(o -> ClientAuthenticationMethodEntity.builder().clientId(clientEntity.getClientId()).value(o).build())
+                .toList();
+        SynaAssert.isTrue(clientAuthenticationMethodService.saveBatch(clientAuthenticationMethodEntities), "客户端身份验证方法保存失败!");
+    }
+
     private void saveClientAuthenticationMethod(RegisteredClient registeredClient) {
         SynaAssert.notEmpty(registeredClient.getClientAuthenticationMethods(), "clientAuthenticationMethods 不能为空!");
         List<ClientAuthenticationMethodEntity> clientAuthenticationMethodEntities = registeredClient.getClientAuthenticationMethods().stream()
@@ -172,6 +192,14 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
                         .build())
                 .toList();
         SynaAssert.isTrue(clientAuthenticationMethodService.saveBatch(clientAuthenticationMethodEntities), "客户端授权方法保存失败!");
+    }
+
+    private void saveClientGrantType(ClientSaveParam param, ClientEntity clientEntity) {
+        List<ClientGrantTypeEntity> clientGrantTypeEntities = param.getGrantTypes().stream()
+                .filter(StrUtil::isNotBlank)
+                .map(o -> ClientGrantTypeEntity.builder().clientId(clientEntity.getClientId()).value(o).build())
+                .toList();
+        SynaAssert.isTrue(clientGrantTypeService.saveBatch(clientGrantTypeEntities), "客户端授权类型保存失败!");
     }
 
     private void saveClientGrantType(RegisteredClient registeredClient) {
@@ -185,6 +213,14 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
         SynaAssert.isTrue(clientGrantTypeService.saveBatch(clientGrantTypeEntities), "客户端授权类型保存失败!");
     }
 
+    private void saveClientRedirectUrl(ClientSaveParam param, ClientEntity clientEntity) {
+        List<ClientRedirectUrlEntity> clientRedirectUrlEntities = param.getRedirectUrls().stream()
+                .filter(StrUtil::isNotBlank)
+                .map(o -> ClientRedirectUrlEntity.builder().clientId(clientEntity.getClientId()).value(o).build())
+                .toList();
+        SynaAssert.isTrue(clientRedirectUrlService.saveBatch(clientRedirectUrlEntities), "客户端重定向地址保存失败!");
+    }
+
     private void saveClientRedirectUrl(RegisteredClient registeredClient) {
         SynaAssert.notEmpty(registeredClient.getRedirectUris(), "redirectUris 不能为空!");
         List<ClientRedirectUrlEntity> clientGrantTypeEntities = registeredClient.getRedirectUris().stream()
@@ -194,6 +230,14 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
                         .build())
                 .toList();
         SynaAssert.isTrue(clientRedirectUrlService.saveBatch(clientGrantTypeEntities), "客户端重定向地址保存失败!");
+    }
+
+    private void saveClientScope(ClientSaveParam param, ClientEntity clientEntity) {
+        List<ClientScopeEntity> clientScopeEntities = param.getScopes().stream()
+                .filter(StrUtil::isNotBlank)
+                .map(o -> ClientScopeEntity.builder().clientId(clientEntity.getClientId()).name(o).build())
+                .toList();
+        SynaAssert.isTrue(clientScopeService.saveBatch(clientScopeEntities), "客户端作用域保存失败!");
     }
 
     private void saveClientScope(RegisteredClient registeredClient, String prefix) {
@@ -206,6 +250,12 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
                         .build())
                 .toList();
         SynaAssert.isTrue(clientScopeService.saveBatch(clientScopeEntities), "客户端作用域保存失败!");
+    }
+
+    private void saveClientSetting(ClientSaveParam param, ClientEntity clientEntity) {
+        ClientSettingEntity clientSettingEntity = BeanUtil.toBean(param.getSetting(), ClientSettingEntity.class);
+        clientSettingEntity.setClientId(clientEntity.getClientId());
+        SynaAssert.isTrue(clientSettingService.save(clientSettingEntity), "客户端配置保存失败!");
     }
 
     private void saveClientSettings(RegisteredClient registeredClient) {
@@ -223,7 +273,13 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
         SynaAssert.isTrue(clientSettingService.save(entityBuilder.build()), "客户端设置保存失败!");
     }
 
-    private void saveTokenSettings(RegisteredClient registeredClient) {
+    private void saveClientTokenSetting(ClientSaveParam param, ClientEntity clientEntity) {
+        ClientTokenSettingEntity clientTokenSettingEntity = BeanUtil.toBean(param.getTokenSetting(), ClientTokenSettingEntity.class);
+        clientTokenSettingEntity.setClientId(clientEntity.getClientId());
+        SynaAssert.isTrue(clientTokenSettingService.save(clientTokenSettingEntity), "客户端令牌配置保存失败!");
+    }
+
+    private void saveClientTokenSetting(RegisteredClient registeredClient) {
         SynaAssert.notNull(registeredClient.getTokenSettings(), "tokenSettings 不能为空!");
         ClientTokenSettingEntity.ClientTokenSettingEntityBuilder entityBuilder = ClientTokenSettingEntity.builder()
                 .clientId(registeredClient.getClientId())
