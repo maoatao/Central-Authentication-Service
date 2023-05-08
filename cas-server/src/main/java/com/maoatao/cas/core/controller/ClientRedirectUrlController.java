@@ -46,11 +46,11 @@ public class ClientRedirectUrlController {
      * @param param 参数
      * @return 分页
      */
-    @GetMapping("/page")
+    @PostMapping("/page")
     @CasAuth("cas_clientredirecturl_get")
     @Operation(summary = "getPage", description = "分页查询CAS 客户端重定向地址列表")
     @OperationLog(type = OperationType.QUERY, content = "分页查询CAS 客户端重定向地址", moduleName = "cas")
-    public Page<ClientRedirectUrlVO> page(@Validated ClientRedirectUrlQueryParam param) {
+    public Page<ClientRedirectUrlVO> page(@Validated @RequestBody ClientRedirectUrlQueryParam param) {
         return clientRedirectUrlService.page(param);
     }
 

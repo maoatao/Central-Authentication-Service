@@ -46,11 +46,11 @@ public class UserController {
      * @param param 参数
      * @return 分页
      */
-    @GetMapping("/page")
+    @PostMapping("/page")
     @CasAuth("cas_user_get")
     @Operation(summary = "getPage", description = "分页查询CAS 用户列表")
     @OperationLog(type = OperationType.QUERY, content = "分页查询CAS 用户", moduleName = "cas")
-    public Page<UserVO> page(@Validated UserQueryParam param) {
+    public Page<UserVO> page(@Validated @RequestBody UserQueryParam param) {
         return userService.page(param);
     }
 

@@ -46,11 +46,11 @@ public class ClientTokenSettingController {
      * @param param 参数
      * @return 分页
      */
-    @GetMapping("/page")
+    @PostMapping("/page")
     @CasAuth("cas_clienttokensetting_get")
     @Operation(summary = "getPage", description = "分页查询CAS 客户端令牌设置列表")
     @OperationLog(type = OperationType.QUERY, content = "分页查询CAS 客户端令牌设置", moduleName = "cas")
-    public Page<ClientTokenSettingVO> page(@Validated ClientTokenSettingQueryParam param) {
+    public Page<ClientTokenSettingVO> page(@Validated @RequestBody ClientTokenSettingQueryParam param) {
         return clientTokenSettingService.page(param);
     }
 

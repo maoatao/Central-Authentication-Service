@@ -46,11 +46,11 @@ public class ClientGrantTypeController {
      * @param param 参数
      * @return 分页
      */
-    @GetMapping("/page")
+    @PostMapping("/page")
     @CasAuth("cas_clientgranttype_get")
     @Operation(summary = "getPage", description = "分页查询CAS 客户端授权类型列表")
     @OperationLog(type = OperationType.QUERY, content = "分页查询CAS 客户端授权类型", moduleName = "cas")
-    public Page<ClientGrantTypeVO> page(@Validated ClientGrantTypeQueryParam param) {
+    public Page<ClientGrantTypeVO> page(@Validated @RequestBody ClientGrantTypeQueryParam param) {
         return clientGrantTypeService.page(param);
     }
 

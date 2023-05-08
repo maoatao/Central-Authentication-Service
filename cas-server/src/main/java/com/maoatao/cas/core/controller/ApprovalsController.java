@@ -46,11 +46,11 @@ public class ApprovalsController {
      * @param param 参数
      * @return 分页
      */
-    @GetMapping("/page")
+    @PostMapping("/page")
     @CasAuth("cas_approvals_get")
     @Operation(summary = "getPage", description = "分页查询CAS 授权批准列表")
     @OperationLog(type = OperationType.QUERY, content = "分页查询CAS 授权批准", moduleName = "cas")
-    public Page<ApprovalsVO> page(@Validated ApprovalsQueryParam param) {
+    public Page<ApprovalsVO> page(@Validated @RequestBody ApprovalsQueryParam param) {
         return approvalsService.page(param);
     }
 

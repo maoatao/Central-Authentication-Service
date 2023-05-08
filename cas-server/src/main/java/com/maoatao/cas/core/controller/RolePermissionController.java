@@ -46,11 +46,11 @@ public class RolePermissionController {
      * @param param 参数
      * @return 分页
      */
-    @GetMapping("/page")
+    @PostMapping("/page")
     @CasAuth("cas_rolepermission_get")
     @Operation(summary = "getPage", description = "分页查询CAS 角色权限关系列表")
     @OperationLog(type = OperationType.QUERY, content = "分页查询CAS 角色权限关系", moduleName = "cas")
-    public Page<RolePermissionVO> page(@Validated RolePermissionQueryParam param) {
+    public Page<RolePermissionVO> page(@Validated @RequestBody RolePermissionQueryParam param) {
         return rolePermissionService.page(param);
     }
 

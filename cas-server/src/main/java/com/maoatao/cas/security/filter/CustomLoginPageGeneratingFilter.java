@@ -73,32 +73,96 @@ public class CustomLoginPageGeneratingFilter extends GenericFilterBean {
         sb.append("    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\">\n");
         sb.append("    <meta name=\"description\" content=\"\">\n");
         sb.append("    <meta name=\"author\" content=\"\">\n");
-        sb.append("    <title>Please sign in</title>\n");
-        // sb.append("    <link href=\"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css\" rel=\"stylesheet\" integrity=\"sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M\" crossorigin=\"anonymous\">\n");
-        // sb.append("    <link href=\"https://getbootstrap.com/docs/4.0/examples/signin/signin.css\" rel=\"stylesheet\" crossorigin=\"anonymous\"/>\n");
+        sb.append("    <title>CAS - 中央认证服务</title>\n");
+        sb.append("    <style>\n");
+        sb.append("      * {\n");
+        sb.append("          margin: 0;\n");
+        sb.append("          padding: 0;\n");
+        sb.append("          box-sizing: border-box;\n");
+        sb.append("          user-select: none;\n");
+        sb.append("      }\n");
+        sb.append("      html, body {\n");
+        sb.append("          height: 100%;\n");
+        sb.append("      }\n");
+        sb.append("      .container {\n");
+        sb.append("          height: 100%;\n");
+        sb.append("          background-image: linear-gradient(to right, #fbc2eb, #a6c1ee);\n");
+        sb.append("      }\n");
+        sb.append("      .login-wrapper {\n");
+        sb.append("          background-color: #fff;\n");
+        sb.append("          width: 358px;\n");
+        sb.append("          height: 588px;\n");
+        sb.append("          border-radius: 15px;\n");
+        sb.append("          padding: 0 50px;\n");
+        sb.append("          position: relative;\n");
+        sb.append("          left: 50%;\n");
+        sb.append("          top: 50%;\n");
+        sb.append("          transform: translate(-50%, -50%);\n");
+        sb.append("      }\n");
+        sb.append("      .header {\n");
+        sb.append("          font-size: 38px;\n");
+        sb.append("          font-weight: bold;\n");
+        sb.append("          text-align: center;\n");
+        sb.append("          line-height: 200px;\n");
+        sb.append("      }\n");
+        sb.append("      .input-item {\n");
+        sb.append("          display: block;\n");
+        sb.append("          width: 100%;\n");
+        sb.append("          margin-bottom: 20px;\n");
+        sb.append("          border: 0;\n");
+        sb.append("          padding: 10px;\n");
+        sb.append("          border-bottom: 1px solid rgb(128, 125, 125);\n");
+        sb.append("          font-size: 15px;\n");
+        sb.append("          outline: none;\n");
+        sb.append("      }\n");
+        sb.append("      .input-item::placeholder {\n");
+        sb.append("          text-transform: uppercase;\n");
+        sb.append("      }\n");
+        sb.append("      .btn {\n");
+        sb.append("          text-align: center;\n");
+        sb.append("          padding: 10px;\n");
+        sb.append("          width: 100%;\n");
+        sb.append("          margin-top: 40px;\n");
+        sb.append("          background-image: linear-gradient(to right, #a6c1ee, #fbc2eb);\n");
+        sb.append("          color: #fff;\n");
+        sb.append("          border: 0;\n");
+        sb.append("      }\n");
+        sb.append("      .msg {\n");
+        sb.append("          text-align: center;\n");
+        sb.append("          height: 80px;\n");
+        sb.append("      }\n");
+        sb.append("      .msg.succes {\n");
+        sb.append("          color: #abc1ee;\n");
+        sb.append("      }\n");
+        sb.append("      .msg.error {\n");
+        sb.append("          color: #f56c6c;\n");
+        sb.append("      }\n");
+        sb.append("    </style>\n");
         sb.append("  </head>\n");
         sb.append("  <body>\n");
-        sb.append("     <div class=\"container\">\n");
-        sb.append("      <form class=\"form-signin\" method=\"post\" action=\"").append(contextPath).append(LOGIN_URL).append("\">\n");
-        sb.append("        <h2 class=\"form-signin-heading\">Please sign in</h2>\n");
+        sb.append("    <div class=\"container\">\n");
+        sb.append("      <div class=\"login-wrapper\">\n");
+        sb.append("      <div class=\"header\">登 录</div>\n");
         sb.append(createError(loginError, errorMsg));
         sb.append(createLogoutSuccess(logoutSuccess));
-        sb.append("        <p>\n");
-        sb.append("          <label for=\"clientId\" class=\"sr-only\">Client Id</label>\n");
-        sb.append("          <input type=\"text\" id=\"clientId\" name=\"clientId\" class=\"form-control\" placeholder=\"Client Id\" required>\n");
-        sb.append("        </p>\n");
-        sb.append("        <p>\n");
-        sb.append("          <label for=\"username\" class=\"sr-only\">Username</label>\n");
-        sb.append("          <input type=\"text\" id=\"username\" name=\"username\" class=\"form-control\" placeholder=\"Username\" required autofocus>\n");
-        sb.append("        </p>\n");
-        sb.append("        <p>\n");
-        sb.append("          <label for=\"password\" class=\"sr-only\">Password</label>\n");
-        sb.append("          <input type=\"password\" id=\"password\" name=\"password\" class=\"form-control\" placeholder=\"Password\" required>\n");
-        sb.append("        </p>\n");
-        sb.append("        <button class=\"btn btn-lg btn-primary btn-block\" type=\"submit\">Sign in</button>\n");
-        sb.append("      </form>\n");
-        sb.append("</div>\n");
-        sb.append("</body></html>");
+        sb.append("        <div class=\"form-wrapper\">\n");
+        sb.append("          <form method=\"post\" action=\"").append(contextPath).append(LOGIN_URL).append("\">\n");
+        sb.append("            <label>\n");
+        sb.append("              <input type=\"text\" id=\"clientId\" name=\"clientId\" class=\"input-item\" placeholder=\"客户端ID\" required>\n");
+        sb.append("            </label>\n");
+        sb.append("            <label>\n");
+        sb.append("              <input type=\"text\" id=\"username\" name=\"username\" class=\"input-item\" placeholder=\"用户名\" required autofocus>\n");
+        sb.append("            </label>\n");
+        sb.append("            <label>\n");
+        sb.append("              <input type=\"password\" id=\"password\" name=\"password\" class=\"input-item\" placeholder=\"密码\" required>\n");
+        sb.append("            </label>\n");
+        sb.append("            <button class=\"btn\" type=\"submit\">登 录</button>\n");
+        sb.append("          </form>\n");
+        sb.append("        </div>\n");
+        sb.append("      </div>\n");
+        sb.append("    </div>\n");
+        sb.append("  </body>");
+        sb.append("</html>");
         return sb.toString();
     }
 
@@ -114,18 +178,18 @@ public class CustomLoginPageGeneratingFilter extends GenericFilterBean {
         return matches(request, FAILURE_URL);
     }
 
-    private static String createError(boolean isError, String message) {
+    private String createError(boolean isError, String message) {
         if (!isError) {
             return "";
         }
-        return "<div class=\"alert alert-danger\" role=\"alert\">" + HtmlUtils.htmlEscape(message) + "</div>";
+        return "<div class=\"msg error\">" + HtmlUtils.htmlEscape(message) + "</div>";
     }
 
-    private static String createLogoutSuccess(boolean isLogoutSuccess) {
+    private String createLogoutSuccess(boolean isLogoutSuccess) {
         if (!isLogoutSuccess) {
             return "";
         }
-        return "<div class=\"alert alert-success\" role=\"alert\">You have been signed out</div>";
+        return "<div class=\"msg success\">You have been signed out</div>";
     }
 
     private boolean matches(HttpServletRequest request, String url) {

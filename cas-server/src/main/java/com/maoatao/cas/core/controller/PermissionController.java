@@ -46,11 +46,11 @@ public class PermissionController {
      * @param param 参数
      * @return 分页
      */
-    @GetMapping("/page")
+    @PostMapping("/page")
     @CasAuth("cas_permission_get")
     @Operation(summary = "getPage", description = "分页查询CAS 权限列表")
     @OperationLog(type = OperationType.QUERY, content = "分页查询CAS 权限", moduleName = "cas")
-    public Page<PermissionVO> page(@Validated PermissionQueryParam param) {
+    public Page<PermissionVO> page(@Validated @RequestBody PermissionQueryParam param) {
         return permissionService.page(param);
     }
 

@@ -2,7 +2,6 @@ package com.maoatao.cas.core.bean.param.rolepermission;
 
 import com.maoatao.daedalus.web.bean.param.BasePaginationParam;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -28,13 +27,11 @@ public class RolePermissionQueryParam extends BasePaginationParam {
     /**
      * 用户id
      */
-    @NotNull(message = "roleId 不能为空")
     @Schema(description = "用户id")
     private Long roleId;
     /**
      * 权限id
      */
-    @NotNull(message = "permissionId 不能为空")
     @Schema(description = "权限id")
     private Long permissionId;
 

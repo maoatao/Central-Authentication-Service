@@ -2,7 +2,6 @@ package com.maoatao.cas.core.bean.param.clientuserrole;
 
 import com.maoatao.daedalus.web.bean.param.BasePaginationParam;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -28,13 +27,11 @@ public class ClientUserRoleQueryParam extends BasePaginationParam {
     /**
      * 客户端用户id
      */
-    @NotNull(message = "clientUserId 不能为空")
     @Schema(description = "客户端用户id")
     private Long clientUserId;
     /**
      * 用户id
      */
-    @NotNull(message = "roleId 不能为空")
     @Schema(description = "用户id")
     private Long roleId;
 

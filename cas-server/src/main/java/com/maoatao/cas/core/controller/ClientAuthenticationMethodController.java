@@ -46,11 +46,11 @@ public class ClientAuthenticationMethodController {
      * @param param 参数
      * @return 分页
      */
-    @GetMapping("/page")
+    @PostMapping("/page")
     @CasAuth("cas_clientauthenticationmethod_get")
     @Operation(summary = "getPage", description = "分页查询CAS 客户端身份验证方法列表")
     @OperationLog(type = OperationType.QUERY, content = "分页查询CAS 客户端身份验证方法", moduleName = "cas")
-    public Page<ClientAuthenticationMethodVO> page(@Validated ClientAuthenticationMethodQueryParam param) {
+    public Page<ClientAuthenticationMethodVO> page(@Validated @RequestBody ClientAuthenticationMethodQueryParam param) {
         return clientAuthenticationMethodService.page(param);
     }
 

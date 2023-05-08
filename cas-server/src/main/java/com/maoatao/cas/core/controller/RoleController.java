@@ -46,11 +46,11 @@ public class RoleController {
      * @param param 参数
      * @return 分页
      */
-    @GetMapping("/page")
+    @PostMapping("/page")
     @CasAuth("cas_role_get")
     @Operation(summary = "getPage", description = "分页查询CAS 角色列表")
     @OperationLog(type = OperationType.QUERY, content = "分页查询CAS 角色", moduleName = "cas")
-    public Page<RoleVO> page(@Validated RoleQueryParam param) {
+    public Page<RoleVO> page(@Validated @RequestBody RoleQueryParam param) {
         return roleService.page(param);
     }
 

@@ -46,11 +46,11 @@ public class ClientScopeController {
      * @param param 参数
      * @return 分页
      */
-    @GetMapping("/page")
+    @PostMapping("/page")
     @CasAuth("cas_clientscope_get")
     @Operation(summary = "getPage", description = "分页查询CAS 客户端作用域列表")
     @OperationLog(type = OperationType.QUERY, content = "分页查询CAS 客户端作用域", moduleName = "cas")
-    public Page<ClientScopeVO> page(@Validated ClientScopeQueryParam param) {
+    public Page<ClientScopeVO> page(@Validated @RequestBody ClientScopeQueryParam param) {
         return clientScopeService.page(param);
     }
 

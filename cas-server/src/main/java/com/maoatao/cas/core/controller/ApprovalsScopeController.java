@@ -46,11 +46,11 @@ public class ApprovalsScopeController {
      * @param param 参数
      * @return 分页
      */
-    @GetMapping("/page")
+    @PostMapping("/page")
     @CasAuth("cas_approvalsscope_get")
     @Operation(summary = "getPage", description = "分页查询CAS 批准作用域列表")
     @OperationLog(type = OperationType.QUERY, content = "分页查询CAS 批准作用域", moduleName = "cas")
-    public Page<ApprovalsScopeVO> page(@Validated ApprovalsScopeQueryParam param) {
+    public Page<ApprovalsScopeVO> page(@Validated @RequestBody ApprovalsScopeQueryParam param) {
         return approvalsScopeService.page(param);
     }
 
