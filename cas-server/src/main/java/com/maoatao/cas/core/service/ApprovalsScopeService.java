@@ -37,7 +37,7 @@ public interface ApprovalsScopeService extends DaedalusService<ApprovalsScopeEnt
      * @param approvalId 批准id
      * @return 批准作用域
      */
-    List<ApprovalsScopeEntity> listApprovalId(Long approvalId);
+    List<ApprovalsScopeEntity> listByApprovalId(Long approvalId);
 
     /**
      * 通过批准id删除批准作用域

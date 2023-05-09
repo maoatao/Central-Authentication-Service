@@ -4,6 +4,11 @@ server:
 spring:
   application:
     name: @artifactId@
+  thymeleaf:
+    cache: false
+    check-template-location: true
+    prefix: classpath:templates/
+    suffix: .html
   datasource:
     url: jdbc:mysql://localhost:3306/cas?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
     username: root

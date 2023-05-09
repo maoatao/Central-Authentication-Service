@@ -53,8 +53,12 @@ public class SecutityConfig {
         http.apply(new TokenAuthenticationFilterConfigurer());
         // 授权服务器上下文配置
         http.apply(new AuthorizationServerContextFilterConfigurer());
-        // 用户登录授权
-        http.apply(new CustomFormLoginConfigurer<>());
+        // 用户登录授权(自定义了登录页面Fliter 不要使用默认的 http.formLogin 否则这里的配置无效)
+        CustomFormLoginConfigurer<HttpSecurity> customFormLoginConfigurer = new CustomFormLoginConfigurer<>();
+        // 这里配置页面和处理登录请求前必须配置 securityBuilder
+        customFormLoginConfigurer.setBuilder(http);
+        customFormLoginConfigurer.loginPage("/login").loginProcessingUrl("/login");
+        http.apply(customFormLoginConfigurer);
         // 登录页面
         http.apply(new CustomLoginPageGeneratingFilterConfigurer());
     }
@@ -64,11 +68,13 @@ public class SecutityConfig {
      */
     private void applyRequestMatchers(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorizeHttpRequests -> {
-            authorizeHttpRequests.requestMatchers("/static/**","/error", "/swagger-ui/**", "/swagger-resources/**",
-                    "/webjars/**", "/v3/**", "/api/**", "/doc.html", "/favicon.ico"
+            authorizeHttpRequests.requestMatchers(
+                    "/login", "/consent",
+                    "/static/**", "/error", "/favicon.ico",
+                    "/swagger-ui/**", "/swagger-resources/**", "/webjars/**", "/v3/**", "/api/**", "/doc.html"
             ).permitAll();
-            authorizeHttpRequests.requestMatchers(HttpMethod.GET,"/token").permitAll();
-            authorizeHttpRequests.requestMatchers(HttpMethod.DELETE,"/token").permitAll();
+            authorizeHttpRequests.requestMatchers(HttpMethod.GET, "/token").permitAll();
+            authorizeHttpRequests.requestMatchers(HttpMethod.DELETE, "/token").permitAll();
             authorizeHttpRequests.anyRequest().authenticated();
         });
     }

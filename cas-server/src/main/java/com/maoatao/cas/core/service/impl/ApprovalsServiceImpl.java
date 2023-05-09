@@ -22,6 +22,7 @@ import com.maoatao.daedalus.data.service.impl.DaedalusServiceImpl;
 import com.maoatao.daedalus.data.util.PageUtils;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import com.maoatao.synapse.lang.util.SynaDates;
+import java.util.Collections;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -37,6 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 public class ApprovalsServiceImpl extends DaedalusServiceImpl<ApprovalsMapper, ApprovalsEntity> implements ApprovalsService {
+
+    private static final String AUTHORITIES_SCOPE_PREFIX = "SCOPE_";
 
     @Autowired
     private ClientService clientService;
@@ -63,12 +66,31 @@ public class ApprovalsServiceImpl extends DaedalusServiceImpl<ApprovalsMapper, A
     }
 
     @Override
+    public List<String> listScopeNamesByClientUser(String clientId, String username) {
+        ClientUserEntity clientUserEntity = getClientUser(clientId, username);
+        ApprovalsEntity approvalsEntity = getByClientUser(clientId, clientUserEntity.getUserId());
+        if (ObjUtil.isNull(approvalsEntity)) {
+            return Collections.emptyList();
+        }
+        List<ApprovalsScopeEntity> approvalsScopeEntities = approvalsScopeService.listByApprovalId(approvalsEntity.getId());
+        if (CollectionUtil.isEmpty(approvalsScopeEntities)) {
+            return Collections.emptyList();
+        }
+        return approvalsScopeService.listByApprovalId(approvalsEntity.getId()).stream().map(o -> o.getScope().replaceAll(AUTHORITIES_SCOPE_PREFIX, "")).toList();
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void save(OAuth2AuthorizationConsent authorizationConsent) {
         ClientEntity clientEntity = getClient(authorizationConsent.getRegisteredClientId());
         ClientSettingEntity clientSettingEntity = clientSettingService.getByClientId(clientEntity.getClientId());
         SynaAssert.notNull(clientSettingEntity, "未找到客户端配置:{}", authorizationConsent.getRegisteredClientId());
         ClientUserEntity clientUserEntity = getClientUser(clientEntity.getClientId(), authorizationConsent.getPrincipalName());
+        ApprovalsEntity approvalsEntity = getByClientUser(clientEntity.getClientId(), clientUserEntity.getUserId());
+        if (ObjUtil.isNotNull(approvalsEntity)) {
+            // 如果存在旧授权就删除
+            SynaAssert.isTrue(remove(approvalsEntity.getId()), "旧的授权同意信息删除失败!");
+        }
         ApprovalsEntity entity = ApprovalsEntity.builder()
                 .clientId(clientEntity.getClientId())
                 .userId(clientUserEntity.getUserId())
@@ -84,6 +106,19 @@ public class ApprovalsServiceImpl extends DaedalusServiceImpl<ApprovalsMapper, A
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean remove(Long approvalsId) {
+        List<Long> approvalsScopeIds = approvalsScopeService.listByApprovalId(approvalsId).stream()
+                .map(ApprovalsScopeEntity::getId).toList();
+        SynaAssert.isTrue(super.removeById(approvalsId), "授权同意信息删除失败!");
+        if (CollectionUtil.isNotEmpty(approvalsScopeIds)) {
+            SynaAssert.isTrue(approvalsScopeService.remove(approvalsScopeIds), "授权同意作用域删除失败!");
+        }
+        return true;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public void remove(OAuth2AuthorizationConsent authorizationConsent) {
         ClientEntity clientEntity = getClient(authorizationConsent.getRegisteredClientId());
         ClientUserEntity clientUserEntity = getClientUser(clientEntity.getClientId(), authorizationConsent.getPrincipalName());
@@ -106,7 +141,7 @@ public class ApprovalsServiceImpl extends DaedalusServiceImpl<ApprovalsMapper, A
         if (SynaDates.now().isAfter(approvalsEntity.getExpiresDate())) {
             return null;
         }
-        List<ApprovalsScopeEntity> approvalsScopeEntities = approvalsScopeService.listApprovalId(approvalsEntity.getId());
+        List<ApprovalsScopeEntity> approvalsScopeEntities = approvalsScopeService.listByApprovalId(approvalsEntity.getId());
         OAuth2AuthorizationConsent.Builder builder = OAuth2AuthorizationConsent.withId(clientEntity.getClientId(), principalName);
         approvalsScopeEntities.forEach(o -> builder.authority(new SimpleGrantedAuthority(o.getScope())));
         return builder.build();

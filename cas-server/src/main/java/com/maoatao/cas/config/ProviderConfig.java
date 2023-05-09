@@ -57,6 +57,7 @@ public class ProviderConfig {
                 .authenticationProvider(refreshTokenProvider)
                 .authenticationProvider(accessTokenProvider)
                 .authenticationProvider(clientTokenProvider)
+                .consentPage("/oauth2/consent")
         );
         return oAuth2AuthorizationServerConfigurer;
     }

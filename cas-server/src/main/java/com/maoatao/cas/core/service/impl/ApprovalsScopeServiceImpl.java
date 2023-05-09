@@ -35,7 +35,7 @@ public class ApprovalsScopeServiceImpl extends DaedalusServiceImpl<ApprovalsScop
     }
 
     @Override
-    public List<ApprovalsScopeEntity> listApprovalId(Long approvalId) {
+    public List<ApprovalsScopeEntity> listByApprovalId(Long approvalId) {
         return list(Wrappers.<ApprovalsScopeEntity>lambdaQuery().eq(ApprovalsScopeEntity::getApprovalsId, approvalId));
     }
 

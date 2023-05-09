@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>CAS - 中央认证服务</title>
+  <link rel="icon" href="../static/favicon.ico">
+  <link rel="stylesheet" type="text/css" href="../static/cas.css">
+</head>
+<body>
+<div class="container">
+  <div class="login-wrapper">
+    <div class="login-header">登 录</div>
+    <div class="form-wrapper">
+      <form method="post" action="/login">
+        <label>
+          <input type="text" id="clientId" name="clientId" class="input-item" placeholder="客户端ID"
+                 required>
+        </label>
+        <label>
+          <input type="text" id="username" name="username" class="input-item" placeholder="用户名"
+                 required autofocus>
+        </label>
+        <label>
+          <input type="password" id="password" name="password" class="input-item" placeholder="密码"
+                 required>
+        </label>
+        <button class="login-btn" type="submit">登 录</button>
+      </form>
+    </div>
+  </div>
+</div>
+</body>
+</html>

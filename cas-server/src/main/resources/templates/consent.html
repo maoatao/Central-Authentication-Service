@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>CAS - 中央认证服务</title>
+  <link rel="icon" href="../static/favicon.ico">
+  <link rel="stylesheet" type="text/css" href="../static/cas.css">
+  <script>
+    function cancelConsent() {
+      document.consent_form.reset();
+      document.consent_form.submit();
+    }
+  </script>
+</head>
+<body>
+<div class="container">
+  <div class="consent-wrapper">
+    <div class="consent-header">
+      <p>
+        <span class="" th:text="${clientName+' '}"></span>
+        希望获得以下许可:
+      </p>
+    </div>
+    <div class="">
+      <div class="">
+        <form name="consent_form" method="post" action="/oauth2/authorize">
+          <input type="hidden" name="client_id" th:value="${clientId}"/>
+          <input type="hidden" name="state" th:value="${state}"/>
+          <div class="consent-scope-wrapper">
+            <label th:each="scope : ${scopes}">
+              <input type="checkbox"
+                     name="scope"
+                     th:value="${scope.get('name')}"
+                     th:id="${scope.get('name')}"
+                     th:text="${' '+scope.get('description')}"
+                     th:checked="${scope.get('checked')}"
+                     th:disabled="${scope.get('checked')}"
+              />
+              <br/>
+            </label>
+          </div>
+          <hr/>
+          <div class="consent-btn-wrapper">
+            <button class="consent-btn" type="submit" id="submit-consent">同意</button>
+            <button class="consent-btn" type="button" onclick="cancelConsent();"
+                    id="cancel-consent">
+              取消
+            </button>
+          </div>
+          <div class="consent-msg">
+            <p>
+              <small>
+                提供访问权限需要您的同意,如果您不批准,请单击取消.
+                在这种情况下,不会与应用程序共享任何信息.
+              </small>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
