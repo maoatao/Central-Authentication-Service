@@ -1,7 +1,6 @@
 package com.maoatao.cas.config;
 
 import com.maoatao.cas.security.configurer.CustomFormLoginConfigurer;
-import com.maoatao.cas.security.configurer.CustomLoginPageGeneratingFilterConfigurer;
 import com.maoatao.cas.security.configurer.TokenAuthenticationFilterConfigurer;
 import com.maoatao.cas.security.configurer.AuthorizationServerContextFilterConfigurer;
 import org.springframework.context.annotation.Bean;
@@ -59,8 +58,6 @@ public class SecutityConfig {
         customFormLoginConfigurer.setBuilder(http);
         customFormLoginConfigurer.loginPage("/login").loginProcessingUrl("/login");
         http.apply(customFormLoginConfigurer);
-        // 登录页面
-        http.apply(new CustomLoginPageGeneratingFilterConfigurer());
     }
 
     /**
