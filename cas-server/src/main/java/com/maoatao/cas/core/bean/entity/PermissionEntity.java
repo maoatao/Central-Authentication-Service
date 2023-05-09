@@ -29,6 +29,10 @@ public class PermissionEntity extends BaseEntity<PermissionEntity> {
      */
     private String clientId;
     /**
+     * 权限权限编号
+     */
+    private String code;
+    /**
      * 权限名
      */
     private String name;

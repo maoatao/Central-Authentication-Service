@@ -30,6 +30,11 @@ public class PermissionQueryParam extends BasePaginationParam {
     @Schema(description = "客户端 id")
     private String clientId;
     /**
+     * 权限编号
+     */
+    @Schema(description = "权限编号")
+    private String code;
+    /**
      * 权限名
      */
     @Schema(description = "权限名")

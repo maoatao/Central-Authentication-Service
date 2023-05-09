@@ -39,6 +39,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -57,6 +58,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author MaoAtao
  * @date 2023-04-07 20:51:07
  */
+@Slf4j
 @Service
 public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientEntity> implements ClientService {
 
@@ -398,6 +400,7 @@ public class ClientServiceImpl extends DaedalusServiceImpl<ClientMapper, ClientE
         if (ObjUtil.isNull(getByClientAlias(alias))) {
             return alias;
         }
+        log.info("尝试生成客户端别名出现重复:{}", alias);
         return nextRandomAlias();
     }
 }

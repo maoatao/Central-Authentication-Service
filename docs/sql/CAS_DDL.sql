@@ -250,6 +250,7 @@ CREATE TABLE `t_cas_permission`
 (
     `id`            bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '主键id(自增)',
     `client_id`     varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'OAuth2 客户端id',
+    `code`          varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci  NOT NULL DEFAULT '' COMMENT '权限编号',
     `name`          varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci  NOT NULL DEFAULT '' COMMENT '权限名',
     `description`   varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci          DEFAULT '' COMMENT '描述',
     `created_by_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci  NOT NULL DEFAULT '' COMMENT '创建人 ID',

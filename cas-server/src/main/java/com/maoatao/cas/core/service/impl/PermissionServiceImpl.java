@@ -1,6 +1,7 @@
 package com.maoatao.cas.core.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.core.bean.param.permission.PermissionQueryParam;
@@ -10,6 +11,7 @@ import com.maoatao.cas.core.mapper.PermissionMapper;
 import com.maoatao.cas.core.service.PermissionService;
 import com.maoatao.daedalus.data.service.impl.DaedalusServiceImpl;
 import com.maoatao.daedalus.data.util.PageUtils;
+import com.maoatao.synapse.core.bean.base.BaseSaveParam;
 import com.maoatao.synapse.lang.util.SynaAssert;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +36,14 @@ public class PermissionServiceImpl extends DaedalusServiceImpl<PermissionMapper,
     @Override
     public PermissionVO details(Long id) {
         return BeanUtil.toBean(super.getById(id), PermissionVO.class);
+    }
+
+    @Override
+    public long save(BaseSaveParam param) {
+        PermissionEntity permissionEntity = BeanUtil.copyProperties(param, PermissionEntity.class);
+        permissionEntity.setCode(IdUtil.getSnowflakeNextIdStr());
+        SynaAssert.isTrue(super.save(permissionEntity), "新增失败!");
+        return permissionEntity.getId();
     }
 
     @Override

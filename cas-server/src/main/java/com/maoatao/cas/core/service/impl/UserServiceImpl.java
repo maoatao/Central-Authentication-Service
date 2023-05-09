@@ -1,6 +1,7 @@
 package com.maoatao.cas.core.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.maoatao.cas.core.bean.entity.UserEntity;
@@ -13,6 +14,7 @@ import com.maoatao.cas.util.IdUtils;
 import com.maoatao.daedalus.data.service.impl.DaedalusServiceImpl;
 import com.maoatao.daedalus.data.util.PageUtils;
 import com.maoatao.synapse.lang.util.SynaAssert;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author MaoAtao
  * @date 2023-04-21 16:09:13
  */
+@Slf4j
 @Service
 public class UserServiceImpl extends DaedalusServiceImpl<UserMapper, UserEntity> implements UserService {
 
@@ -49,5 +52,14 @@ public class UserServiceImpl extends DaedalusServiceImpl<UserMapper, UserEntity>
     @Override
     public UserEntity getByOpenId(String openId) {
         return super.getOne(Wrappers.<UserEntity>lambdaQuery().eq(UserEntity::getOpenId, openId));
+    }
+
+    private String nextRandomOpenId() {
+        String openId = IdUtils.nextUserOpenId();
+        if (ObjUtil.isNull(getByOpenId(openId))) {
+            return openId;
+        }
+        log.info("尝试生成 OPEN ID 出现重复:{}", openId);
+        return nextRandomOpenId();
     }
 }

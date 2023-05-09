@@ -315,7 +315,7 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
     private Map<String, Set<String>> buildPermissionByEntity(List<PermissionEntity> permissionEntities) {
         if (CollectionUtil.isNotEmpty(permissionEntities)) {
             return permissionEntities.stream()
-                    .collect(Collectors.groupingBy(PermissionEntity::getClientId, Collectors.mapping(PermissionEntity::getName, Collectors.toSet())));
+                    .collect(Collectors.groupingBy(PermissionEntity::getClientId, Collectors.mapping(PermissionEntity::getCode, Collectors.toSet())));
         }
         return Map.of();
     }

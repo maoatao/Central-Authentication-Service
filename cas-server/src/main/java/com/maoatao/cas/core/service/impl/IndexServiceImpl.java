@@ -25,7 +25,7 @@ import org.springframework.ui.Model;
 /**
  * 静态页面 thymeleaf 索引
  *
- * @author LiYuanHao
+ * @author MaoAtao
  * @date 2023-05-09 17:19:09
  */
 @Service
