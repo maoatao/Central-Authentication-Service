@@ -7,6 +7,7 @@ import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.maoatao.cas.common.constant.CasSeparator;
 import com.maoatao.cas.core.bean.entity.ClientEntity;
 import com.maoatao.cas.core.bean.entity.ClientScopeEntity;
 import com.maoatao.cas.core.bean.entity.UserEntity;
@@ -277,7 +278,8 @@ public class ClientUserServiceImpl extends DaedalusServiceImpl<ClientUserMapper,
         if (MapUtil.isEmpty(scopes)) {
             return Map.of();
         }
-        List<String> scopeNames = scopes.values().stream().flatMap(Collection::stream).toList();
+        List<String> scopeNames = scopes.entrySet().stream()
+                .flatMap(entry -> entry.getValue().stream().map(o -> entry.getKey().concat(CasSeparator.SCOPE).concat(o))).toList();
         List<String> clientAliases = scopes.keySet().stream().toList();
         if (CollectionUtil.isEmpty(scopeNames) || CollectionUtil.isEmpty(clientAliases)) {
             return Map.of();
