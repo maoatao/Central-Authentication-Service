@@ -127,7 +127,6 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
      * Basic 令牌过滤
      *
      * @param token 令牌
-     * @return 没有权限返回false
      */
     private void doBasicTokenFilter(String token) {
         // 去掉令牌前缀
