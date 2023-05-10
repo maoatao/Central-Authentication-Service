@@ -4,7 +4,6 @@ import com.maoatao.cas.openapi.converter.JwtOperatorContextConverter;
 import com.maoatao.daedalus.core.context.DaedalusOperatorContext;
 import org.junit.Test;
 
-
 /**
  * jwt测试
  *

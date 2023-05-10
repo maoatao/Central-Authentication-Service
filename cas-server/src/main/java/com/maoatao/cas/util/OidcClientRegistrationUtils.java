@@ -1,12 +1,13 @@
 package com.maoatao.cas.util;
 
-
 import org.springframework.security.oauth2.server.authorization.oidc.OidcClientRegistration;
 import org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat;
 
 import java.time.Duration;
 
 /**
+ * oidc客户端注册工具类
+ *
  * @author MaoAtao
  * @date 2022-10-17 00:35:25
  */

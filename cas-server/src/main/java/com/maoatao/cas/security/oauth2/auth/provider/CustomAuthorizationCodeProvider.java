@@ -62,7 +62,7 @@ import org.springframework.util.StringUtils;
 /**
  * 自定义 无需授权同意,生成授权码
  * <p>
- * {@link org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationProvider}
+ * Customized by {@link org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationProvider}
  *
  * @author MaoAtao
  * @date 2022-10-29 22:10:10

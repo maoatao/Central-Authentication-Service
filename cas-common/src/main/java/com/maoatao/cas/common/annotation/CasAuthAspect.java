@@ -46,52 +46,86 @@ public class CasAuthAspect {
         verifiyInternal(joinPoint);
     }
 
+    /**
+     * 内部校验
+     *
+     * @param joinPoint 切入点
+     */
     private void verifiyInternal(JoinPoint joinPoint) {
         // 是认证的
         AtomicBoolean isAuthentication = new AtomicBoolean(false);
         // 是人机接口 (Human–Computer Interaction)
-        AtomicBoolean isHci = new AtomicBoolean(false);
+        AtomicBoolean isHumanComputerInteraction = new AtomicBoolean(false);
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         Method method = methodSignature.getMethod();
         CasAuth methodAnnotation = method.getAnnotation(CasAuth.class);
-        preMethodAuthentication(methodAnnotation, isAuthentication, isHci);
+        preMethodAuthentication(methodAnnotation, isAuthentication, isHumanComputerInteraction);
         // 以方法注解为主,没有方法注解时尝试使用类注解
         if (methodAnnotation == null) {
-            preClassAuthentication(joinPoint, isAuthentication, isHci);
+            CasAuth classAnnotation = joinPoint.getTarget().getClass().getAnnotation(CasAuth.class);
+            preClassAuthentication(classAnnotation, isAuthentication, isHumanComputerInteraction);
         }
-        throwException(isAuthentication.get(), isHci.get());
+        throwException(isAuthentication.get(), isHumanComputerInteraction.get());
     }
 
-    private void preMethodAuthentication(CasAuth methodAnnotation, AtomicBoolean isAuthentication, AtomicBoolean isHci) {
+    /**
+     * 方法身份验证
+     *
+     * @param methodAnnotation           方法的注解
+     * @param isAuthentication           是认证的
+     * @param isHumanComputerInteraction 是人机接口
+     */
+    private void preMethodAuthentication(CasAuth methodAnnotation, AtomicBoolean isAuthentication, AtomicBoolean isHumanComputerInteraction) {
         Set<String> methodAuths = getAnnotationValues(methodAnnotation);
         if (methodAnnotation != null) {
             if (CollectionUtil.isNotEmpty(methodAuths)) {
                 isAuthentication.set(anyAuthMatch(methodAuths, SynaSafes.of(OperatorContextHolder.getContext().getPermissions())));
-                isHci.set(true);
+                isHumanComputerInteraction.set(true);
             } else {
                 // 有注解,没权限值 就是机机接口
-                isHci.set(false);
+                isHumanComputerInteraction.set(false);
             }
         }
     }
 
-    private void preClassAuthentication(JoinPoint joinPoint, AtomicBoolean isAuthentication, AtomicBoolean isHci) {
-        CasAuth classAnnotation = joinPoint.getTarget().getClass().getAnnotation(CasAuth.class);
+    /**
+     * 类身份验证
+     *
+     * @param classAnnotation            类的注解
+     * @param isAuthentication           是认证的
+     * @param isHumanComputerInteraction 是人机接口
+     */
+    private void preClassAuthentication(CasAuth classAnnotation, AtomicBoolean isAuthentication, AtomicBoolean isHumanComputerInteraction) {
         Set<String> classAuths = getAnnotationValues(classAnnotation);
         if (!isAuthentication.get() && classAnnotation != null) {
             if (CollectionUtil.isNotEmpty(classAuths)) {
                 isAuthentication.set(anyAuthMatch(classAuths, SynaSafes.of(OperatorContextHolder.getContext().getPermissions())));
-                isHci.set(true);
+                isHumanComputerInteraction.set(true);
             } else {
-                isHci.set(false);
+                isHumanComputerInteraction.set(false);
             }
         }
     }
 
+    /**
+     * 获取权限注解的值
+     * <p>
+     * {@link CasAuth#value()}
+     *
+     * @param casAuth 权限注解
+     * @return 注解的值
+     */
     private Set<String> getAnnotationValues(CasAuth casAuth) {
         return casAuth == null ? Set.of() : Arrays.stream(casAuth.value()).collect(Collectors.toSet());
     }
 
+    /**
+     * 有任何匹配身份验证
+     *
+     * @param annotationAuths 权限注解的值
+     * @param operatorAuths   上下文操作者的权限(用户Token的权限)
+     * @return 有匹配返回true
+     */
     private boolean anyAuthMatch(@NonNull Set<String> annotationAuths, @NonNull Set<String> operatorAuths) {
         if (CollectionUtil.isEmpty(operatorAuths)) {
             return false;
@@ -99,8 +133,14 @@ public class CasAuthAspect {
         return annotationAuths.stream().anyMatch(operatorAuths::contains);
     }
 
-    private void throwException(boolean isAuthentication, boolean isHci) {
-        if (isHci) {
+    /**
+     * 抛出异常
+     *
+     * @param isAuthentication           是认证的
+     * @param isHumanComputerInteraction 是人机接口
+     */
+    private void throwException(boolean isAuthentication, boolean isHumanComputerInteraction) {
+        if (isHumanComputerInteraction) {
             if (OperatorContextHolder.getContext().isClientCredentials()) {
                 // 人机接口 不允许机器访问
                 throw new SynaException(HttpResponseStatus.UNAUTHORIZED_HCI);

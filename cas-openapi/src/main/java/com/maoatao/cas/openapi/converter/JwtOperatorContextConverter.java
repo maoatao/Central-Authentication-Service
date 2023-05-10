@@ -21,6 +21,7 @@ public class JwtOperatorContextConverter implements ContextConverter {
 
     public JwtOperatorContextConverter(String appKey) {
         SynaAssert.notNull(appKey, "appKey cannot be null");
+        // 权限支持多客户端,通过设置 appKey (客户端id)来筛选本客户端的权限
         this.appKey = appKey;
     }
 

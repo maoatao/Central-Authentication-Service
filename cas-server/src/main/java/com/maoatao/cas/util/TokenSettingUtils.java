@@ -7,6 +7,8 @@ import java.util.Objects;
 
 
 /**
+ * 令牌设定工具类
+ *
  * @author MaoAtao
  * @date 2022-10-19 13:18:42
  */

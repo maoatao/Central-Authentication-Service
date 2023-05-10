@@ -23,6 +23,7 @@ public class DefaultOperatorContextConverter implements ContextConverter {
                                            CasAuthorizationService casAuthorizationService) {
         SynaAssert.notNull(appKey, "appKey cannot be null");
         SynaAssert.notNull(casAuthorizationService, "casAuthorizationService cannot be null");
+        // 权限支持多客户端,通过设置 appKey (客户端id)来筛选本客户端的权限
         this.appKey = appKey;
         this.casAuthorizationService = casAuthorizationService;
     }

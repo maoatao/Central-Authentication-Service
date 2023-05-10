@@ -66,16 +66,25 @@ public class GeneratorConfig {
         );
     }
 
+    /**
+     * JWT编码器
+     */
     @Bean
     public JwtEncoder jwtEncoder(JWKSource<SecurityContext> jwkSource) {
         return new NimbusJwtEncoder(jwkSource);
     }
 
+    /**
+     * JWT解码器
+     */
     @Bean
     public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
         return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
     }
 
+    /**
+     * JWK源
+     */
     @Bean
     public JWKSource<SecurityContext> jwkSource() {
         KeyPair keyPair = AuthorizationUtils.generateRsaKey();
@@ -89,6 +98,9 @@ public class GeneratorConfig {
         return new ImmutableJWKSet<>(jwkSet);
     }
 
+    /**
+     * JWT定制器 (jwt token 额外字段在这里设置)
+     */
     @Bean
     public OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer() {
         return context -> {

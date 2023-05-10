@@ -4,6 +4,8 @@ import java.util.Map;
 import org.springframework.util.AntPathMatcher;
 
 /**
+ * Customized by org.springframework.security.web.util.matcher.AntPathRequestMatcher.SpringAntMatcher
+ *
  * @author MaoAtao
  * @date 2023-03-26 16:29:12
  */

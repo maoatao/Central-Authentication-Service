@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 /**
  * 自定义 CustomAuthorizationServerContext
  * <p>
- * 源码不能公共访问,这里复制了一边
+ * 源码不能公共访问,这里复制了一遍
  * org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.AuthorizationServerContextFilter.DefaultAuthorizationServerContext
  *
  * @author MaoAtao

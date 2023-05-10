@@ -46,7 +46,6 @@ public class SecutityConfig {
      * <p>
      * {@link org.springframework.security.web.FilterChainProxy}
      */
-    @SuppressWarnings("unchecked")
     private void applyConfigurers(HttpSecurity http) throws Exception {
         // 令牌
         http.apply(new TokenAuthenticationFilterConfigurer());
@@ -61,7 +60,7 @@ public class SecutityConfig {
     }
 
     /**
-     * 配置授权访问的白名单
+     * 配置授权访问的白名单(匿名访问)
      */
     private void applyRequestMatchers(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorizeHttpRequests -> {

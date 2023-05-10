@@ -59,7 +59,7 @@ import org.springframework.util.StringUtils;
 /**
  * 自定义 同意授权后,生成授权码
  * <p>
- * {@link org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationConsentAuthenticationProvider}
+ * Customized by {@link org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationConsentAuthenticationProvider}
  *
  * @author MaoAtao
  * @date 2023-04-14 10:01:18

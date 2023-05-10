@@ -5,6 +5,8 @@ import java.util.Objects;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 
 /**
+ * 客户端设置工具类
+ *
  * @author MaoAtao
  * @date 2022-10-19 13:18:42
  */
@@ -13,7 +15,7 @@ public final class ClientSettingUtils {
     private ClientSettingUtils() {}
 
     /**
-     * 授权码有效时间
+     * 客户端别名
      */
     private static final String CLIENT_ALIAS = "settings.client.alias";
 

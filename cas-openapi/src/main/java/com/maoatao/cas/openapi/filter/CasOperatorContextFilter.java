@@ -70,9 +70,13 @@ public class CasOperatorContextFilter extends GenericFilterBean {
         }
     }
 
+    /**
+     * 允许的请求(匿名访问)
+     */
     private boolean doPermitFilter(HttpServletRequest request) {
         for (CasRequestMatcher matcher : this.permitMatchers) {
             if (matcher.isMatch(request)) {
+                // 上下文添加匿名操作者
                 OperatorContextHolder.setContext(AnonymousOperatorContext::new);
                 return true;
             }
@@ -80,6 +84,9 @@ public class CasOperatorContextFilter extends GenericFilterBean {
         return false;
     }
 
+    /**
+     * 令牌过滤
+     */
     private boolean doTokenFilter(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
         if (StrUtil.isNotBlank(token) && token.startsWith(TOKEM_TYPE_BEARER)) {
@@ -88,16 +95,23 @@ public class CasOperatorContextFilter extends GenericFilterBean {
         return false;
     }
 
+    /**
+     * Bearer 令牌过滤
+     */
     private boolean doBearerTokenFilter(String token) {
         token = token.replace(TOKEM_TYPE_BEARER, SynaStrings.EMPTY).trim();
         DaedalusOperatorContext operatorContext = this.contextConverter.convert(token);
         if (operatorContext != null && operatorContext.isAuthenticated()) {
+            // 上下文添加已转换的操作者权限信息
             OperatorContextHolder.setContext(operatorContext);
             return true;
         }
         return false;
     }
 
+    /**
+     * 未授权
+     */
     private void unauthorized(ServletResponse response) {
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
