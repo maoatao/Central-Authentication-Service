@@ -33,7 +33,7 @@ import java.util.List;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/client/authentication/method")
+@RequestMapping("/core/client/authentication/method")
 @Tag(name = "ClientAuthenticationMethodController", description = "CAS 客户端身份验证方法管理")
 public class ClientAuthenticationMethodController {
 

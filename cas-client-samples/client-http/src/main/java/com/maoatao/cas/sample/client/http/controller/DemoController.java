@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/demo")
+@RequestMapping("/core/demo")
 @Tag(name = "DemoController", description = "演示")
 public class DemoController {
 

@@ -33,7 +33,7 @@ import java.util.List;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/role/permission")
+@RequestMapping("/core/role/permission")
 @Tag(name = "RolePermissionController", description = "CAS 角色权限关系管理")
 public class RolePermissionController {
 

@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/token")
+@RequestMapping("/core/token")
 @Tag(name = "TokenController", description = "令牌管理")
 public class AccessTokenController {
 

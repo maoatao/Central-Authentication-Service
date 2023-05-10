@@ -33,7 +33,7 @@ import java.util.List;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/approvals")
+@RequestMapping("/core/approvals")
 @Tag(name = "ApprovalsController", description = "CAS 授权批准管理")
 public class ApprovalsController {
 

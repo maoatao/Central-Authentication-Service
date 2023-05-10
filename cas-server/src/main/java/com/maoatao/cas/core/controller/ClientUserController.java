@@ -33,7 +33,7 @@ import java.util.List;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/client/user")
+@RequestMapping("/core/client/user")
 @Tag(name = "ClientUserController", description = "CAS 客户端用户管理")
 public class ClientUserController {
 

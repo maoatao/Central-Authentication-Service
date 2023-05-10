@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/code")
+@RequestMapping("/core/code")
 @Tag(name = "AuthorizationCodeController", description = "授权码管理")
 public class AuthorizationCodeController {
 

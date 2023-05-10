@@ -33,7 +33,7 @@ import java.util.List;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/client/scope")
+@RequestMapping("/core/client/scope")
 @Tag(name = "ClientScopeController", description = "CAS 客户端作用域管理")
 public class ClientScopeController {
 

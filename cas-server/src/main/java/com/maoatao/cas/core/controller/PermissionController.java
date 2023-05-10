@@ -33,7 +33,7 @@ import java.util.List;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/permission")
+@RequestMapping("/core/permission")
 @Tag(name = "PermissionController", description = "CAS 权限管理")
 public class PermissionController {
 
