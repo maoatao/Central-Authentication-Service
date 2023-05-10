@@ -6,6 +6,7 @@ import com.maoatao.cas.core.bean.vo.ClientRedirectUrlVO;
 import com.maoatao.cas.core.bean.param.clientredirecturl.ClientRedirectUrlQueryParam;
 import com.maoatao.cas.core.bean.param.clientredirecturl.ClientRedirectUrlSaveParam;
 import com.maoatao.cas.core.bean.param.clientredirecturl.ClientRedirectUrlUpdateParam;
+import com.maoatao.cas.core.constant.RequestPath;
 import com.maoatao.cas.core.service.ClientRedirectUrlService;
 import com.maoatao.daedalus.web.annotation.OperationLog;
 import com.maoatao.daedalus.web.annotation.ResponseHandle;
@@ -33,7 +34,7 @@ import java.util.List;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/core/client/redirect/url")
+@RequestMapping(RequestPath.CAS_CORE + "/client/redirect/url")
 @Tag(name = "ClientRedirectUrlController", description = "CAS 客户端重定向地址管理")
 public class ClientRedirectUrlController {
 

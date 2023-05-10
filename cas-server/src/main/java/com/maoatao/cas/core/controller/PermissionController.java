@@ -6,6 +6,7 @@ import com.maoatao.cas.core.bean.vo.PermissionVO;
 import com.maoatao.cas.core.bean.param.permission.PermissionQueryParam;
 import com.maoatao.cas.core.bean.param.permission.PermissionSaveParam;
 import com.maoatao.cas.core.bean.param.permission.PermissionUpdateParam;
+import com.maoatao.cas.core.constant.RequestPath;
 import com.maoatao.cas.core.service.PermissionService;
 import com.maoatao.daedalus.web.annotation.OperationLog;
 import com.maoatao.daedalus.web.annotation.ResponseHandle;
@@ -33,7 +34,7 @@ import java.util.List;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/core/permission")
+@RequestMapping(RequestPath.CAS_CORE + "/permission")
 @Tag(name = "PermissionController", description = "CAS 权限管理")
 public class PermissionController {
 

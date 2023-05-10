@@ -6,6 +6,7 @@ import com.maoatao.cas.core.bean.vo.ClientVO;
 import com.maoatao.cas.core.bean.param.client.ClientQueryParam;
 import com.maoatao.cas.core.bean.param.client.ClientSaveParam;
 import com.maoatao.cas.core.bean.param.client.ClientUpdateParam;
+import com.maoatao.cas.core.constant.RequestPath;
 import com.maoatao.cas.core.service.ClientService;
 import com.maoatao.daedalus.web.annotation.OperationLog;
 import com.maoatao.daedalus.web.annotation.ResponseHandle;
@@ -33,7 +34,7 @@ import java.util.List;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/core/client")
+@RequestMapping(RequestPath.CAS_CORE + "/client")
 @Tag(name = "ClientController", description = "CAS 客户端管理")
 public class ClientController {
 

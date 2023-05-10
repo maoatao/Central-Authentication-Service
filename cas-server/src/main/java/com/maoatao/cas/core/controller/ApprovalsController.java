@@ -6,6 +6,7 @@ import com.maoatao.cas.core.bean.vo.ApprovalsVO;
 import com.maoatao.cas.core.bean.param.approvals.ApprovalsQueryParam;
 import com.maoatao.cas.core.bean.param.approvals.ApprovalsSaveParam;
 import com.maoatao.cas.core.bean.param.approvals.ApprovalsUpdateParam;
+import com.maoatao.cas.core.constant.RequestPath;
 import com.maoatao.cas.core.service.ApprovalsService;
 import com.maoatao.daedalus.web.annotation.OperationLog;
 import com.maoatao.daedalus.web.annotation.ResponseHandle;
@@ -33,7 +34,7 @@ import java.util.List;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/core/approvals")
+@RequestMapping(RequestPath.CAS_CORE + "/approvals")
 @Tag(name = "ApprovalsController", description = "CAS 授权批准管理")
 public class ApprovalsController {
 

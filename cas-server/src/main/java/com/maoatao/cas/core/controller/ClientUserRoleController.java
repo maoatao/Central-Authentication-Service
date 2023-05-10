@@ -6,6 +6,7 @@ import com.maoatao.cas.core.bean.vo.ClientUserRoleVO;
 import com.maoatao.cas.core.bean.param.clientuserrole.ClientUserRoleQueryParam;
 import com.maoatao.cas.core.bean.param.clientuserrole.ClientUserRoleSaveParam;
 import com.maoatao.cas.core.bean.param.clientuserrole.ClientUserRoleUpdateParam;
+import com.maoatao.cas.core.constant.RequestPath;
 import com.maoatao.cas.core.service.ClientUserRoleService;
 import com.maoatao.daedalus.web.annotation.OperationLog;
 import com.maoatao.daedalus.web.annotation.ResponseHandle;
@@ -33,7 +34,7 @@ import java.util.List;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/core/client/user/role")
+@RequestMapping(RequestPath.CAS_CORE + "/client/user/role")
 @Tag(name = "UserRoleController", description = "CAS 客户端用户角色关系管理")
 public class ClientUserRoleController {
 

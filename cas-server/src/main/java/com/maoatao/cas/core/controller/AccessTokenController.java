@@ -3,6 +3,7 @@ package com.maoatao.cas.core.controller;
 import com.maoatao.cas.common.authentication.CasAccessToken;
 import com.maoatao.cas.common.authentication.CasAuthorization;
 import com.maoatao.cas.core.bean.param.accesstoken.GenerateAccessTokenParam;
+import com.maoatao.cas.core.constant.RequestPath;
 import com.maoatao.cas.security.service.CasAuthorizationService;
 import com.maoatao.daedalus.web.annotation.ResponseHandle;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/core/token")
+@RequestMapping(RequestPath.CAS_TOKEN)
 @Tag(name = "TokenController", description = "令牌管理")
 public class AccessTokenController {
 

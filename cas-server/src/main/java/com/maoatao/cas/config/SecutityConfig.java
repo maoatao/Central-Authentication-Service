@@ -1,5 +1,6 @@
 package com.maoatao.cas.config;
 
+import com.maoatao.cas.core.constant.RequestPath;
 import com.maoatao.cas.security.configurer.CustomFormLoginConfigurer;
 import com.maoatao.cas.security.configurer.TokenAuthenticationFilterConfigurer;
 import com.maoatao.cas.security.configurer.AuthorizationServerContextFilterConfigurer;
@@ -69,8 +70,8 @@ public class SecutityConfig {
                     "/static/**", "/error", "/favicon.ico",
                     "/swagger-ui/**", "/swagger-resources/**", "/webjars/**", "/v3/**", "/api/**", "/doc.html"
             ).permitAll();
-            authorizeHttpRequests.requestMatchers(HttpMethod.GET, "/token").permitAll();
-            authorizeHttpRequests.requestMatchers(HttpMethod.DELETE, "/token").permitAll();
+            authorizeHttpRequests.requestMatchers(HttpMethod.GET, RequestPath.CAS_TOKEN).permitAll();
+            authorizeHttpRequests.requestMatchers(HttpMethod.DELETE, RequestPath.CAS_TOKEN).permitAll();
             authorizeHttpRequests.anyRequest().authenticated();
         });
     }

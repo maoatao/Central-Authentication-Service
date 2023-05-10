@@ -1,5 +1,6 @@
 package com.maoatao.cas.core.controller;
 
+import com.maoatao.cas.core.constant.RequestPath;
 import com.maoatao.cas.security.service.CasAuthorizationService;
 import com.maoatao.cas.core.bean.param.authorization.GenerateAuthorizationCodeParam;
 import com.maoatao.daedalus.web.annotation.ResponseHandle;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/core/code")
+@RequestMapping(RequestPath.CAS_CODE)
 @Tag(name = "AuthorizationCodeController", description = "授权码管理")
 public class AuthorizationCodeController {
 

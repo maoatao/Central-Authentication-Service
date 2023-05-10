@@ -6,6 +6,7 @@ import com.maoatao.cas.core.bean.vo.ClientScopePermissionVO;
 import com.maoatao.cas.core.bean.param.clientscopepermission.ClientScopePermissionQueryParam;
 import com.maoatao.cas.core.bean.param.clientscopepermission.ClientScopePermissionSaveParam;
 import com.maoatao.cas.core.bean.param.clientscopepermission.ClientScopePermissionUpdateParam;
+import com.maoatao.cas.core.constant.RequestPath;
 import com.maoatao.cas.core.service.ClientScopePermissionService;
 import com.maoatao.daedalus.web.annotation.OperationLog;
 import com.maoatao.daedalus.web.annotation.ResponseHandle;
@@ -33,7 +34,7 @@ import java.util.List;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/core/client/scope/permission")
+@RequestMapping(RequestPath.CAS_CORE + "/client/scope/permission")
 @Tag(name = "ClientScopePermissionController", description = "CAS 角色权限关系管理")
 public class ClientScopePermissionController {
 

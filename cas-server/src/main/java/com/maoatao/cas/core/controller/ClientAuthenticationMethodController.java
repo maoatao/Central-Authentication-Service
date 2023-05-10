@@ -6,6 +6,7 @@ import com.maoatao.cas.core.bean.vo.ClientAuthenticationMethodVO;
 import com.maoatao.cas.core.bean.param.clientauthenticationmethod.ClientAuthenticationMethodQueryParam;
 import com.maoatao.cas.core.bean.param.clientauthenticationmethod.ClientAuthenticationMethodSaveParam;
 import com.maoatao.cas.core.bean.param.clientauthenticationmethod.ClientAuthenticationMethodUpdateParam;
+import com.maoatao.cas.core.constant.RequestPath;
 import com.maoatao.cas.core.service.ClientAuthenticationMethodService;
 import com.maoatao.daedalus.web.annotation.OperationLog;
 import com.maoatao.daedalus.web.annotation.ResponseHandle;
@@ -33,7 +34,7 @@ import java.util.List;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/core/client/authentication/method")
+@RequestMapping(RequestPath.CAS_CORE + "/client/authentication/method")
 @Tag(name = "ClientAuthenticationMethodController", description = "CAS 客户端身份验证方法管理")
 public class ClientAuthenticationMethodController {
 

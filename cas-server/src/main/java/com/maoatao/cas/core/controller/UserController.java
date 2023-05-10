@@ -6,6 +6,7 @@ import com.maoatao.cas.core.bean.vo.UserVO;
 import com.maoatao.cas.core.bean.param.user.UserQueryParam;
 import com.maoatao.cas.core.bean.param.user.UserSaveParam;
 import com.maoatao.cas.core.bean.param.user.UserUpdateParam;
+import com.maoatao.cas.core.constant.RequestPath;
 import com.maoatao.cas.core.service.UserService;
 import com.maoatao.daedalus.web.annotation.OperationLog;
 import com.maoatao.daedalus.web.annotation.ResponseHandle;
@@ -33,7 +34,7 @@ import java.util.List;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/core/user")
+@RequestMapping(RequestPath.CAS_CORE + "/user")
 @Tag(name = "UserController", description = "CAS 用户管理")
 public class UserController {
 

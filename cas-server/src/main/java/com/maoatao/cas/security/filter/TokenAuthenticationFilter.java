@@ -1,6 +1,7 @@
 package com.maoatao.cas.security.filter;
 
 import cn.hutool.core.util.StrUtil;
+import com.maoatao.cas.core.constant.RequestPath;
 import com.maoatao.cas.security.authorization.CasServerSettings;
 import com.maoatao.cas.security.bean.BasicAuthentication;
 import com.maoatao.cas.security.service.CasAuthorizationService;
@@ -52,14 +53,14 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
      * 获取授权码和令牌的两个接口使用 {@value TOKEM_TYPE_BASIC} 鉴权
      */
     private static final List<RequestMatcher> BASIC_REQUEST_MATCHER = FilterUtils.requestMatchersBuilder()
-            .antMatchers(HttpMethod.POST, "/code", "/token")
+            .antMatchers(HttpMethod.POST, RequestPath.CAS_CODE, RequestPath.CAS_TOKEN)
             .build();
 
     /**
      * CAS CORE 接口 (前后端分离的接口)
      */
     private static final List<RequestMatcher> CAS_CORE_REQUEST_MATCHER = FilterUtils.requestMatchersBuilder()
-            .antMatchers(null, "/core/**")
+            .antMatchers(null, RequestPath.CAS_CORE + "/**")
             .build();
 
     private final CasServerSettings casServerSettings;

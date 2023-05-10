@@ -6,6 +6,7 @@ import com.maoatao.cas.core.bean.vo.ClientSettingVO;
 import com.maoatao.cas.core.bean.param.clientsetting.ClientSettingQueryParam;
 import com.maoatao.cas.core.bean.param.clientsetting.ClientSettingSaveParam;
 import com.maoatao.cas.core.bean.param.clientsetting.ClientSettingUpdateParam;
+import com.maoatao.cas.core.constant.RequestPath;
 import com.maoatao.cas.core.service.ClientSettingService;
 import com.maoatao.daedalus.web.annotation.OperationLog;
 import com.maoatao.daedalus.web.annotation.ResponseHandle;
@@ -33,7 +34,7 @@ import java.util.List;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/core/client/setting")
+@RequestMapping(RequestPath.CAS_CORE + "/client/setting")
 @Tag(name = "ClientSettingController", description = "CAS 客户端设置管理")
 public class ClientSettingController {
 

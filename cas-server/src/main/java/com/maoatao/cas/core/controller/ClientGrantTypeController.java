@@ -6,6 +6,7 @@ import com.maoatao.cas.core.bean.vo.ClientGrantTypeVO;
 import com.maoatao.cas.core.bean.param.clientgranttype.ClientGrantTypeQueryParam;
 import com.maoatao.cas.core.bean.param.clientgranttype.ClientGrantTypeSaveParam;
 import com.maoatao.cas.core.bean.param.clientgranttype.ClientGrantTypeUpdateParam;
+import com.maoatao.cas.core.constant.RequestPath;
 import com.maoatao.cas.core.service.ClientGrantTypeService;
 import com.maoatao.daedalus.web.annotation.OperationLog;
 import com.maoatao.daedalus.web.annotation.ResponseHandle;
@@ -33,7 +34,7 @@ import java.util.List;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/core/client/grant/type")
+@RequestMapping(RequestPath.CAS_CORE + "/client/grant/type")
 @Tag(name = "ClientGrantTypeController", description = "CAS 客户端授权类型管理")
 public class ClientGrantTypeController {
 

@@ -6,6 +6,7 @@ import com.maoatao.cas.core.bean.vo.RoleVO;
 import com.maoatao.cas.core.bean.param.role.RoleQueryParam;
 import com.maoatao.cas.core.bean.param.role.RoleSaveParam;
 import com.maoatao.cas.core.bean.param.role.RoleUpdateParam;
+import com.maoatao.cas.core.constant.RequestPath;
 import com.maoatao.cas.core.service.RoleService;
 import com.maoatao.daedalus.web.annotation.OperationLog;
 import com.maoatao.daedalus.web.annotation.ResponseHandle;
@@ -33,7 +34,7 @@ import java.util.List;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/core/role")
+@RequestMapping(RequestPath.CAS_CORE + "/role")
 @Tag(name = "RoleController", description = "CAS 角色管理")
 public class RoleController {
 

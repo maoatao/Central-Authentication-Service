@@ -6,6 +6,7 @@ import com.maoatao.cas.core.bean.vo.ClientTokenSettingVO;
 import com.maoatao.cas.core.bean.param.clienttokensetting.ClientTokenSettingQueryParam;
 import com.maoatao.cas.core.bean.param.clienttokensetting.ClientTokenSettingSaveParam;
 import com.maoatao.cas.core.bean.param.clienttokensetting.ClientTokenSettingUpdateParam;
+import com.maoatao.cas.core.constant.RequestPath;
 import com.maoatao.cas.core.service.ClientTokenSettingService;
 import com.maoatao.daedalus.web.annotation.OperationLog;
 import com.maoatao.daedalus.web.annotation.ResponseHandle;
@@ -33,7 +34,7 @@ import java.util.List;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/core/client/token/setting")
+@RequestMapping(RequestPath.CAS_CORE + "/client/token/setting")
 @Tag(name = "ClientTokenSettingController", description = "CAS 客户端令牌设置管理")
 public class ClientTokenSettingController {
 

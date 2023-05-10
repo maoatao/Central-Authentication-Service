@@ -6,6 +6,7 @@ import com.maoatao.cas.core.bean.vo.RolePermissionVO;
 import com.maoatao.cas.core.bean.param.rolepermission.RolePermissionQueryParam;
 import com.maoatao.cas.core.bean.param.rolepermission.RolePermissionSaveParam;
 import com.maoatao.cas.core.bean.param.rolepermission.RolePermissionUpdateParam;
+import com.maoatao.cas.core.constant.RequestPath;
 import com.maoatao.cas.core.service.RolePermissionService;
 import com.maoatao.daedalus.web.annotation.OperationLog;
 import com.maoatao.daedalus.web.annotation.ResponseHandle;
@@ -33,7 +34,7 @@ import java.util.List;
  */
 @ResponseHandle
 @RestController
-@RequestMapping("/core/role/permission")
+@RequestMapping(RequestPath.CAS_CORE + "/role/permission")
 @Tag(name = "RolePermissionController", description = "CAS 角色权限关系管理")
 public class RolePermissionController {
 
