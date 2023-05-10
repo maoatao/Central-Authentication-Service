@@ -43,6 +43,10 @@ public class CasAuthAspect {
      */
     @Before(value = "casAuthPoinCut()", argNames = "joinPoint")
     public void beforeCasAuth(JoinPoint joinPoint) {
+        verifiyInternal(joinPoint);
+    }
+
+    private void verifiyInternal(JoinPoint joinPoint) {
         // 是认证的
         AtomicBoolean isAuthentication = new AtomicBoolean(false);
         // 是人机接口 (Human–Computer Interaction)
