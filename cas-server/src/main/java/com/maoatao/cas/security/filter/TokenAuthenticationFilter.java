@@ -109,21 +109,17 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
     private void doTokenFilter(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
         if (StrUtil.isBlank(token)) {
-            throwExceptionIfCasCoreRequest(request);
+            if (FilterUtils.anyMatch(CAS_CORE_REQUEST_MATCHER, request)) {
+                throwExceptionIfCasCoreRequest();
+            }
             return;
         }
         if (token.startsWith(TOKEM_TYPE_BASIC) && FilterUtils.anyMatch(BASIC_REQUEST_MATCHER, request)) {
-            if (!doBasicTokenFilter(token)) {
-                // 没有权限就尝试抛出异常
-                throwExceptionIfCasCoreRequest(request);
-            }
+            doBasicTokenFilter(token);
             return;
         }
-        if (token.startsWith(TOKEM_TYPE_BEARER)) {
-            if (!doBearerTokenFilter(token)) {
-                // 没有权限就尝试抛出异常
-                throwExceptionIfCasCoreRequest(request);
-            }
+        if (token.startsWith(TOKEM_TYPE_BEARER) && FilterUtils.anyMatch(CAS_CORE_REQUEST_MATCHER, request)) {
+            doBearerTokenFilter(token);
         }
     }
 
@@ -133,35 +129,32 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
      * @param token 令牌
      * @return 没有权限返回false
      */
-    private boolean doBasicTokenFilter(String token) {
+    private void doBasicTokenFilter(String token) {
         // 去掉令牌前缀
         token = token.replace(TOKEM_TYPE_BASIC, SynaStrings.EMPTY).trim();
         BasicAuthentication basicAuthentication = FilterUtils.buildBasicAuthentication(token);
         if (basicAuthentication == null) {
-            return false;
+            throwExceptionIfCasCoreRequest();
         }
         // 根据 token 生成已授权的主体
         Optional.ofNullable(this.casAuthorizationService.generateClientPrincipal(basicAuthentication.username(), basicAuthentication.password()))
                 .ifPresent(principal -> SecurityContextHolder.getContext().setAuthentication(principal));
-        return true;
     }
 
     /**
      * Bearer 令牌过滤
      *
      * @param token 令牌
-     * @return 没有权限返回false
      */
-    private boolean doBearerTokenFilter(String token) {
+    private void doBearerTokenFilter(String token) {
         // 去掉令牌前缀
         token = token.replace(TOKEM_TYPE_BEARER, SynaStrings.EMPTY).trim();
         OAuth2Authorization authorization = this.oAuth2AuthorizationService.findByToken(token, OAuth2TokenType.ACCESS_TOKEN);
         if (authorization == null || authorization.getAccessToken() == null || !authorization.getAccessToken().isActive()) {
-            return false;
+            throwExceptionIfCasCoreRequest();
         }
         setSecurityContext(authorization);
         setOperatorContext(token);
-        return true;
     }
 
     /**
@@ -193,7 +186,7 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
      * <p>
      * 授权服务器的原版接口是不需要处理的,他们有自己的异常处理方法,这里只管自己定义的前后端分离接口
      */
-    private void throwExceptionIfCasCoreRequest(HttpServletRequest request) {
-        SynaAssert.isFalse(FilterUtils.anyMatch(CAS_CORE_REQUEST_MATCHER, request), "CAS CORE接口需要完整的身份验证才能访问!");
+    private void throwExceptionIfCasCoreRequest() {
+        throw new SynaException("CAS CORE接口需要完整的身份验证才能访问!");
     }
 }
