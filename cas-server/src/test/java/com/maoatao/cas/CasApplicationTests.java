@@ -175,11 +175,6 @@ class CasApplicationTests {
      */
     private static final String TEST_USER_PASSWORD = "password";
 
-    @Test
-    void test() {
-        System.out.println(new Base64StringKeyGenerator(java.util.Base64.getUrlEncoder().withoutPadding(), 96).generateKey());
-    }
-
     /**
      * 测试步骤 1
      * <p>

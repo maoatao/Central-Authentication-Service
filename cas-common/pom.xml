@@ -45,6 +45,19 @@
         </dependency>
     </dependencies>
 
+    <repositories>
+        <repository>
+            <id>maoatao</id>
+            <url>https://maven.maoatao.com/repository/maven-public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <build>
         <plugins>
             <plugin>
